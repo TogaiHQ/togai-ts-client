@@ -772,10 +772,10 @@ export interface EventPipelineInfoPricePlansInner {
     'cycleEnd': string;
     /**
      * 
-     * @type {Set<string>}
+     * @type {Array<string>}
      * @memberof EventPipelineInfoPricePlansInner
      */
-    'usageMeters'?: Set<string>;
+    'usageMeters'?: Array<string>;
 }
 /**
  * 
@@ -848,16 +848,16 @@ export interface EventSchema {
     'status'?: EventSchemaStatusEnum;
     /**
      * 
-     * @type {Set<EventAttributeSchema>}
+     * @type {Array<EventAttributeSchema>}
      * @memberof EventSchema
      */
-    'attributes': Set<EventAttributeSchema>;
+    'attributes': Array<EventAttributeSchema>;
     /**
      * 
-     * @type {Set<DimensionsSchema>}
+     * @type {Array<DimensionsSchema>}
      * @memberof EventSchema
      */
-    'dimensions'?: Set<DimensionsSchema>;
+    'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
      * @type {string}
@@ -913,16 +913,16 @@ export interface EventSchemaListData {
     'status'?: EventSchemaListDataStatusEnum;
     /**
      * 
-     * @type {Set<EventAttributeSchema>}
+     * @type {Array<EventAttributeSchema>}
      * @memberof EventSchemaListData
      */
-    'attributes': Set<EventAttributeSchema>;
+    'attributes': Array<EventAttributeSchema>;
     /**
      * 
-     * @type {Set<DimensionsSchema>}
+     * @type {Array<DimensionsSchema>}
      * @memberof EventSchemaListData
      */
-    'dimensions'?: Set<DimensionsSchema>;
+    'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
      * @type {string}
@@ -1112,10 +1112,10 @@ export interface GetMetricsRequest {
     'endTime': string;
     /**
      * 
-     * @type {Set<MetricQuery>}
+     * @type {Array<MetricQuery>}
      * @memberof GetMetricsRequest
      */
-    'metricQueries': Set<MetricQuery>;
+    'metricQueries': Array<MetricQuery>;
 }
 /**
  * Response to GetMetrics Request
