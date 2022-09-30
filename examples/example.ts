@@ -25,12 +25,14 @@ import {
 } from "togai-client";
 
 const API_KEY = "YOUR_API_KEY";
+const BASE_PATH = "https://sandbox-api.togai.com"
+
 const configuration = new Configuration({
-    basePath: "https://sandbox-api.togai.com",
+    basePath: BASE_PATH,
     accessToken: API_KEY,
 });
 
-// The eample here is Twilio charging its customers based on country and message sent usage.
+// The example here is Twilio charging its customers based on country and message sent usage.
 // Follow the steps below to create the required entities in Togai, and then ingest an event.
 
 async function sample() {
@@ -59,7 +61,7 @@ async function sample() {
 
     // Step 3: Create a Usage Meter to meter the usage with aggregation methods
     const createUsageMeterRequest: CreateUsageMeterRequest = {
-        name: "messages",
+        name: "message_count",
         type: CreateUsageMeterRequestTypeEnum.Counter,
         // The filters are written in Json Logic format
         filters: `{
@@ -100,7 +102,7 @@ async function sample() {
             type: RateCardTypeEnum.Usage,
             usageConfig: {
                 [usageMeter.name]: {
-                    name: "rate-card",
+                    name: "SMS charges",
                     rateStrategy: RateCardUsageValueRateStrategyEnum.PerUnit,
                     slabStrategy: "TIER",
                     slabs: [
@@ -110,7 +112,7 @@ async function sample() {
                             order: 1,
                         },
                         {
-                            rate: 0.5,
+                            rate: 0.1,
                             startAfter: 10000.0,
                             order: 2,
                         },
@@ -128,7 +130,7 @@ async function sample() {
     // Step 6: Activate the Price Plan
     await pricePlanApi.activatePricePlan(pricePlan.name);
 
-    // Step 7: Create customers to associte events and price to a particular customer and get monthly bill value
+    // Step 7: Create customers to associate price plans
     const createCustomerRequest:CreateCustomerRequest = {
         name: "customer1",
         id: "1",
@@ -190,7 +192,7 @@ async function sample() {
 
     //Step 11: Get the revenue metrics
     //Revenue metrics might take a bit of time to be reflected in the system
-    //You can call the api after 15 minutes of ingestion to get the accurate revenue metrics
+    //You can check the docs on the amount of time it takes for events to get processed for revenue.
     const revenueMetricsRequest:GetMetricsRequest = {
         startTime: yesterday.toISOString(),
         endTime: now.toISOString(),
@@ -204,6 +206,27 @@ async function sample() {
     }
     const revenueMetrics = (await metricsApi.getMetrics(revenueMetricsRequest)).data
     console.log("Revenue Metrics", JSON.stringify(revenueMetrics, null, 2));
+
+    // Revenue metrics for a specific customer
+    const customerRevenueMetricsRequest:GetMetricsRequest = {
+        startTime: yesterday.toISOString(),
+        endTime: now.toISOString(),
+        metricQueries: [
+            {
+                id: "customer-revenue-metrics",
+                name: MetricName.Revenue,
+                aggregationPeriod: MetricQueryAggregationPeriodEnum.Day,
+                filters: [
+                    {
+                        fieldName: "CUSTOMER_ID",
+                        fieldValues: [customer.id]
+                    }
+                ]
+            }
+        ]
+    }
+    const customerRevenueMetrics = (await metricsApi.getMetrics(customerRevenueMetricsRequest)).data
+    console.log("Customer Revenue Metrics", JSON.stringify(customerRevenueMetrics, null, 2));
 }
 
 sample();
