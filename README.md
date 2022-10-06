@@ -1,38 +1,41 @@
-## togai-client@1.0.0
+# Togai Client
 
-This generator creates TypeScript/JavaScript client that utilizes [axios](https://github.com/axios/axios). The generated Node module can be used in the following environments:
+![npm](https://img.shields.io/npm/v/togai-client)
 
-Environment
-* Node.js
-* Webpack
-* Browserify
+[Togai](https://www.togai.com/) is an end to end pricing infrastructure that enable you with metering, aggregating, pricing and billing for your application.
 
-Language level
-* ES5 - you must have a Promises/A+ library installed
-* ES6
+This is an official Typescript client library for using [Togai APIs](https://docs.togai.com/reference/createcustomer).
 
-Module system
-* CommonJS
-* ES6 module system
+## Installation
 
-It can be used in both TypeScript and JavaScript. In TypeScript, the definition should be automatically resolved via `package.json`. ([Reference](http://www.typescriptlang.org/docs/handbook/typings-for-npm-packages.html))
-
-### Building
-
-To build and compile the typescript sources to javascript use:
-```
-npm install
-npm run build
+To install the library, run:
+```bash
+npm install togai-client
 ```
 
-### Publishing
+## Usage
 
-First build the package then run ```npm publish```
+To get started with the library, you need to create a api token from your Togai Account
 
-### Consuming
+```typescript
+import { Configuration, CustomersApi, CreateCustomerRequest } from 'togai-client';
 
-navigate to the folder of your consuming project and run one of the following commands.
+const API_TOKEN = "YOUR_API_TOKEN";
+const BASE_PATH = "https://sandbox-api.togai.com"
 
+const configuration = new Configuration({
+    basePath: BASE_PATH,
+    accessToken: API_TOKEN,
+});
+const createCustomerRequest:CreateCustomerRequest = {
+    name: "customer1",
+    id: "1",
+    billingAddress: "address",
+    primaryEmail: "email@togai.com"
+} 
+const customersApi = new CustomersApi(configuration);
+const customer = (await customersApi.createCustomer(createCustomerRequest)).data;
+console.log("Customer created", customer);
 ```
-npm install togai-client@1.0.0 --save
-```
+
+You can get a detailed step-by-step guide for a sample ingestion and metering at [examples](examples).

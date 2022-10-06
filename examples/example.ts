@@ -24,15 +24,15 @@ import {
     MetricName,
 } from "togai-client";
 
-const API_KEY = "YOUR_API_KEY";
+const API_TOKEN = "YOUR_API_TOKEN";
 const BASE_PATH = "https://sandbox-api.togai.com"
 
 const configuration = new Configuration({
     basePath: BASE_PATH,
-    accessToken: API_KEY,
+    accessToken: API_TOKEN,
 });
 
-// The example here is Twilio charging its customers based on country and message sent usage.
+// The following example is based on the Twilio SMS service, which charges customers depending on country and message sent consumption.
 // Follow the steps below to create the required entities in Togai, and then ingest an event.
 
 async function sample() {
