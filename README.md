@@ -1,4 +1,4 @@
-## togai-client@0.0.1
+## togai-client@1.0.0
 
 This generator creates TypeScript/JavaScript client that utilizes [axios](https://github.com/axios/axios). The generated Node module can be used in the following environments:
 
@@ -33,13 +33,6 @@ First build the package then run ```npm publish```
 
 navigate to the folder of your consuming project and run one of the following commands.
 
-_published:_
-
 ```
-npm install togai-client@0.0.1 --save
+npm install togai-client@1.0.0 --save
 ```
-
-_unPublished (not recommended):_
-
-```
-npm install PATH_TO_GENERATED_PACKAGE --save

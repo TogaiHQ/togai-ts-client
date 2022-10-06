@@ -1,6 +1,6 @@
 import {
     Configuration,
-    EventsApi,
+    EventSchemasApi,
     CreateEventSchemaRequest,
     UsageMetersApi,
     CreateUsageMeterRequest,
@@ -37,7 +37,7 @@ const configuration = new Configuration({
 
 async function sample() {
     // Step 1: Create an Event Schema to define the event structure, attributes (can be usage value) and dimensions (can be used filters in usage meters i.e country in this case)
-    const eventSchemaApi = new EventsApi(configuration);
+    const eventSchemaApi = new EventSchemasApi(configuration);
     const createEventSchemaRequest: CreateEventSchemaRequest = {
         name: "message_sent",
         attributes: [
@@ -167,7 +167,7 @@ async function sample() {
             }
         }
     }
-    const event = await eventsApi.ingest(eventRequest)
+    const event = (await eventsApi.ingest(eventRequest)).data
     console.log("Event ingested", event);
 
     //Step 10: Get the usage metrics 
