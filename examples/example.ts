@@ -32,7 +32,7 @@ const configuration = new Configuration({
     accessToken: API_TOKEN,
 });
 
-// The following example is based on the Twilio SMS service, which charges customers depending on country and message sent consumption.
+// Following example simulates the pricing of an API based SMS service which charges their customers based on region and size of the message.
 // Follow the steps below to create the required entities in Togai, and then ingest an event.
 
 async function sample() {
