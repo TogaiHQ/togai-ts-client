@@ -239,6 +239,31 @@ export interface BundleStrategyUsageMetersValue {
     'startAfter': number;
 }
 /**
+ * 
+ * @export
+ * @interface Computation
+ */
+export interface Computation {
+    /**
+     * Optional identifier describing the matcher and computation pair
+     * @type {string}
+     * @memberof Computation
+     */
+    'id'?: string;
+    /**
+     * Condition to be applied on event. Upon matching it the corresponding computation will be considered for usage_meter unit calculation. The result of the matcher needs to be truthy (https://jsonlogic.com/truthy.html) in order to be considered as a match. 
+     * @type {string}
+     * @memberof Computation
+     */
+    'matcher'?: string;
+    /**
+     * Computation to be applied on an event if it matches the matcher In case of a COUNT aggregation type, computation should be passed as \'1\' 
+     * @type {string}
+     * @memberof Computation
+     */
+    'computation': string;
+}
+/**
  * Payload to create account
  * @export
  * @interface CreateAccountRequest
@@ -430,17 +455,11 @@ export interface CreateUsageMeterRequest {
      */
     'aggregation': CreateUsageMeterRequestAggregationEnum;
     /**
-     * Filters to be applied on event before matching to usage meter in JSONLogic format (https://jsonlogic.com/) 
-     * @type {string}
+     * 
+     * @type {Array<Computation>}
      * @memberof CreateUsageMeterRequest
      */
-    'filters'?: string;
-    /**
-     * Computation. Has no effect if aggregation is \'count\'
-     * @type {string}
-     * @memberof CreateUsageMeterRequest
-     */
-    'computation'?: string;
+    'computations'?: Array<Computation>;
 }
 
 export const CreateUsageMeterRequestTypeEnum = {
@@ -2002,17 +2021,11 @@ export interface UpdateUsageMeterRequest {
      */
     'aggregation': UpdateUsageMeterRequestAggregationEnum;
     /**
-     * Filters to be applied on event before matching to usage meter in JSONLogic format (https://jsonlogic.com/) To remove filter in patch request, set this field to empty string. 
-     * @type {string}
+     * 
+     * @type {Array<Computation>}
      * @memberof UpdateUsageMeterRequest
      */
-    'filters'?: string;
-    /**
-     * Computation. Has no effect if aggregation is \'count\'
-     * @type {string}
-     * @memberof UpdateUsageMeterRequest
-     */
-    'computation'?: string;
+    'computations'?: Array<Computation>;
 }
 
 export const UpdateUsageMeterRequestTypeEnum = {
@@ -2066,17 +2079,11 @@ export interface UsageMeter {
      */
     'aggregation': UsageMeterAggregationEnum;
     /**
-     * Filters to be applied on event before matching to usage meter in JSONLogic format (https://jsonlogic.com/) 
-     * @type {string}
+     * 
+     * @type {Array<Computation>}
      * @memberof UsageMeter
      */
-    'filters'?: string;
-    /**
-     * Computation. Has no effect if aggregation is \'count\'
-     * @type {string}
-     * @memberof UsageMeter
-     */
-    'computation'?: string;
+    'computations'?: Array<Computation>;
     /**
      * 
      * @type {string}

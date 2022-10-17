@@ -4,7 +4,7 @@
 
 [Togai](https://www.togai.com/) is an end to end pricing infrastructure that enable you with metering, aggregating, pricing and billing for your application.
 
-This is an official Typescript client library for using [Togai APIs](https://docs.togai.com/reference/createcustomer).
+This is an official Typescript client library for using [Togai APIs](https://docs.togai.com/reference).
 
 ## Installation
 

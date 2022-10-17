@@ -63,16 +63,21 @@ async function sample() {
     const createUsageMeterRequest: CreateUsageMeterRequest = {
         name: "message_count",
         type: CreateUsageMeterRequestTypeEnum.Counter,
-        // The filters are written in Json Logic format
-        filters: `{
-            "==": [
-                {
-                    "var": "dimensions.country"
-                },
-                "US"
-            ]
-        }`,
         aggregation: CreateUsageMeterRequestAggregationEnum.Count,
+        computations: [
+            {
+                // The filters are written in Json Logic format
+                matcher: `{
+                    "==": [
+                        {
+                            "var": "dimensions.country"
+                        },
+                        "US"
+                    ]
+                }`,
+                computation: `1`
+            }
+        ]
     };
     const usageMeterApi = new UsageMetersApi(configuration);
     const usageMeter = (
