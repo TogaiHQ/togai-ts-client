@@ -142,19 +142,19 @@ export interface AssociatePricePlanRequest {
      * @type {string}
      * @memberof AssociatePricePlanRequest
      */
-    'effectiveFrom'?: string;
+    'effectiveFrom': string;
     /**
      * Date until which the association must be effective. - Expected only if effectiveFrom is present. 
      * @type {string}
      * @memberof AssociatePricePlanRequest
      */
-    'effectiveUntil'?: string;
+    'effectiveUntil': string;
     /**
      * 
-     * @type {RateCard}
+     * @type {PricePlanDetailsOverride}
      * @memberof AssociatePricePlanRequest
      */
-    'rateCardOverride'?: RateCard;
+    'pricePlanDetailsOverride'?: PricePlanDetailsOverride;
 }
 /**
  * 
@@ -195,48 +195,29 @@ export interface BaseSuccessResponse {
     'success': boolean;
 }
 /**
- * Represents a pricing strategy (rates + slabs) for bundle price plan
+ * TODO
  * @export
- * @interface BundleStrategy
+ * @interface Bundle
  */
-export interface BundleStrategy {
+export interface Bundle {
     /**
      * 
      * @type {string}
-     * @memberof BundleStrategy
+     * @memberof Bundle
      */
-    'name': string;
+    'displayName': string;
     /**
      * 
      * @type {number}
-     * @memberof BundleStrategy
-     */
-    'rate': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof BundleStrategy
+     * @memberof Bundle
      */
     'order': number;
     /**
      * 
-     * @type {{ [key: string]: BundleStrategyUsageMetersValue; }}
-     * @memberof BundleStrategy
+     * @type {Array<RateConfigBundle>}
+     * @memberof Bundle
      */
-    'usageMeters': { [key: string]: BundleStrategyUsageMetersValue; };
-}
-/**
- * 
- * @export
- * @interface BundleStrategyUsageMetersValue
- */
-export interface BundleStrategyUsageMetersValue {
-    /**
-     * 
-     * @type {number}
-     * @memberof BundleStrategyUsageMetersValue
-     */
-    'startAfter': number;
+    'rateConfigs': Array<RateConfigBundle>;
 }
 /**
  * 
@@ -413,16 +394,10 @@ export interface CreatePricePlanRequest {
     'description'?: string;
     /**
      * 
-     * @type {PricingCycle}
+     * @type {PricePlanDetails}
      * @memberof CreatePricePlanRequest
      */
-    'pricingCycle': PricingCycle;
-    /**
-     * 
-     * @type {RateCard}
-     * @memberof CreatePricePlanRequest
-     */
-    'rateCard': RateCard;
+    'pricePlanDetails': PricePlanDetails;
 }
 /**
  * Request to create usage meter
@@ -788,6 +763,12 @@ export interface EventPipelineInfoPricePlansInner {
      * @type {string}
      * @memberof EventPipelineInfoPricePlansInner
      */
+    'scheduleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EventPipelineInfoPricePlansInner
+     */
     'cycleStart': string;
     /**
      * 
@@ -962,10 +943,10 @@ export interface EventSchemaListData {
     'updatedAt'?: string;
     /**
      * 
-     * @type {Array<string>}
+     * @type {number}
      * @memberof EventSchemaListData
      */
-    'associatedUsageMeters'?: Array<string>;
+    'usageMetersCount'?: number;
 }
 
 export const EventSchemaListDataStatusEnum = {
@@ -985,10 +966,10 @@ export type EventSchemaListDataStatusEnum = typeof EventSchemaListDataStatusEnum
 export interface EventSchemaListDataAllOf {
     /**
      * 
-     * @type {Array<string>}
+     * @type {number}
      * @memberof EventSchemaListDataAllOf
      */
-    'associatedUsageMeters'?: Array<string>;
+    'usageMetersCount'?: number;
 }
 /**
  * 
@@ -1096,7 +1077,7 @@ export interface GetEventResponse {
      * @type {Array<EventWithStatusAndEventPipelineInfo>}
      * @memberof GetEventResponse
      */
-    'events'?: Array<EventWithStatusAndEventPipelineInfo>;
+    'events': Array<EventWithStatusAndEventPipelineInfo>;
 }
 /**
  * Get batch events response
@@ -1251,6 +1232,7 @@ export const IngestionStatusStatusEnum = {
     IngestionFailed: 'INGESTION_FAILED',
     IngestionFailedSchemaNotDefined: 'INGESTION_FAILED_SCHEMA_NOT_DEFINED',
     IngestionFailedUnitsInvalid: 'INGESTION_FAILED_UNITS_INVALID',
+    IngestionFailedEventInvalid: 'INGESTION_FAILED_EVENT_INVALID',
     IngestionCompletedNoMatchingMeters: 'INGESTION_COMPLETED_NO_MATCHING_METERS',
     IngestionCompletedEventMetered: 'INGESTION_COMPLETED_EVENT_METERED',
     IngestionCompletedEventNotMetered: 'INGESTION_COMPLETED_EVENT_NOT_METERED',
@@ -1365,7 +1347,7 @@ export const MetricQueryAggregationPeriodEnum = {
 export type MetricQueryAggregationPeriodEnum = typeof MetricQueryAggregationPeriodEnum[keyof typeof MetricQueryAggregationPeriodEnum];
 
 /**
- *  | Metric Name | FilterEntry Name |    Allowed groupBy fields    |      Default Values      |                 Allowed Values                  | |-------------|------------------|------------------------------|--------------------------|-------------------------------------------------| | EVENTS      | ACCOUNT_ID       | ACCOUNT_ID, EVENT_STATUS     | None                     | *\\<one or more valid accounts IDs>              | | EVENTS      | CUSTOMER_ID      | ACCOUNT_ID, EVENT_STATUS     | None                     | *\\<at most one valid customer ID>               | | EVENTS      | EVENT_STATUS     | ACCOUNT_ID, EVENT_STATUS     | [PROCESSED, UNPROCESSED] | oneOrMoreOf PROCESSED, UNPROCESSED, IN_PROGRESS | | USAGE       | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid accounts ID>               | | USAGE       | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<at most one valid customer ID>               | | USAGE       | USAGE_METER_NAME | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid usage meter name>          | | REVENUE     | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid accounts ID>               | | REVENUE     | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<at most one valid customer ID>               | | REVENUE     | USAGE_METER_NAME | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid usage meter name>          | 
+ *  | Metric Name | FilterEntry Name |    Allowed groupBy fields    |      Default Values      |                 Allowed Values                  | |-------------|------------------|------------------------------|--------------------------|-------------------------------------------------| | EVENTS      | ACCOUNT_ID       | ACCOUNT_ID, EVENT_STATUS     | None                     | *\\<one or more valid accounts IDs>              | | EVENTS      | CUSTOMER_ID      | ACCOUNT_ID, EVENT_STATUS     | None                     | *\\<at most one valid customer ID>               | | EVENTS      | EVENT_STATUS     | ACCOUNT_ID, EVENT_STATUS     | [PROCESSED, UNPROCESSED] | oneOrMoreOf PROCESSED, UNPROCESSED, IN_PROGRESS | | USAGE       | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid accounts ID>               | | USAGE       | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<at most one valid customer ID>               | | USAGE       | USAGE_METER_NAME | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid usage meter name>          | | REVENUE     | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid accounts ID>               | | REVENUE     | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<at most one valid customer ID>               | | REVENUE     | USAGE_METER_NAME | ACCOUNT_ID, USAGE_METER_NAME | None                     | *\\<one or more valid usage meter name>          | | EVENTS      | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_NAME | <From auth token>        |                                                 | | USAGE       | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_NAME | <From auth token>        |                                                 | | REVENUE     | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_NAME | <From auth token>        |                                                 | 
  * @export
  * @interface MetricQueryFilterEntry
  */
@@ -1449,10 +1431,10 @@ export interface PlanOverride {
     'pricePlanName': string;
     /**
      * 
-     * @type {RateCard}
+     * @type {PricePlanDetailsOverride}
      * @memberof PlanOverride
      */
-    'override'?: RateCard;
+    'pricePlanDetailsOverride'?: PricePlanDetailsOverride;
     /**
      * 
      * @type {string}
@@ -1492,12 +1474,6 @@ export interface PricePlan {
     'status': PricePlanStatusEnum;
     /**
      * 
-     * @type {PricingCycle}
-     * @memberof PricePlan
-     */
-    'pricingCycle': PricingCycle;
-    /**
-     * 
      * @type {Array<PricingSchedule>}
      * @memberof PricePlan
      */
@@ -1512,6 +1488,44 @@ export const PricePlanStatusEnum = {
 
 export type PricePlanStatusEnum = typeof PricePlanStatusEnum[keyof typeof PricePlanStatusEnum];
 
+/**
+ * 
+ * @export
+ * @interface PricePlanDetails
+ */
+export interface PricePlanDetails {
+    /**
+     * 
+     * @type {PricingCycleConfig}
+     * @memberof PricePlanDetails
+     */
+    'pricingCycleConfig': PricingCycleConfig;
+    /**
+     * 
+     * @type {Array<RateCard>}
+     * @memberof PricePlanDetails
+     */
+    'rateCards': Array<RateCard>;
+}
+/**
+ * 
+ * @export
+ * @interface PricePlanDetailsOverride
+ */
+export interface PricePlanDetailsOverride {
+    /**
+     * 
+     * @type {PricingCycleConfig}
+     * @memberof PricePlanDetailsOverride
+     */
+    'pricingCycleConfig'?: PricingCycleConfig;
+    /**
+     * 
+     * @type {Array<RateCard>}
+     * @memberof PricePlanDetailsOverride
+     */
+    'rateCards'?: Array<RateCard>;
+}
 /**
  * Data of price plan list
  * @export
@@ -1537,23 +1551,17 @@ export interface PricePlanListData {
      */
     'status': PricePlanListDataStatusEnum;
     /**
-     * 
-     * @type {PricingCycle}
-     * @memberof PricePlanListData
-     */
-    'pricingCycle': PricingCycle;
-    /**
      * Usage meters name linked to the price plan
      * @type {Array<string>}
      * @memberof PricePlanListData
      */
     'usageMeters': Array<string>;
     /**
-     * Pricing type of the price plan
-     * @type {string}
+     * 
+     * @type {PricePlanDetails}
      * @memberof PricePlanListData
      */
-    'pricingType': string;
+    'pricePlanDetails': PricePlanDetails;
     /**
      * 
      * @type {string}
@@ -1587,7 +1595,7 @@ export interface PricePlanPaginatedResponse {
      * @type {Array<PricePlanListData>}
      * @memberof PricePlanPaginatedResponse
      */
-    'data'?: Array<PricePlanListData>;
+    'data': Array<PricePlanListData>;
     /**
      * 
      * @type {string}
@@ -1602,70 +1610,99 @@ export interface PricePlanPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const PriceType = {
+    Flat: 'FLAT',
+    PerUnit: 'PER_UNIT',
+    Package: 'PACKAGE'
+} as const;
+
+export type PriceType = typeof PriceType[keyof typeof PriceType];
+
+
+/**
  * Represents configurations related to pricing cycle
  * @export
- * @interface PricingCycle
+ * @interface PricingCycleConfig
  */
-export interface PricingCycle {
+export interface PricingCycleConfig {
     /**
      * 
      * @type {string}
-     * @memberof PricingCycle
+     * @memberof PricingCycleConfig
      */
-    'interval': PricingCycleIntervalEnum;
+    'interval': PricingCycleConfigIntervalEnum;
     /**
      * 
      * @type {string}
-     * @memberof PricingCycle
+     * @memberof PricingCycleConfig
      */
-    'startType': PricingCycleStartTypeEnum;
+    'startType': PricingCycleConfigStartTypeEnum;
     /**
      * 
-     * @type {PricingCycleStartOffset}
-     * @memberof PricingCycle
+     * @type {PricingCycleConfigStartOffset}
+     * @memberof PricingCycleConfig
      */
-    'startOffset': PricingCycleStartOffset;
+    'startOffset': PricingCycleConfigStartOffset;
     /**
      * 
      * @type {number}
-     * @memberof PricingCycle
+     * @memberof PricingCycleConfig
      */
     'gracePeriod': number;
 }
 
-export const PricingCycleIntervalEnum = {
+export const PricingCycleConfigIntervalEnum = {
     Monthly: 'MONTHLY',
     Quarterly: 'QUARTERLY',
     HalfYearly: 'HALF_YEARLY',
     Annually: 'ANNUALLY'
 } as const;
 
-export type PricingCycleIntervalEnum = typeof PricingCycleIntervalEnum[keyof typeof PricingCycleIntervalEnum];
-export const PricingCycleStartTypeEnum = {
+export type PricingCycleConfigIntervalEnum = typeof PricingCycleConfigIntervalEnum[keyof typeof PricingCycleConfigIntervalEnum];
+export const PricingCycleConfigStartTypeEnum = {
     Static: 'STATIC'
 } as const;
 
-export type PricingCycleStartTypeEnum = typeof PricingCycleStartTypeEnum[keyof typeof PricingCycleStartTypeEnum];
+export type PricingCycleConfigStartTypeEnum = typeof PricingCycleConfigStartTypeEnum[keyof typeof PricingCycleConfigStartTypeEnum];
 
 /**
  * Represents the start of pricing cycle in terms of  - dayOffset - number of days from beginning of month and  - monthOffset - number of months from beginning of interval (quarter, half-year or year) Note: If a day with offset doesn\'t exist for a month, closest previous day is considered Examples: MONTHLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every month   - {dayOffset: 12, monthOffset: NIL} - 12th of every month   - {dayOffset: 28, monthOffset: NIL} - 28th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: 30, monthOffset: NIL} - 30th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: LAST, monthOffset: NIL} - Last day of every month. i.e, 31st of Jan, 28th of Feb, ... QUARTERLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan, 15th Apr, 15th Jul and 15th Oct   - {dayOffset: 15, monthOffset: 2} - 15th Feb, 15th May, 15th Aug and 15th Nov   - {dayOffset: 15, monthOffset: LAST} - 15th Mar, 15th Jun, 15th Sep and 15th Dec   - {dayOffset: LAST, monthOffset: FIRST} - 31st Jan, 30th Apr, 30th Jul and 31th Oct HALF_YEARLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan and 15th Jul   - {dayOffset: 15, monthOffset: 4} - 15th Apr and 15th Oct   - {dayOffset: 15, monthOffset: LAST} - 15th Jun and 15th Dec ANNUALLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan   - {dayOffset: 15, monthOffset: 1} - 15th Jan   - {dayOffset: LAST, monthOffset: 2} - 29th Feb on Leap year, 28th otherwise    - {dayOffset: 15, monthOffset: 8} - 15th Aug   - {dayOffset: 15, monthOffset: LAST} - 15th Dec 
  * @export
- * @interface PricingCycleStartOffset
+ * @interface PricingCycleConfigStartOffset
  */
-export interface PricingCycleStartOffset {
+export interface PricingCycleConfigStartOffset {
     /**
      * min: \"1\" and max: \"31\" as strings. Spl. string allowed: LAST 
      * @type {string}
-     * @memberof PricingCycleStartOffset
+     * @memberof PricingCycleConfigStartOffset
      */
     'dayOffset': string;
     /**
      * min: \"1\" and max: \"12\". Spl. string allowed: FIRST / LAST. For QUARTERLY only 1 - 3 is allowed and for HALF_YEARLY 1 - 6. This being an optional field, shouldn\'t be passed for MONTHLY. 
      * @type {string}
-     * @memberof PricingCycleStartOffset
+     * @memberof PricingCycleConfigStartOffset
      */
     'monthOffset': string;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const PricingModel = {
+    Tiered: 'TIERED',
+    Volume: 'VOLUME'
+} as const;
+
+export type PricingModel = typeof PricingModel[keyof typeof PricingModel];
+
+
 /**
  * Represents effectiveness period and config of a price plan. i.e, price plan bound by time.
  * @export
@@ -1674,10 +1711,10 @@ export interface PricingCycleStartOffset {
 export interface PricingSchedule {
     /**
      * 
-     * @type {RateCard}
+     * @type {PricePlanDetails}
      * @memberof PricingSchedule
      */
-    'ratePayload'?: RateCard;
+    'pricePlanDetails'?: PricePlanDetails;
     /**
      * 
      * @type {string}
@@ -1692,7 +1729,7 @@ export interface PricingSchedule {
     'endDate': string;
 }
 /**
- * Represents a rate card
+ * 
  * @export
  * @interface RateCard
  */
@@ -1702,109 +1739,88 @@ export interface RateCard {
      * @type {string}
      * @memberof RateCard
      */
-    'type': RateCardTypeEnum;
+    'displayName': string;
     /**
      * 
-     * @type {{ [key: string]: RateCardUsageValue; }}
+     * @type {PricingModel}
      * @memberof RateCard
      */
-    'usageConfig'?: { [key: string]: RateCardUsageValue; };
+    'pricingModel': PricingModel;
     /**
      * 
-     * @type {RateCardBundle}
+     * @type {RateConfigUsage}
      * @memberof RateCard
      */
-    'bundleConfig'?: RateCardBundle;
+    'rateConfig': RateConfigUsage;
 }
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
 
-export const RateCardTypeEnum = {
-    Usage: 'USAGE',
-    Bundle: 'BUNDLE'
+export const RateCardBundleAggregation = {
+    Max: 'MAX',
+    Min: 'MIN',
+    Sum: 'SUM',
+    Avg: 'AVG'
 } as const;
 
-export type RateCardTypeEnum = typeof RateCardTypeEnum[keyof typeof RateCardTypeEnum];
+export type RateCardBundleAggregation = typeof RateCardBundleAggregation[keyof typeof RateCardBundleAggregation];
+
 
 /**
  * 
  * @export
- * @interface RateCardBundle
+ * @enum {string}
  */
-export interface RateCardBundle {
-    /**
-     * 
-     * @type {string}
-     * @memberof RateCardBundle
-     */
-    'rateStrategy': RateCardBundleRateStrategyEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof RateCardBundle
-     */
-    'slabStrategy': RateCardBundleSlabStrategyEnum;
-    /**
-     * 
-     * @type {Array<BundleStrategy>}
-     * @memberof RateCardBundle
-     */
-    'bundles': Array<BundleStrategy>;
-}
 
-export const RateCardBundleRateStrategyEnum = {
-    Flat: 'FLAT'
+export const RateCardType = {
+    Usage: 'USAGE',
+    Bundle: 'BUNDLE'
 } as const;
 
-export type RateCardBundleRateStrategyEnum = typeof RateCardBundleRateStrategyEnum[keyof typeof RateCardBundleRateStrategyEnum];
-export const RateCardBundleSlabStrategyEnum = {
-    Tier: 'TIER'
-} as const;
+export type RateCardType = typeof RateCardType[keyof typeof RateCardType];
 
-export type RateCardBundleSlabStrategyEnum = typeof RateCardBundleSlabStrategyEnum[keyof typeof RateCardBundleSlabStrategyEnum];
 
 /**
- * Represents rate card of a price plan of usage type
+ * TODO
  * @export
- * @interface RateCardUsageValue
+ * @interface RateConfigBundle
  */
-export interface RateCardUsageValue {
+export interface RateConfigBundle {
     /**
      * 
      * @type {string}
-     * @memberof RateCardUsageValue
+     * @memberof RateConfigBundle
      */
-    'name': string;
+    'usageMeterName': string;
     /**
      * 
-     * @type {string}
-     * @memberof RateCardUsageValue
+     * @type {SlabBundle}
+     * @memberof RateConfigBundle
      */
-    'rateStrategy': RateCardUsageValueRateStrategyEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof RateCardUsageValue
-     */
-    'slabStrategy': RateCardUsageValueSlabStrategyEnum;
-    /**
-     * 
-     * @type {Array<UsageStrategy>}
-     * @memberof RateCardUsageValue
-     */
-    'slabs': Array<UsageStrategy>;
+    'slab': SlabBundle;
 }
-
-export const RateCardUsageValueRateStrategyEnum = {
-    Flat: 'FLAT',
-    PerUnit: 'PER_UNIT'
-} as const;
-
-export type RateCardUsageValueRateStrategyEnum = typeof RateCardUsageValueRateStrategyEnum[keyof typeof RateCardUsageValueRateStrategyEnum];
-export const RateCardUsageValueSlabStrategyEnum = {
-    Tier: 'TIER'
-} as const;
-
-export type RateCardUsageValueSlabStrategyEnum = typeof RateCardUsageValueSlabStrategyEnum[keyof typeof RateCardUsageValueSlabStrategyEnum];
-
+/**
+ * Contains all rate related configurations
+ * @export
+ * @interface RateConfigUsage
+ */
+export interface RateConfigUsage {
+    /**
+     * 
+     * @type {string}
+     * @memberof RateConfigUsage
+     */
+    'usageMeterName': string;
+    /**
+     * 
+     * @type {Array<SlabUsage>}
+     * @memberof RateConfigUsage
+     */
+    'slabs': Array<SlabUsage>;
+}
 /**
  * Payload to remove aliases from account
  * @export
@@ -1861,6 +1877,74 @@ export interface SignupResponse {
      * @memberof SignupResponse
      */
     'jwtToken': string;
+}
+/**
+ * TODO
+ * @export
+ * @interface SlabBundle
+ */
+export interface SlabBundle {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabBundle
+     */
+    'rate': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabBundle
+     */
+    'startAfter': number;
+    /**
+     * 
+     * @type {PriceType}
+     * @memberof SlabBundle
+     */
+    'priceType': PriceType;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabBundle
+     */
+    'config'?: { [key: string]: string; };
+}
+/**
+ * Represents a pricing priceType (rates + slabs) for usage price plan
+ * @export
+ * @interface SlabUsage
+ */
+export interface SlabUsage {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabUsage
+     */
+    'rate': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabUsage
+     */
+    'startAfter': number;
+    /**
+     * 
+     * @type {PriceType}
+     * @memberof SlabUsage
+     */
+    'priceType': PriceType;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabUsage
+     */
+    'config'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabUsage
+     */
+    'order': number;
 }
 /**
  * 
@@ -1985,16 +2069,10 @@ export interface UpdatePricePlanRequest {
     'description'?: string;
     /**
      * 
-     * @type {PricingCycle}
+     * @type {PricePlanDetailsOverride}
      * @memberof UpdatePricePlanRequest
      */
-    'pricingCycle'?: PricingCycle;
-    /**
-     * 
-     * @type {RateCard}
-     * @memberof UpdatePricePlanRequest
-     */
-    'rateCard'?: RateCard;
+    'pricePlanDetails'?: PricePlanDetailsOverride;
 }
 /**
  * Request to update usage meter
@@ -2150,31 +2228,6 @@ export interface UsageMeterPaginatedResponse {
      * @memberof UsageMeterPaginatedResponse
      */
     'context'?: PaginationOptions;
-}
-/**
- * Represents a pricing strategy (rates + slabs) for usage price plan
- * @export
- * @interface UsageStrategy
- */
-export interface UsageStrategy {
-    /**
-     * 
-     * @type {number}
-     * @memberof UsageStrategy
-     */
-    'rate': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof UsageStrategy
-     */
-    'startAfter': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof UsageStrategy
-     */
-    'order': number;
 }
 /**
  * Root user details for the organization

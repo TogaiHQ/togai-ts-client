@@ -8,10 +8,6 @@ import {
     CreateUsageMeterRequestAggregationEnum,
     PricePlansApi,
     CreatePricePlanRequest,
-    PricingCycleIntervalEnum,
-    PricingCycleStartTypeEnum,
-    RateCardTypeEnum,
-    RateCardUsageValueRateStrategyEnum,
     CreateCustomerRequest,
     CustomersApi,
     AssociatePricePlanRequest,
@@ -22,10 +18,14 @@ import {
     GetMetricsRequest,
     MetricQueryAggregationPeriodEnum,
     MetricName,
+    PricingCycleConfigIntervalEnum,
+    PricingCycleConfigStartTypeEnum,
+    PricingModel,
+    PriceType,
 } from "togai-client";
 
-const API_TOKEN = "YOUR_API_TOKEN";
-const BASE_PATH = "https://sandbox-api.togai.com"
+const API_TOKEN = "wfmflK3GUWBgbbYpnmYQCKLkPpMVfQrdqmqRTWsB";
+const BASE_PATH = "https://staging.togai.dev"
 
 const configuration = new Configuration({
     basePath: BASE_PATH,
@@ -94,37 +94,40 @@ async function sample() {
     // Step 5: Create a Price plan to convert the usage into a billable price
     const createPricePlanRequest: CreatePricePlanRequest = {
         name: "price-plan",
-        pricingCycle: {
-            interval: PricingCycleIntervalEnum.Monthly,
-            startType: PricingCycleStartTypeEnum.Static,
-            startOffset: {
-                dayOffset: "1",
-                monthOffset: "NIL"
-            },
-            gracePeriod: 1,
-        },
-        rateCard: {
-            type: RateCardTypeEnum.Usage,
-            usageConfig: {
-                [usageMeter.name]: {
-                    name: "SMS charges",
-                    rateStrategy: RateCardUsageValueRateStrategyEnum.PerUnit,
-                    slabStrategy: "TIER",
-                    slabs: [
-                        {
-                            rate: 0.2,
-                            startAfter: 0.0,
-                            order: 1,
-                        },
-                        {
-                            rate: 0.1,
-                            startAfter: 10000.0,
-                            order: 2,
-                        },
-                    ],
+        pricePlanDetails: {
+            pricingCycleConfig: {
+                interval: PricingCycleConfigIntervalEnum.Monthly,
+                startType: PricingCycleConfigStartTypeEnum.Static,
+                startOffset: {
+                    dayOffset: "1",
+                    monthOffset: "NIL"
                 },
+                gracePeriod: 1,
             },
-        },
+            rateCards: [
+                {
+                    displayName: "sms-charges",
+                    pricingModel: PricingModel.Tiered,
+                    rateConfig: {
+                        usageMeterName: usageMeter.name,
+                        slabs: [
+                            {
+                                rate: 0.2,
+                                startAfter: 0.0,
+                                priceType: PriceType.PerUnit,
+                                order: 1,
+                            },
+                            {
+                                rate: 0.1,
+                                startAfter: 10000.0,
+                                priceType: PriceType.PerUnit,
+                                order: 2,
+                            },
+                        ]
+                    }
+                }
+            ]
+        }
     };
     const pricePlanApi = new PricePlansApi(configuration);
     const pricePlan = (
@@ -149,7 +152,8 @@ async function sample() {
     // Step 8: Associate the customer/account to the price plan
     const associatePricePlanRequest:AssociatePricePlanRequest = {
         pricePlanName: pricePlan.name,
-        effectiveFrom: new Date().toISOString().substring(0, 10)
+        effectiveFrom: new Date().toISOString().substring(0, 10),
+        effectiveUntil: "9999-01-01"
     }
     const associatePricePlanApi = new AccountsApi(configuration);
     const associatePricePlan = (await associatePricePlanApi.associatePricePlan(customer.id, customer.id, associatePricePlanRequest)).data;
@@ -174,6 +178,8 @@ async function sample() {
     }
     const event = (await eventsApi.ingest(eventRequest)).data
     console.log("Event ingested", event);
+
+    await new Promise(f => setTimeout(f, 60000));
 
     //Step 10: Get the usage metrics 
     const now = new Date();
