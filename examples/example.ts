@@ -24,8 +24,8 @@ import {
     PriceType,
 } from "togai-client";
 
-const API_TOKEN = "wfmflK3GUWBgbbYpnmYQCKLkPpMVfQrdqmqRTWsB";
-const BASE_PATH = "https://staging.togai.dev"
+const API_TOKEN = "YOUR API TOKEN"; 
+const BASE_PATH = "https://sandbox-api.togai.com"
 
 const configuration = new Configuration({
     basePath: BASE_PATH,
@@ -164,12 +164,12 @@ async function sample() {
     const eventRequest:IngestEventRequest = {
         event: {
             id: "random-string" + Math.random(),
-            eventName: eventSchema.name,
-            eventTimestamp: new Date().toISOString(),
+            schemaName: eventSchema.name,
+            timestamp: new Date().toISOString(),
             accountId: customer.id,
-            eventAttributes: [{
-                attributeName: "sms_id",
-                attributeValue: "random-string" + Math.random()
+            attributes: [{
+                name: "sms_id",
+                value: "random-string" + Math.random()
             }],
             dimensions: {
                 "country": "US"
