@@ -3587,12 +3587,12 @@ export const EventManagementApiAxiosParamCreator = function (configuration?: Con
          * @param {string} [accountId] Filter option to filter the events based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
-         * @param {number} [startTime] Start time filter in epoch milli seconds
-         * @param {number} [endTime] End time filter in epoch milli seconds
+         * @param {string} [startTime] Start time filter in date time format . The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
+         * @param {string} [endTime] End time filter in date time format. The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvents: async (nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: number, endTime?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getEvents: async (nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: string, endTime?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/events`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -3704,12 +3704,12 @@ export const EventManagementApiFp = function(configuration?: Configuration) {
          * @param {string} [accountId] Filter option to filter the events based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
-         * @param {number} [startTime] Start time filter in epoch milli seconds
-         * @param {number} [endTime] End time filter in epoch milli seconds
+         * @param {string} [startTime] Start time filter in date time format . The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
+         * @param {string} [endTime] End time filter in date time format. The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getEvents(nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: number, endTime?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetEventsResponse>> {
+        async getEvents(nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: string, endTime?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetEventsResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getEvents(nextToken, status, accountId, schemaName, pageSize, startTime, endTime, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -3742,12 +3742,12 @@ export const EventManagementApiFactory = function (configuration?: Configuration
          * @param {string} [accountId] Filter option to filter the events based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
-         * @param {number} [startTime] Start time filter in epoch milli seconds
-         * @param {number} [endTime] End time filter in epoch milli seconds
+         * @param {string} [startTime] Start time filter in date time format . The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
+         * @param {string} [endTime] End time filter in date time format. The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getEvents(nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: number, endTime?: number, options?: any): AxiosPromise<GetEventsResponse> {
+        getEvents(nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: string, endTime?: string, options?: any): AxiosPromise<GetEventsResponse> {
             return localVarFp.getEvents(nextToken, status, accountId, schemaName, pageSize, startTime, endTime, options).then((request) => request(axios, basePath));
         },
         /**
@@ -3778,13 +3778,13 @@ export class EventManagementApi extends BaseAPI {
      * @param {string} [accountId] Filter option to filter the events based on account id.
      * @param {string} [schemaName] Filter option to filter the events based on schema name.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
-     * @param {number} [startTime] Start time filter in epoch milli seconds
-     * @param {number} [endTime] End time filter in epoch milli seconds
+     * @param {string} [startTime] Start time filter in date time format . The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
+     * @param {string} [endTime] End time filter in date time format. The format is yyyy-MM-dd\&#39;T\&#39;HH:mm:ss.SSSXXX
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EventManagementApi
      */
-    public getEvents(nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: number, endTime?: number, options?: AxiosRequestConfig) {
+    public getEvents(nextToken?: string, status?: string, accountId?: string, schemaName?: string, pageSize?: number, startTime?: string, endTime?: string, options?: AxiosRequestConfig) {
         return EventManagementApiFp(this.configuration).getEvents(nextToken, status, accountId, schemaName, pageSize, startTime, endTime, options).then((request) => request(this.axios, this.basePath));
     }
 
