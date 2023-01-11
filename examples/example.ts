@@ -32,6 +32,9 @@ const configuration = new Configuration({
     accessToken: API_TOKEN,
 });
 
+// We append randomSeed to all entities created in this file to avoid conflicts due to re-running the test
+const randomSeed = Math.floor(Math.random() * 99999);
+
 // Following example simulates the pricing of an API based SMS service which charges their customers based on region and size of the message.
 // Follow the steps below to create the required entities in Togai, and then ingest an event.
 
@@ -39,7 +42,7 @@ async function sample() {
     // Step 1: Create an Event Schema to define the event structure, attributes (can be usage value) and dimensions (can be used filters in usage meters i.e country in this case)
     const eventSchemaApi = new EventSchemasApi(configuration);
     const createEventSchemaRequest: CreateEventSchemaRequest = {
-        name: "message_sent",
+        name: "message_sent" + "-" + randomSeed,
         attributes: [
             {
                 name: "sms_id"
@@ -47,7 +50,7 @@ async function sample() {
         ],
         dimensions: [
             {
-                name: "country",
+                name: "country"
             },
         ],
     };
@@ -61,7 +64,7 @@ async function sample() {
 
     // Step 3: Create a Usage Meter to meter the usage with aggregation methods
     const createUsageMeterRequest: CreateUsageMeterRequest = {
-        name: "message_count",
+        name: "message_count" + "-" + randomSeed,
         type: CreateUsageMeterRequestTypeEnum.Counter,
         aggregation: CreateUsageMeterRequestAggregationEnum.Count,
         computations: [
@@ -89,11 +92,11 @@ async function sample() {
     console.log("Usage Meter created", usageMeter);
 
     // Step 4: Activate a usage meter
-    await usageMeterApi.activateUsageMeter(eventSchema.name, usageMeter.name);
+    await usageMeterApi.activateUsageMeter(eventSchema.name, usageMeter.id);
 
     // Step 5: Create a Price plan to convert the usage into a billable price
     const createPricePlanRequest: CreatePricePlanRequest = {
-        name: "price-plan",
+        name: "price-plan" + "-" + randomSeed,
         pricePlanDetails: {
             pricingCycleConfig: {
                 interval: PricingCycleConfigIntervalEnum.Monthly,
@@ -106,10 +109,10 @@ async function sample() {
             },
             rateCards: [
                 {
-                    displayName: "sms-charges",
+                    displayName: "sms-charges" + "-" + randomSeed,
                     pricingModel: PricingModel.Tiered,
                     rateConfig: {
-                        usageMeterName: usageMeter.name,
+                        usageMeterId: usageMeter.id,
                         slabs: [
                             {
                                 rate: 0.2,
@@ -136,12 +139,13 @@ async function sample() {
     console.log("Price Plan created", pricePlan);
 
     // Step 6: Activate the Price Plan
-    await pricePlanApi.activatePricePlan(pricePlan.name);
+    await pricePlanApi.activatePricePlan(pricePlan.id);
+    console.log("Price Plan activated", pricePlan);
 
     // Step 7: Create customers to associate price plans
     const createCustomerRequest:CreateCustomerRequest = {
-        name: "customer1",
-        id: "1",
+        name: "customer1" + "-" + randomSeed,
+        id: "1" + "-" + randomSeed,
         billingAddress: "address",
         primaryEmail: "email@togai.com"
     } 
@@ -151,7 +155,7 @@ async function sample() {
 
     // Step 8: Associate the customer/account to the price plan
     const associatePricePlanRequest:AssociatePricePlanRequest = {
-        pricePlanName: pricePlan.name,
+        pricePlanId: pricePlan.id,
         effectiveFrom: new Date().toISOString().substring(0, 10),
         effectiveUntil: "9999-01-01"
     }
