@@ -19,12 +19,11 @@ import {
     MetricQueryAggregationPeriodEnum,
     MetricName,
     PricingCycleConfigIntervalEnum,
-    PricingCycleConfigStartTypeEnum,
     PricingModel,
     PriceType,
 } from "togai-client";
 
-const API_TOKEN = "YOUR API TOKEN"; 
+const API_TOKEN = "KPLtAdSRYYBgjJZbAfxuekoSZaHaAYeeupJTAyUH"; 
 const BASE_PATH = "https://sandbox-api.togai.com"
 
 const configuration = new Configuration({
@@ -100,7 +99,6 @@ async function sample() {
         pricePlanDetails: {
             pricingCycleConfig: {
                 interval: PricingCycleConfigIntervalEnum.Monthly,
-                startType: PricingCycleConfigStartTypeEnum.Static,
                 startOffset: {
                     dayOffset: "1",
                     monthOffset: "NIL"

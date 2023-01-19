@@ -1637,12 +1637,6 @@ export interface PricingCycleConfig {
     'interval': PricingCycleConfigIntervalEnum;
     /**
      * 
-     * @type {string}
-     * @memberof PricingCycleConfig
-     */
-    'startType': PricingCycleConfigStartTypeEnum;
-    /**
-     * 
      * @type {PricingCycleConfigStartOffset}
      * @memberof PricingCycleConfig
      */
@@ -1663,11 +1657,6 @@ export const PricingCycleConfigIntervalEnum = {
 } as const;
 
 export type PricingCycleConfigIntervalEnum = typeof PricingCycleConfigIntervalEnum[keyof typeof PricingCycleConfigIntervalEnum];
-export const PricingCycleConfigStartTypeEnum = {
-    Static: 'STATIC'
-} as const;
-
-export type PricingCycleConfigStartTypeEnum = typeof PricingCycleConfigStartTypeEnum[keyof typeof PricingCycleConfigStartTypeEnum];
 
 /**
  * Represents the start of pricing cycle in terms of  - dayOffset - number of days from beginning of month and  - monthOffset - number of months from beginning of interval (quarter, half-year or year) Note: If a day with offset doesn\'t exist for a month, closest previous day is considered Examples: MONTHLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every month   - {dayOffset: 12, monthOffset: NIL} - 12th of every month   - {dayOffset: 28, monthOffset: NIL} - 28th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: 30, monthOffset: NIL} - 30th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: LAST, monthOffset: NIL} - Last day of every month. i.e, 31st of Jan, 28th of Feb, ... QUARTERLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan, 15th Apr, 15th Jul and 15th Oct   - {dayOffset: 15, monthOffset: 2} - 15th Feb, 15th May, 15th Aug and 15th Nov   - {dayOffset: 15, monthOffset: LAST} - 15th Mar, 15th Jun, 15th Sep and 15th Dec   - {dayOffset: LAST, monthOffset: FIRST} - 31st Jan, 30th Apr, 30th Jul and 31th Oct HALF_YEARLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan and 15th Jul   - {dayOffset: 15, monthOffset: 4} - 15th Apr and 15th Oct   - {dayOffset: 15, monthOffset: LAST} - 15th Jun and 15th Dec ANNUALLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan   - {dayOffset: 15, monthOffset: 1} - 15th Jan   - {dayOffset: LAST, monthOffset: 2} - 29th Feb on Leap year, 28th otherwise    - {dayOffset: 15, monthOffset: 8} - 15th Aug   - {dayOffset: 15, monthOffset: LAST} - 15th Dec 
