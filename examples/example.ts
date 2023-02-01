@@ -23,7 +23,7 @@ import {
     PriceType,
 } from "togai-client";
 
-const API_TOKEN = "KPLtAdSRYYBgjJZbAfxuekoSZaHaAYeeupJTAyUH"; 
+const API_TOKEN = "<YOUR_API_TOKEN>"; 
 const BASE_PATH = "https://sandbox-api.togai.com"
 
 const configuration = new Configuration({
@@ -105,27 +105,40 @@ async function sample() {
                 },
                 gracePeriod: 1,
             },
-            rateCards: [
+            usageRateCards: [
                 {
                     displayName: "sms-charges" + "-" + randomSeed,
-                    pricingModel: PricingModel.Tiered,
-                    rateConfig: {
-                        usageMeterId: usageMeter.id,
+                    usageMeterId: usageMeter.id,
+                    ratePlan: {
+                        pricingModel: PricingModel.Tiered,
                         slabs: [
                             {
-                                rate: 0.2,
                                 startAfter: 0.0,
                                 priceType: PriceType.PerUnit,
                                 order: 1,
                             },
                             {
-                                rate: 0.1,
                                 startAfter: 10000.0,
                                 priceType: PriceType.PerUnit,
                                 order: 2,
                             },
                         ]
-                    }
+                    },
+                    rateValues: [
+                        {
+                            currency: "USD",
+                            slabRates: [
+                                {
+                                    order: 1,
+                                    rate: 0.2
+                                },
+                                {
+                                    order: 2,
+                                    rate: 0.1
+                                }
+                            ]
+                        }
+                    ]
                 }
             ]
         }
@@ -137,7 +150,9 @@ async function sample() {
     console.log("Price Plan created", pricePlan);
 
     // Step 6: Activate the Price Plan
-    await pricePlanApi.activatePricePlan(pricePlan.id);
+    await pricePlanApi.activatePricePlan(pricePlan.id, {
+        currencies: ["USD"]
+    });
     console.log("Price Plan activated", pricePlan);
 
     // Step 7: Create customers to associate price plans

@@ -40,6 +40,12 @@ export interface Account {
      */
     'name': string;
     /**
+     * [ISO_4217](https://en.wikipedia.org/wiki/ISO_4217) code of the currency in which the account must be invoiced Defaults to Base currency. 
+     * @type {string}
+     * @memberof Account
+     */
+    'invoiceCurrency': string;
+    /**
      * list of aliases of the account
      * @type {Array<AccountAliases>}
      * @memberof Account
@@ -113,6 +119,19 @@ export interface AccountPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
+ * Request to activate currencies of a price plan
+ * @export
+ * @interface ActivatePricePlanRequest
+ */
+export interface ActivatePricePlanRequest {
+    /**
+     * List of currencies to activate
+     * @type {Array<string>}
+     * @memberof ActivatePricePlanRequest
+     */
+    'currencies': Array<string>;
+}
+/**
  * Payload to add aliases from account
  * @export
  * @interface AddAccountAliasesRequest
@@ -124,6 +143,25 @@ export interface AddAccountAliasesRequest {
      * @memberof AddAccountAliasesRequest
      */
     'aliases'?: Array<string>;
+}
+/**
+ * Request to adding currency to a price plan
+ * @export
+ * @interface AddCurrencyToPricePlanRequest
+ */
+export interface AddCurrencyToPricePlanRequest {
+    /**
+     * Currency to be added
+     * @type {string}
+     * @memberof AddCurrencyToPricePlanRequest
+     */
+    'currency': string;
+    /**
+     * List of usage rates
+     * @type {Array<UsageRate>}
+     * @memberof AddCurrencyToPricePlanRequest
+     */
+    'usageRates': Array<UsageRate>;
 }
 /**
  * Request to associate a price plan to an account
@@ -263,7 +301,13 @@ export interface CreateAccountRequest {
      */
     'name': string;
     /**
-     * list of aliases for the account. Can be used interchangeably with \'id\' for event ingestion.
+     * [ISO_4217](https://en.wikipedia.org/wiki/ISO_4217) code of the currency in which the account must be invoiced Defaults to Base currency. 
+     * @type {string}
+     * @memberof CreateAccountRequest
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * Aliases are tags that are associated with an account. Multiple aliases are allowed for a single account.
      * @type {Array<string>}
      * @memberof CreateAccountRequest
      */
@@ -375,6 +419,25 @@ export interface CreateEventSchemaRequest {
     'dimensions': Array<DimensionsSchema>;
 }
 /**
+ * 
+ * @export
+ * @interface CreatePricePlanDetails
+ */
+export interface CreatePricePlanDetails {
+    /**
+     * 
+     * @type {PricingCycleConfig}
+     * @memberof CreatePricePlanDetails
+     */
+    'pricingCycleConfig': PricingCycleConfig;
+    /**
+     * List of usage rate cards
+     * @type {Array<UsageRateCard>}
+     * @memberof CreatePricePlanDetails
+     */
+    'usageRateCards': Array<UsageRateCard>;
+}
+/**
  * Request to create a price plan
  * @export
  * @interface CreatePricePlanRequest
@@ -394,10 +457,10 @@ export interface CreatePricePlanRequest {
     'description'?: string;
     /**
      * 
-     * @type {PricePlanDetails}
+     * @type {CreatePricePlanDetails}
      * @memberof CreatePricePlanRequest
      */
-    'pricePlanDetails': PricePlanDetails;
+    'pricePlanDetails': CreatePricePlanDetails;
 }
 /**
  * Request to create usage meter
@@ -438,9 +501,7 @@ export interface CreateUsageMeterRequest {
 }
 
 export const CreateUsageMeterRequestTypeEnum = {
-    Counter: 'COUNTER',
-    Gauge: 'GAUGE',
-    Timer: 'TIMER'
+    Counter: 'COUNTER'
 } as const;
 
 export type CreateUsageMeterRequestTypeEnum = typeof CreateUsageMeterRequestTypeEnum[keyof typeof CreateUsageMeterRequestTypeEnum];
@@ -566,7 +627,7 @@ export interface ErrorResponse {
  */
 export interface Event {
     /**
-     * Name of the event to be recorded.
+     * Name of the Event Schema.  Know more about [event schema](https://docs.togai.com/docs/event-schemas) 
      * @type {string}
      * @memberof Event
      */
@@ -584,13 +645,13 @@ export interface Event {
      */
     'timestamp': string;
     /**
-     * 
+     * The event will be associated with the provided account
      * @type {string}
      * @memberof Event
      */
     'accountId': string;
     /**
-     * 
+     * Attributes are numeric values. It can be usage metric which you push to Togai
      * @type {Array<Attribute>}
      * @memberof Event
      */
@@ -1267,7 +1328,7 @@ export interface MetricDataPointsGroupedBy {
     'fieldValue': string;
 }
 /**
- * 
+ * Define the metric you would like to get - allowed options are EVENTS - Aggregation of raw events, USAGE - Aggregated usage value from Usage meters, REVENUE - Aggregated of revenue value from Pricing Plans 
  * @export
  * @enum {string}
  */
@@ -1288,7 +1349,7 @@ export type MetricName = typeof MetricName[keyof typeof MetricName];
  */
 export interface MetricQuery {
     /**
-     * 
+     * Mandatory  for all request.  User defined ID for identifying the request for your internal reference 
      * @type {string}
      * @memberof MetricQuery
      */
@@ -1300,19 +1361,25 @@ export interface MetricQuery {
      */
     'name': MetricName;
     /**
-     * 
+     * Set the aggregation period. Allowed periods are DAY, WEEK, MONTH
      * @type {string}
      * @memberof MetricQuery
      */
     'aggregationPeriod': MetricQueryAggregationPeriodEnum;
     /**
-     * 
+     * Group your metric with a groupBy field.  Allowed fields are ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME, USAGE_METER_ID.  Please refer the table above for the list of combinations allowed in the groupBy 
      * @type {string}
      * @memberof MetricQuery
      */
     'groupBy'?: string;
     /**
-     * 
+     * Configurations. | Metric Name | Config Key | Allowed Values  | Default value |              Description             | |-------------|------------|-----------------|---------------|--------------------------------------| | REVENUE     | CURRENCY   | BASE or INVOICE | BASE          | currency to return the revenue in    | 
+     * @type {{ [key: string]: string; }}
+     * @memberof MetricQuery
+     */
+    'configs'?: { [key: string]: string; };
+    /**
+     * Field Values” required when “Field Name” is present.  You can find a list of Field Values (FilterEntry Name) combinations allowed in the table mentioned above the body param. 
      * @type {Array<MetricQueryFilterEntry>}
      * @memberof MetricQuery
      */
@@ -1370,6 +1437,19 @@ export interface MetricQueryResponse {
      * @memberof MetricQueryResponse
      */
     'data': Array<MetricDataPoints>;
+}
+/**
+ * 
+ * @export
+ * @interface OrganizationSetting
+ */
+export interface OrganizationSetting {
+    /**
+     * Base currency of the organization
+     * @type {string}
+     * @memberof OrganizationSetting
+     */
+    'baseCurrency'?: string;
 }
 /**
  * 
@@ -1489,16 +1569,28 @@ export type PricePlanStatusEnum = typeof PricePlanStatusEnum[keyof typeof PriceP
 export interface PricePlanDetails {
     /**
      * 
+     * @type {Array<string>}
+     * @memberof PricePlanDetails
+     */
+    'supportedCurrencies': Array<string>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof PricePlanDetails
+     */
+    'activeCurrencies': Array<string>;
+    /**
+     * 
      * @type {PricingCycleConfig}
      * @memberof PricePlanDetails
      */
     'pricingCycleConfig': PricingCycleConfig;
     /**
      * 
-     * @type {Array<RateCard>}
+     * @type {Array<UsageRateCard>}
      * @memberof PricePlanDetails
      */
-    'rateCards': Array<RateCard>;
+    'usageRateCards': Array<UsageRateCard>;
 }
 /**
  * 
@@ -1514,10 +1606,10 @@ export interface PricePlanDetailsOverride {
     'pricingCycleConfig'?: PricingCycleConfig;
     /**
      * 
-     * @type {Array<RateCard>}
+     * @type {Array<UsageRateCard>}
      * @memberof PricePlanDetailsOverride
      */
-    'rateCards'?: Array<RateCard>;
+    'usageRateCards'?: Array<UsageRateCard>;
 }
 /**
  * Data of price plan list
@@ -1630,7 +1722,7 @@ export type PriceType = typeof PriceType[keyof typeof PriceType];
  */
 export interface PricingCycleConfig {
     /**
-     * 
+     * Interval field allow you to define the billing interval you would like to set
      * @type {string}
      * @memberof PricingCycleConfig
      */
@@ -1642,7 +1734,7 @@ export interface PricingCycleConfig {
      */
     'startOffset': PricingCycleConfigStartOffset;
     /**
-     * 
+     * Togai allows you to ingest past dated events that will be processed by a pricing cycle till the end grace period.  For example: Pricing cycle is Monthly from 1st to 30th and gracePeriod is 5 days which next month 1 to 5th date, you can ingest past dated events during this grace period. 
      * @type {number}
      * @memberof PricingCycleConfig
      */
@@ -1678,7 +1770,7 @@ export interface PricingCycleConfigStartOffset {
     'monthOffset': string;
 }
 /**
- * 
+ * Togai supports two type of pricing model Tiered and Volume. Tiered pricing model applies respective slab and its rate to the usage value while volume pricing model applies the latest matching slab of the usage value and applies respective rate.  For more understanding read [Rate Cards](https://docs.togai.com/docs/priceplan#setting-up-multiple-rate-cards) 
  * @export
  * @enum {string}
  */
@@ -1717,48 +1809,42 @@ export interface PricingSchedule {
     'endDate': string;
 }
 /**
- * 
+ * Contains all rate related configurations
  * @export
- * @interface RateCard
+ * @interface RatePlan
  */
-export interface RateCard {
-    /**
-     * 
-     * @type {string}
-     * @memberof RateCard
-     */
-    'displayName': string;
+export interface RatePlan {
     /**
      * 
      * @type {PricingModel}
-     * @memberof RateCard
+     * @memberof RatePlan
      */
     'pricingModel': PricingModel;
     /**
-     * 
-     * @type {RateConfigUsage}
-     * @memberof RateCard
+     * Rate cards can have single or multiple slab up to 100.
+     * @type {Array<Slab>}
+     * @memberof RatePlan
      */
-    'rateConfig': RateConfigUsage;
+    'slabs': Array<Slab>;
 }
 /**
- * Contains all rate related configurations
+ * Represents a rate
  * @export
- * @interface RateConfigUsage
+ * @interface RateValue
  */
-export interface RateConfigUsage {
+export interface RateValue {
     /**
      * 
      * @type {string}
-     * @memberof RateConfigUsage
+     * @memberof RateValue
      */
-    'usageMeterId': string;
+    'currency': string;
     /**
      * 
-     * @type {Array<SlabUsage>}
-     * @memberof RateConfigUsage
+     * @type {Array<SlabRate>}
+     * @memberof RateValue
      */
-    'slabs': Array<SlabUsage>;
+    'slabRates': Array<SlabRate>;
 }
 /**
  * Payload to remove aliases from account
@@ -1772,6 +1858,37 @@ export interface RemoveAccountAliasesRequest {
      * @memberof RemoveAccountAliasesRequest
      */
     'aliases'?: Array<string>;
+}
+/**
+ * Represents user_setting
+ * @export
+ * @interface Setting
+ */
+export interface Setting {
+    /**
+     * 
+     * @type {string}
+     * @memberof Setting
+     */
+    'settingName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Setting
+     */
+    'settingValue': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Setting
+     */
+    'entityType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Setting
+     */
+    'entityId': string;
 }
 /**
  * Payload to signup
@@ -1820,39 +1937,58 @@ export interface SignupResponse {
 /**
  * Represents a pricing priceType (rates + slabs) for usage price plan
  * @export
- * @interface SlabUsage
+ * @interface Slab
  */
-export interface SlabUsage {
+export interface Slab {
     /**
      * 
      * @type {number}
-     * @memberof SlabUsage
+     * @memberof Slab
      */
-    'rate': number;
+    'order': number;
     /**
      * 
      * @type {number}
-     * @memberof SlabUsage
+     * @memberof Slab
      */
     'startAfter': number;
     /**
      * 
      * @type {PriceType}
-     * @memberof SlabUsage
+     * @memberof Slab
      */
     'priceType': PriceType;
     /**
      * 
      * @type {{ [key: string]: string; }}
-     * @memberof SlabUsage
+     * @memberof Slab
      */
-    'config'?: { [key: string]: string; };
+    'slabConfig'?: { [key: string]: string; };
+}
+/**
+ * Represents a rate for a slab
+ * @export
+ * @interface SlabRate
+ */
+export interface SlabRate {
     /**
      * 
      * @type {number}
-     * @memberof SlabUsage
+     * @memberof SlabRate
      */
     'order': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRate
+     */
+    'rate': number;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRate
+     */
+    'slabRateConfig'?: { [key: string]: string; };
 }
 /**
  * 
@@ -1964,6 +2100,19 @@ export interface UpdateEventSchemaRequest {
     'dimensions': Array<DimensionsSchema>;
 }
 /**
+ * 
+ * @export
+ * @interface UpdateOrganizationSettingRequest
+ */
+export interface UpdateOrganizationSettingRequest {
+    /**
+     * Base currency of the organization
+     * @type {string}
+     * @memberof UpdateOrganizationSettingRequest
+     */
+    'baseCurrency': string;
+}
+/**
  * Request to update a price plan
  * @export
  * @interface UpdatePricePlanRequest
@@ -1995,7 +2144,7 @@ export interface UpdateUsageMeterRequest {
      */
     'description'?: string;
     /**
-     * Type of usage meter * COUNTER - Count usage  * GAUGE - Not supported at the moment * TIMER - Not supported at the moment 
+     * Type of usage meter * COUNTER - Count usage  
      * @type {string}
      * @memberof UpdateUsageMeterRequest
      */
@@ -2015,9 +2164,7 @@ export interface UpdateUsageMeterRequest {
 }
 
 export const UpdateUsageMeterRequestTypeEnum = {
-    Counter: 'COUNTER',
-    Gauge: 'GAUGE',
-    Timer: 'TIMER'
+    Counter: 'COUNTER'
 } as const;
 
 export type UpdateUsageMeterRequestTypeEnum = typeof UpdateUsageMeterRequestTypeEnum[keyof typeof UpdateUsageMeterRequestTypeEnum];
@@ -2097,9 +2244,7 @@ export interface UsageMeter {
 }
 
 export const UsageMeterTypeEnum = {
-    Counter: 'COUNTER',
-    Gauge: 'GAUGE',
-    Timer: 'TIMER'
+    Counter: 'COUNTER'
 } as const;
 
 export type UsageMeterTypeEnum = typeof UsageMeterTypeEnum[keyof typeof UsageMeterTypeEnum];
@@ -2142,6 +2287,56 @@ export interface UsageMeterPaginatedResponse {
      * @memberof UsageMeterPaginatedResponse
      */
     'context'?: PaginationOptions;
+}
+/**
+ * 
+ * @export
+ * @interface UsageRate
+ */
+export interface UsageRate {
+    /**
+     * The usage meter will be associated with the rate card to transform the usage value to billable value
+     * @type {string}
+     * @memberof UsageRate
+     */
+    'usageMeterId': string;
+    /**
+     * List of slab rates
+     * @type {Array<SlabRate>}
+     * @memberof UsageRate
+     */
+    'slabRates': Array<SlabRate>;
+}
+/**
+ * 
+ * @export
+ * @interface UsageRateCard
+ */
+export interface UsageRateCard {
+    /**
+     * Name your rate card, this will be displayed in the Togai App
+     * @type {string}
+     * @memberof UsageRateCard
+     */
+    'displayName': string;
+    /**
+     * The usage meter will be associated with the rate card to transform the usage value to billable value
+     * @type {string}
+     * @memberof UsageRateCard
+     */
+    'usageMeterId': string;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof UsageRateCard
+     */
+    'ratePlan': RatePlan;
+    /**
+     * 
+     * @type {Array<RateValue>}
+     * @memberof UsageRateCard
+     */
+    'rateValues': Array<RateValue>;
 }
 /**
  * Root user details for the organization
@@ -2188,7 +2383,7 @@ export interface UserDetails {
 export const AccountsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Add Aliases to an account by id
+         * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2236,7 +2431,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Associate a plan to an account
+         * This API let’s you to assign a price plan to an existing account
          * @summary Associate a plan to an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2284,7 +2479,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Create an account
+         * This API let’s you to create an account for a customer using customer_id.
          * @summary Create an account
          * @param {string} customerId 
          * @param {CreateAccountRequest} createAccountRequest Payload to create account
@@ -2328,7 +2523,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Delete an account by id
+         * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2370,7 +2565,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get an account
+         * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2412,7 +2607,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * List accounts with pagination and sort
+         * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} customerId 
          * @param {string} [nextToken] 
@@ -2460,7 +2655,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Remove Aliases to an account by id
+         * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2508,7 +2703,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Update an account by id
+         * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2566,7 +2761,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = AccountsApiAxiosParamCreator(configuration)
     return {
         /**
-         * Add Aliases to an account by id
+         * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2579,7 +2774,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Associate a plan to an account
+         * This API let’s you to assign a price plan to an existing account
          * @summary Associate a plan to an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2592,7 +2787,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create an account
+         * This API let’s you to create an account for a customer using customer_id.
          * @summary Create an account
          * @param {string} customerId 
          * @param {CreateAccountRequest} createAccountRequest Payload to create account
@@ -2604,7 +2799,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Delete an account by id
+         * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2616,7 +2811,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get an account
+         * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2628,7 +2823,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List accounts with pagination and sort
+         * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} customerId 
          * @param {string} [nextToken] 
@@ -2641,7 +2836,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Remove Aliases to an account by id
+         * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2654,7 +2849,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Update an account by id
+         * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2677,7 +2872,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
     const localVarFp = AccountsApiFp(configuration)
     return {
         /**
-         * Add Aliases to an account by id
+         * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2689,7 +2884,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.addAliases(customerId, accountId, addAccountAliasesRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Associate a plan to an account
+         * This API let’s you to assign a price plan to an existing account
          * @summary Associate a plan to an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2701,7 +2896,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.associatePricePlan(customerId, accountId, associatePricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create an account
+         * This API let’s you to create an account for a customer using customer_id.
          * @summary Create an account
          * @param {string} customerId 
          * @param {CreateAccountRequest} createAccountRequest Payload to create account
@@ -2712,7 +2907,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.createAccount(customerId, createAccountRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete an account by id
+         * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2723,7 +2918,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.deleteAccount(customerId, accountId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get an account
+         * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2734,7 +2929,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getAccount(customerId, accountId, options).then((request) => request(axios, basePath));
         },
         /**
-         * List accounts with pagination and sort
+         * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} customerId 
          * @param {string} [nextToken] 
@@ -2746,7 +2941,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getAccounts(customerId, nextToken, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * Remove Aliases to an account by id
+         * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2758,7 +2953,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.removeAliases(customerId, accountId, removeAccountAliasesRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update an account by id
+         * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
          * @param {string} accountId 
@@ -2780,7 +2975,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
  */
 export class AccountsApi extends BaseAPI {
     /**
-     * Add Aliases to an account by id
+     * Add aliases to an account using customer_id and account_id.
      * @summary Add Aliases to account
      * @param {string} customerId 
      * @param {string} accountId 
@@ -2794,7 +2989,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Associate a plan to an account
+     * This API let’s you to assign a price plan to an existing account
      * @summary Associate a plan to an account
      * @param {string} customerId 
      * @param {string} accountId 
@@ -2808,7 +3003,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Create an account
+     * This API let’s you to create an account for a customer using customer_id.
      * @summary Create an account
      * @param {string} customerId 
      * @param {CreateAccountRequest} createAccountRequest Payload to create account
@@ -2821,7 +3016,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Delete an account by id
+     * This API let’s you to delete a customer using customer_id and account_id.
      * @summary Delete an account
      * @param {string} customerId 
      * @param {string} accountId 
@@ -2834,7 +3029,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Get an account
+     * Get account information using customer_id and account_id.
      * @summary Get an account
      * @param {string} customerId 
      * @param {string} accountId 
@@ -2847,7 +3042,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * List accounts with pagination and sort
+     * Returns a list of accounts of a customer with pagination and sort.
      * @summary List accounts of customer
      * @param {string} customerId 
      * @param {string} [nextToken] 
@@ -2861,7 +3056,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Remove Aliases to an account by id
+     * Remove existing aliases tagged to an account using this API
      * @summary Remove Aliases to account
      * @param {string} customerId 
      * @param {string} accountId 
@@ -2875,7 +3070,7 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Update an account by id
+     * This API let’s you to update an account’s information using customer_id and account_id.
      * @summary Update an account
      * @param {string} customerId 
      * @param {string} accountId 
@@ -2897,7 +3092,7 @@ export class AccountsApi extends BaseAPI {
 export const CustomersApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Create a customer and a default account corresponding to it
+         * This API let’s you to create customers and corresponding accounts.
          * @summary Create a customer
          * @param {CreateCustomerRequest} createCustomerRequest Payload to create customer
          * @param {*} [options] Override http request option.
@@ -2937,7 +3132,7 @@ export const CustomersApiAxiosParamCreator = function (configuration?: Configura
             };
         },
         /**
-         * Delete a customer by id
+         * This API let’s you to delete a customer using customer_id.
          * @summary Delete a customer
          * @param {string} customerId 
          * @param {*} [options] Override http request option.
@@ -2975,7 +3170,7 @@ export const CustomersApiAxiosParamCreator = function (configuration?: Configura
             };
         },
         /**
-         * Get a customer by id
+         * Get customer information using customer_id.
          * @summary Get a customer
          * @param {string} customerId 
          * @param {*} [options] Override http request option.
@@ -3013,7 +3208,7 @@ export const CustomersApiAxiosParamCreator = function (configuration?: Configura
             };
         },
         /**
-         * List customers with pagination and sort
+         * Returns a list of customers with pagination and sort.
          * @summary List customers
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
@@ -3057,7 +3252,7 @@ export const CustomersApiAxiosParamCreator = function (configuration?: Configura
             };
         },
         /**
-         * Update a customer by id
+         * This API let’s you to update a customer’s information using customer_id.
          * @summary Update a customer
          * @param {string} customerId 
          * @param {UpdateCustomerRequest} updateCustomerRequest Payload to update customer
@@ -3111,7 +3306,7 @@ export const CustomersApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = CustomersApiAxiosParamCreator(configuration)
     return {
         /**
-         * Create a customer and a default account corresponding to it
+         * This API let’s you to create customers and corresponding accounts.
          * @summary Create a customer
          * @param {CreateCustomerRequest} createCustomerRequest Payload to create customer
          * @param {*} [options] Override http request option.
@@ -3122,7 +3317,7 @@ export const CustomersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Delete a customer by id
+         * This API let’s you to delete a customer using customer_id.
          * @summary Delete a customer
          * @param {string} customerId 
          * @param {*} [options] Override http request option.
@@ -3133,7 +3328,7 @@ export const CustomersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get a customer by id
+         * Get customer information using customer_id.
          * @summary Get a customer
          * @param {string} customerId 
          * @param {*} [options] Override http request option.
@@ -3144,7 +3339,7 @@ export const CustomersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List customers with pagination and sort
+         * Returns a list of customers with pagination and sort.
          * @summary List customers
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
@@ -3156,7 +3351,7 @@ export const CustomersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Update a customer by id
+         * This API let’s you to update a customer’s information using customer_id.
          * @summary Update a customer
          * @param {string} customerId 
          * @param {UpdateCustomerRequest} updateCustomerRequest Payload to update customer
@@ -3178,7 +3373,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
     const localVarFp = CustomersApiFp(configuration)
     return {
         /**
-         * Create a customer and a default account corresponding to it
+         * This API let’s you to create customers and corresponding accounts.
          * @summary Create a customer
          * @param {CreateCustomerRequest} createCustomerRequest Payload to create customer
          * @param {*} [options] Override http request option.
@@ -3188,7 +3383,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
             return localVarFp.createCustomer(createCustomerRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete a customer by id
+         * This API let’s you to delete a customer using customer_id.
          * @summary Delete a customer
          * @param {string} customerId 
          * @param {*} [options] Override http request option.
@@ -3198,7 +3393,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
             return localVarFp.deleteCustomer(customerId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a customer by id
+         * Get customer information using customer_id.
          * @summary Get a customer
          * @param {string} customerId 
          * @param {*} [options] Override http request option.
@@ -3208,7 +3403,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
             return localVarFp.getCustomer(customerId, options).then((request) => request(axios, basePath));
         },
         /**
-         * List customers with pagination and sort
+         * Returns a list of customers with pagination and sort.
          * @summary List customers
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
@@ -3219,7 +3414,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
             return localVarFp.getCustomers(nextToken, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update a customer by id
+         * This API let’s you to update a customer’s information using customer_id.
          * @summary Update a customer
          * @param {string} customerId 
          * @param {UpdateCustomerRequest} updateCustomerRequest Payload to update customer
@@ -3240,7 +3435,7 @@ export const CustomersApiFactory = function (configuration?: Configuration, base
  */
 export class CustomersApi extends BaseAPI {
     /**
-     * Create a customer and a default account corresponding to it
+     * This API let’s you to create customers and corresponding accounts.
      * @summary Create a customer
      * @param {CreateCustomerRequest} createCustomerRequest Payload to create customer
      * @param {*} [options] Override http request option.
@@ -3252,7 +3447,7 @@ export class CustomersApi extends BaseAPI {
     }
 
     /**
-     * Delete a customer by id
+     * This API let’s you to delete a customer using customer_id.
      * @summary Delete a customer
      * @param {string} customerId 
      * @param {*} [options] Override http request option.
@@ -3264,7 +3459,7 @@ export class CustomersApi extends BaseAPI {
     }
 
     /**
-     * Get a customer by id
+     * Get customer information using customer_id.
      * @summary Get a customer
      * @param {string} customerId 
      * @param {*} [options] Override http request option.
@@ -3276,7 +3471,7 @@ export class CustomersApi extends BaseAPI {
     }
 
     /**
-     * List customers with pagination and sort
+     * Returns a list of customers with pagination and sort.
      * @summary List customers
      * @param {string} [nextToken] 
      * @param {number} [pageSize] 
@@ -3289,7 +3484,7 @@ export class CustomersApi extends BaseAPI {
     }
 
     /**
-     * Update a customer by id
+     * This API let’s you to update a customer’s information using customer_id.
      * @summary Update a customer
      * @param {string} customerId 
      * @param {UpdateCustomerRequest} updateCustomerRequest Payload to update customer
@@ -3310,7 +3505,7 @@ export class CustomersApi extends BaseAPI {
 export const EventIngestionApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * API to ingest your application event to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+         * This API let’s you to ingest events to your Togai account.  Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer  Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
          * @summary Ingest events to Togai
          * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -3350,7 +3545,7 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * API to ingest your application event in batch to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -3400,7 +3595,7 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = EventIngestionApiAxiosParamCreator(configuration)
     return {
         /**
-         * API to ingest your application event to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+         * This API let’s you to ingest events to your Togai account.  Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer  Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
          * @summary Ingest events to Togai
          * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -3411,7 +3606,7 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * API to ingest your application event in batch to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -3432,7 +3627,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
     const localVarFp = EventIngestionApiFp(configuration)
     return {
         /**
-         * API to ingest your application event to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+         * This API let’s you to ingest events to your Togai account.  Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer  Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
          * @summary Ingest events to Togai
          * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -3442,7 +3637,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
             return localVarFp.ingest(ingestEventRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * API to ingest your application event in batch to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -3462,7 +3657,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
  */
 export class EventIngestionApi extends BaseAPI {
     /**
-     * API to ingest your application event to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+     * This API let’s you to ingest events to your Togai account.  Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer  Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
      * @summary Ingest events to Togai
      * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
      * @param {*} [options] Override http request option.
@@ -3474,7 +3669,7 @@ export class EventIngestionApi extends BaseAPI {
     }
 
     /**
-     * API to ingest your application event in batch to Togai for billing and usage analytics. To know the limits on the ingestion api, check our docs - https://togai.com/docs/limits.
+     * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
      * @summary Ingest events to Togai in batch
      * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
      * @param {*} [options] Override http request option.
@@ -3494,8 +3689,8 @@ export class EventIngestionApi extends BaseAPI {
 export const EventManagementApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * API to get usage events ingested to Togai.
-         * @summary Get usage events from Togai
+         * This API let’s you to fetch a list of events with multiple query parameters
+         * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
          * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
          * @param {string} [accountId] Filter option to filter the events based on account id.
@@ -3553,8 +3748,8 @@ export const EventManagementApiAxiosParamCreator = function (configuration?: Con
             };
         },
         /**
-         * API to get the event given the event id.
-         * @summary Get the usage event given event id.
+         * Fetch details of a particular event using the event ID.
+         * @summary Get an usage event using event id
          * @param {string} eventId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3601,8 +3796,8 @@ export const EventManagementApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = EventManagementApiAxiosParamCreator(configuration)
     return {
         /**
-         * API to get usage events ingested to Togai.
-         * @summary Get usage events from Togai
+         * This API let’s you to fetch a list of events with multiple query parameters
+         * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
          * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
          * @param {string} [accountId] Filter option to filter the events based on account id.
@@ -3616,8 +3811,8 @@ export const EventManagementApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * API to get the event given the event id.
-         * @summary Get the usage event given event id.
+         * Fetch details of a particular event using the event ID.
+         * @summary Get an usage event using event id
          * @param {string} eventId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3637,8 +3832,8 @@ export const EventManagementApiFactory = function (configuration?: Configuration
     const localVarFp = EventManagementApiFp(configuration)
     return {
         /**
-         * API to get usage events ingested to Togai.
-         * @summary Get usage events from Togai
+         * This API let’s you to fetch a list of events with multiple query parameters
+         * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
          * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
          * @param {string} [accountId] Filter option to filter the events based on account id.
@@ -3651,8 +3846,8 @@ export const EventManagementApiFactory = function (configuration?: Configuration
             return localVarFp.getEvents(nextToken, status, accountId, schemaName, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * API to get the event given the event id.
-         * @summary Get the usage event given event id.
+         * Fetch details of a particular event using the event ID.
+         * @summary Get an usage event using event id
          * @param {string} eventId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -3671,8 +3866,8 @@ export const EventManagementApiFactory = function (configuration?: Configuration
  */
 export class EventManagementApi extends BaseAPI {
     /**
-     * API to get usage events ingested to Togai.
-     * @summary Get usage events from Togai
+     * This API let’s you to fetch a list of events with multiple query parameters
+     * @summary Get a list of usage events with multiple query options
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
      * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
      * @param {string} [accountId] Filter option to filter the events based on account id.
@@ -3687,8 +3882,8 @@ export class EventManagementApi extends BaseAPI {
     }
 
     /**
-     * API to get the event given the event id.
-     * @summary Get the usage event given event id.
+     * Fetch details of a particular event using the event ID.
+     * @summary Get an usage event using event id
      * @param {string} eventId 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -3745,7 +3940,7 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
             };
         },
         /**
-         * Create an event schema
+         * Create an event schema with attributes and dimensions to process events.
          * @summary Create an event schema
          * @param {CreateEventSchemaRequest} createEventSchemaRequest Payload to create event schema
          * @param {*} [options] Override http request option.
@@ -3785,7 +3980,7 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
             };
         },
         /**
-         * Deactivate an event schema
+         * You can deactivate an event schema using this API. In case you have an activate usage meter associated with the event schema, you will need to deactivate it first and then try deactivating the event schema. 
          * @summary Deactivate an event schema
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -3823,7 +4018,7 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
             };
         },
         /**
-         * Delete an event schema
+         * To delete(archive) an event schema, you’re required to archive associated active usage meters if any.
          * @summary Delete an event schema
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -3854,6 +4049,50 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update an event schema and add new attributes and dimensions  Once an event schema is activated, you cannot update or delete existing attributes and dimensions however you can add new attributes and dimensions and update event schema description.     operationId: updateEventSchema 
+         * @summary Update an event schema
+         * @param {string} eventSchemaName 
+         * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        eventSchemaEventSchemaNamePatch: async (eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'eventSchemaName' is not null or undefined
+            assertParamExists('eventSchemaEventSchemaNamePatch', 'eventSchemaName', eventSchemaName)
+            // verify required parameter 'updateEventSchemaRequest' is not null or undefined
+            assertParamExists('eventSchemaEventSchemaNamePatch', 'updateEventSchemaRequest', updateEventSchemaRequest)
+            const localVarPath = `/event_schema/{event_schema_name}`
+                .replace(`{${"event_schema_name"}}`, encodeURIComponent(String(eventSchemaName)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateEventSchemaRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -3904,7 +4143,7 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
             };
         },
         /**
-         * List all event schema versions
+         * Get a list of all the versions of an event schema
          * @summary List all event schema versions
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -3942,7 +4181,7 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
             };
         },
         /**
-         * List event schemas with pagination and sort
+         * Returns a list of event schema with pagination and sort.
          * @summary List event schemas
          * @param {string} [statuses] Filter by provided statuses
          * @param {string} [nextToken] 
@@ -3995,50 +4234,6 @@ export const EventSchemasApiAxiosParamCreator = function (configuration?: Config
                 options: localVarRequestOptions,
             };
         },
-        /**
-         * Update an event schema
-         * @summary Update an event schema
-         * @param {string} eventSchemaName 
-         * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateEventSchema: async (eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'eventSchemaName' is not null or undefined
-            assertParamExists('updateEventSchema', 'eventSchemaName', eventSchemaName)
-            // verify required parameter 'updateEventSchemaRequest' is not null or undefined
-            assertParamExists('updateEventSchema', 'updateEventSchemaRequest', updateEventSchemaRequest)
-            const localVarPath = `/event_schema/{event_schema_name}`
-                .replace(`{${"event_schema_name"}}`, encodeURIComponent(String(eventSchemaName)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(updateEventSchemaRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
     }
 };
 
@@ -4061,7 +4256,7 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create an event schema
+         * Create an event schema with attributes and dimensions to process events.
          * @summary Create an event schema
          * @param {CreateEventSchemaRequest} createEventSchemaRequest Payload to create event schema
          * @param {*} [options] Override http request option.
@@ -4072,7 +4267,7 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Deactivate an event schema
+         * You can deactivate an event schema using this API. In case you have an activate usage meter associated with the event schema, you will need to deactivate it first and then try deactivating the event schema. 
          * @summary Deactivate an event schema
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -4083,7 +4278,7 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Delete an event schema
+         * To delete(archive) an event schema, you’re required to archive associated active usage meters if any.
          * @summary Delete an event schema
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -4091,6 +4286,18 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
          */
         async deleteEventSchema(eventSchemaName: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.deleteEventSchema(eventSchemaName, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Update an event schema and add new attributes and dimensions  Once an event schema is activated, you cannot update or delete existing attributes and dimensions however you can add new attributes and dimensions and update event schema description.     operationId: updateEventSchema 
+         * @summary Update an event schema
+         * @param {string} eventSchemaName 
+         * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async eventSchemaEventSchemaNamePatch(eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EventSchema>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.eventSchemaEventSchemaNamePatch(eventSchemaName, updateEventSchemaRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4106,7 +4313,7 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List all event schema versions
+         * Get a list of all the versions of an event schema
          * @summary List all event schema versions
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -4117,7 +4324,7 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List event schemas with pagination and sort
+         * Returns a list of event schema with pagination and sort.
          * @summary List event schemas
          * @param {string} [statuses] Filter by provided statuses
          * @param {string} [nextToken] 
@@ -4128,18 +4335,6 @@ export const EventSchemasApiFp = function(configuration?: Configuration) {
          */
         async listEventSchemas(statuses?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EventSchemaListPaginatedResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listEventSchemas(statuses, nextToken, pageSize, sortOrder, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Update an event schema
-         * @summary Update an event schema
-         * @param {string} eventSchemaName 
-         * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async updateEventSchema(eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EventSchema>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.updateEventSchema(eventSchemaName, updateEventSchemaRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4163,7 +4358,7 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
             return localVarFp.activateEventSchema(eventSchemaName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create an event schema
+         * Create an event schema with attributes and dimensions to process events.
          * @summary Create an event schema
          * @param {CreateEventSchemaRequest} createEventSchemaRequest Payload to create event schema
          * @param {*} [options] Override http request option.
@@ -4173,7 +4368,7 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
             return localVarFp.createEventSchema(createEventSchemaRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Deactivate an event schema
+         * You can deactivate an event schema using this API. In case you have an activate usage meter associated with the event schema, you will need to deactivate it first and then try deactivating the event schema. 
          * @summary Deactivate an event schema
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -4183,7 +4378,7 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
             return localVarFp.deactivateEventSchema(eventSchemaName, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete an event schema
+         * To delete(archive) an event schema, you’re required to archive associated active usage meters if any.
          * @summary Delete an event schema
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -4191,6 +4386,17 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
          */
         deleteEventSchema(eventSchemaName: string, options?: any): AxiosPromise<BaseSuccessResponse> {
             return localVarFp.deleteEventSchema(eventSchemaName, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update an event schema and add new attributes and dimensions  Once an event schema is activated, you cannot update or delete existing attributes and dimensions however you can add new attributes and dimensions and update event schema description.     operationId: updateEventSchema 
+         * @summary Update an event schema
+         * @param {string} eventSchemaName 
+         * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        eventSchemaEventSchemaNamePatch(eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options?: any): AxiosPromise<EventSchema> {
+            return localVarFp.eventSchemaEventSchemaNamePatch(eventSchemaName, updateEventSchemaRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get an event schema
@@ -4204,7 +4410,7 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
             return localVarFp.getEventSchema(eventSchemaName, version, options).then((request) => request(axios, basePath));
         },
         /**
-         * List all event schema versions
+         * Get a list of all the versions of an event schema
          * @summary List all event schema versions
          * @param {string} eventSchemaName 
          * @param {*} [options] Override http request option.
@@ -4214,7 +4420,7 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
             return localVarFp.listEventSchemaVersions(eventSchemaName, options).then((request) => request(axios, basePath));
         },
         /**
-         * List event schemas with pagination and sort
+         * Returns a list of event schema with pagination and sort.
          * @summary List event schemas
          * @param {string} [statuses] Filter by provided statuses
          * @param {string} [nextToken] 
@@ -4225,17 +4431,6 @@ export const EventSchemasApiFactory = function (configuration?: Configuration, b
          */
         listEventSchemas(statuses?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options?: any): AxiosPromise<EventSchemaListPaginatedResponse> {
             return localVarFp.listEventSchemas(statuses, nextToken, pageSize, sortOrder, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Update an event schema
-         * @summary Update an event schema
-         * @param {string} eventSchemaName 
-         * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        updateEventSchema(eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options?: any): AxiosPromise<EventSchema> {
-            return localVarFp.updateEventSchema(eventSchemaName, updateEventSchemaRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4260,7 +4455,7 @@ export class EventSchemasApi extends BaseAPI {
     }
 
     /**
-     * Create an event schema
+     * Create an event schema with attributes and dimensions to process events.
      * @summary Create an event schema
      * @param {CreateEventSchemaRequest} createEventSchemaRequest Payload to create event schema
      * @param {*} [options] Override http request option.
@@ -4272,7 +4467,7 @@ export class EventSchemasApi extends BaseAPI {
     }
 
     /**
-     * Deactivate an event schema
+     * You can deactivate an event schema using this API. In case you have an activate usage meter associated with the event schema, you will need to deactivate it first and then try deactivating the event schema. 
      * @summary Deactivate an event schema
      * @param {string} eventSchemaName 
      * @param {*} [options] Override http request option.
@@ -4284,7 +4479,7 @@ export class EventSchemasApi extends BaseAPI {
     }
 
     /**
-     * Delete an event schema
+     * To delete(archive) an event schema, you’re required to archive associated active usage meters if any.
      * @summary Delete an event schema
      * @param {string} eventSchemaName 
      * @param {*} [options] Override http request option.
@@ -4293,6 +4488,19 @@ export class EventSchemasApi extends BaseAPI {
      */
     public deleteEventSchema(eventSchemaName: string, options?: AxiosRequestConfig) {
         return EventSchemasApiFp(this.configuration).deleteEventSchema(eventSchemaName, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update an event schema and add new attributes and dimensions  Once an event schema is activated, you cannot update or delete existing attributes and dimensions however you can add new attributes and dimensions and update event schema description.     operationId: updateEventSchema 
+     * @summary Update an event schema
+     * @param {string} eventSchemaName 
+     * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EventSchemasApi
+     */
+    public eventSchemaEventSchemaNamePatch(eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options?: AxiosRequestConfig) {
+        return EventSchemasApiFp(this.configuration).eventSchemaEventSchemaNamePatch(eventSchemaName, updateEventSchemaRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4309,7 +4517,7 @@ export class EventSchemasApi extends BaseAPI {
     }
 
     /**
-     * List all event schema versions
+     * Get a list of all the versions of an event schema
      * @summary List all event schema versions
      * @param {string} eventSchemaName 
      * @param {*} [options] Override http request option.
@@ -4321,7 +4529,7 @@ export class EventSchemasApi extends BaseAPI {
     }
 
     /**
-     * List event schemas with pagination and sort
+     * Returns a list of event schema with pagination and sort.
      * @summary List event schemas
      * @param {string} [statuses] Filter by provided statuses
      * @param {string} [nextToken] 
@@ -4334,19 +4542,6 @@ export class EventSchemasApi extends BaseAPI {
     public listEventSchemas(statuses?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options?: AxiosRequestConfig) {
         return EventSchemasApiFp(this.configuration).listEventSchemas(statuses, nextToken, pageSize, sortOrder, options).then((request) => request(this.axios, this.basePath));
     }
-
-    /**
-     * Update an event schema
-     * @summary Update an event schema
-     * @param {string} eventSchemaName 
-     * @param {UpdateEventSchemaRequest} updateEventSchemaRequest Payload to update event schema
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof EventSchemasApi
-     */
-    public updateEventSchema(eventSchemaName: string, updateEventSchemaRequest: UpdateEventSchemaRequest, options?: AxiosRequestConfig) {
-        return EventSchemasApiFp(this.configuration).updateEventSchema(eventSchemaName, updateEventSchemaRequest, options).then((request) => request(this.axios, this.basePath));
-    }
 }
 
 
@@ -4357,8 +4552,8 @@ export class EventSchemasApi extends BaseAPI {
 export const MetricsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * To get the metrics, you make a POST request to the /metrics resource. You can query up to five metrics in a single request. Single response dataset can contain a maximum of 100 data points.
-         * @summary Get togai metrics.
+         * Togai Metrics API allows you to fetch different metrics from Events value, Usage value, revenue metrics with multiple queryable options you may require for your business use case.  Make a POST request to the /metrics resource to get the metrics.  A single request can query up to five metrics.  Single response dataset can contain a maximum of 100 data points. 
+         * @summary Get Togai Metrics
          * @param {GetMetricsRequest} [getMetricsRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4405,8 +4600,8 @@ export const MetricsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = MetricsApiAxiosParamCreator(configuration)
     return {
         /**
-         * To get the metrics, you make a POST request to the /metrics resource. You can query up to five metrics in a single request. Single response dataset can contain a maximum of 100 data points.
-         * @summary Get togai metrics.
+         * Togai Metrics API allows you to fetch different metrics from Events value, Usage value, revenue metrics with multiple queryable options you may require for your business use case.  Make a POST request to the /metrics resource to get the metrics.  A single request can query up to five metrics.  Single response dataset can contain a maximum of 100 data points. 
+         * @summary Get Togai Metrics
          * @param {GetMetricsRequest} [getMetricsRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4426,8 +4621,8 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
     const localVarFp = MetricsApiFp(configuration)
     return {
         /**
-         * To get the metrics, you make a POST request to the /metrics resource. You can query up to five metrics in a single request. Single response dataset can contain a maximum of 100 data points.
-         * @summary Get togai metrics.
+         * Togai Metrics API allows you to fetch different metrics from Events value, Usage value, revenue metrics with multiple queryable options you may require for your business use case.  Make a POST request to the /metrics resource to get the metrics.  A single request can query up to five metrics.  Single response dataset can contain a maximum of 100 data points. 
+         * @summary Get Togai Metrics
          * @param {GetMetricsRequest} [getMetricsRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4446,8 +4641,8 @@ export const MetricsApiFactory = function (configuration?: Configuration, basePa
  */
 export class MetricsApi extends BaseAPI {
     /**
-     * To get the metrics, you make a POST request to the /metrics resource. You can query up to five metrics in a single request. Single response dataset can contain a maximum of 100 data points.
-     * @summary Get togai metrics.
+     * Togai Metrics API allows you to fetch different metrics from Events value, Usage value, revenue metrics with multiple queryable options you may require for your business use case.  Make a POST request to the /metrics resource to get the metrics.  A single request can query up to five metrics.  Single response dataset can contain a maximum of 100 data points. 
+     * @summary Get Togai Metrics
      * @param {GetMetricsRequest} [getMetricsRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4466,15 +4661,18 @@ export class MetricsApi extends BaseAPI {
 export const PricePlansApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * Activate a price plan
+         * Activate a price plan details using price plan id
          * @summary Activate a price plan
          * @param {string} pricePlanId 
+         * @param {ActivatePricePlanRequest} activatePricePlanRequest Payload to activate price plan
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        activatePricePlan: async (pricePlanId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        activatePricePlan: async (pricePlanId: string, activatePricePlanRequest: ActivatePricePlanRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pricePlanId' is not null or undefined
             assertParamExists('activatePricePlan', 'pricePlanId', pricePlanId)
+            // verify required parameter 'activatePricePlanRequest' is not null or undefined
+            assertParamExists('activatePricePlan', 'activatePricePlanRequest', activatePricePlanRequest)
             const localVarPath = `/price_plans/{price_plan_id}/activate`
                 .replace(`{${"price_plan_id"}}`, encodeURIComponent(String(pricePlanId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -4494,9 +4692,12 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
 
 
     
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(activatePricePlanRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4504,7 +4705,51 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
-         * Create a price plan
+         * Add currencies to a price plan
+         * @summary Add currencies to a price plan
+         * @param {string} pricePlanId 
+         * @param {AddCurrencyToPricePlanRequest} addCurrencyToPricePlanRequest Payload to add currency to price plan
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addCurrencyToPricePlan: async (pricePlanId: string, addCurrencyToPricePlanRequest: AddCurrencyToPricePlanRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pricePlanId' is not null or undefined
+            assertParamExists('addCurrencyToPricePlan', 'pricePlanId', pricePlanId)
+            // verify required parameter 'addCurrencyToPricePlanRequest' is not null or undefined
+            assertParamExists('addCurrencyToPricePlan', 'addCurrencyToPricePlanRequest', addCurrencyToPricePlanRequest)
+            const localVarPath = `/price_plans/{price_plan_id}/currencies`
+                .replace(`{${"price_plan_id"}}`, encodeURIComponent(String(pricePlanId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(addCurrencyToPricePlanRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Create a price plan and associate with customers to it  A price plan is a collection of pre-set conditions with prices that convert usage metrics into billable value. Price Plans and the roll up of items comprising the pricing plans are used to assign a customer to get the final bill value. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
          * @param {*} [options] Override http request option.
@@ -4544,7 +4789,7 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
-         * Get a price plan
+         * Get a price plan details using price plan id
          * @summary Get a price plan
          * @param {string} pricePlanId 
          * @param {*} [options] Override http request option.
@@ -4582,7 +4827,7 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
-         * List price plans with pagination and sort
+         * Get a list of price plans
          * @summary List price plans
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
@@ -4626,7 +4871,49 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
-         * Update a price plan
+         * Remove a draft currency from a price plan
+         * @summary Remove a draft currency from a price plan
+         * @param {string} pricePlanId 
+         * @param {string} currencyId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeCurrencyFromPricePlan: async (pricePlanId: string, currencyId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pricePlanId' is not null or undefined
+            assertParamExists('removeCurrencyFromPricePlan', 'pricePlanId', pricePlanId)
+            // verify required parameter 'currencyId' is not null or undefined
+            assertParamExists('removeCurrencyFromPricePlan', 'currencyId', currencyId)
+            const localVarPath = `/price_plans/{price_plan_id}/currencies/{currency_id}`
+                .replace(`{${"price_plan_id"}}`, encodeURIComponent(String(pricePlanId)))
+                .replace(`{${"currency_id"}}`, encodeURIComponent(String(currencyId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update a draft state price plan  Only DRAFT state Price Plans are allowed to Update. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
          * @summary Update a price plan
          * @param {string} pricePlanId 
          * @param {UpdatePricePlanRequest} updatePricePlanRequest Payload to update price plan
@@ -4680,18 +4967,31 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PricePlansApiAxiosParamCreator(configuration)
     return {
         /**
-         * Activate a price plan
+         * Activate a price plan details using price plan id
          * @summary Activate a price plan
          * @param {string} pricePlanId 
+         * @param {ActivatePricePlanRequest} activatePricePlanRequest Payload to activate price plan
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async activatePricePlan(pricePlanId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricePlan>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.activatePricePlan(pricePlanId, options);
+        async activatePricePlan(pricePlanId: string, activatePricePlanRequest: ActivatePricePlanRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricePlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.activatePricePlan(pricePlanId, activatePricePlanRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create a price plan
+         * Add currencies to a price plan
+         * @summary Add currencies to a price plan
+         * @param {string} pricePlanId 
+         * @param {AddCurrencyToPricePlanRequest} addCurrencyToPricePlanRequest Payload to add currency to price plan
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addCurrencyToPricePlan(pricePlanId: string, addCurrencyToPricePlanRequest: AddCurrencyToPricePlanRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricePlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Create a price plan and associate with customers to it  A price plan is a collection of pre-set conditions with prices that convert usage metrics into billable value. Price Plans and the roll up of items comprising the pricing plans are used to assign a customer to get the final bill value. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
          * @param {*} [options] Override http request option.
@@ -4702,7 +5002,7 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get a price plan
+         * Get a price plan details using price plan id
          * @summary Get a price plan
          * @param {string} pricePlanId 
          * @param {*} [options] Override http request option.
@@ -4713,7 +5013,7 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List price plans with pagination and sort
+         * Get a list of price plans
          * @summary List price plans
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
@@ -4725,7 +5025,19 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Update a price plan
+         * Remove a draft currency from a price plan
+         * @summary Remove a draft currency from a price plan
+         * @param {string} pricePlanId 
+         * @param {string} currencyId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeCurrencyFromPricePlan(pricePlanId: string, currencyId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricePlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.removeCurrencyFromPricePlan(pricePlanId, currencyId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Update a draft state price plan  Only DRAFT state Price Plans are allowed to Update. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
          * @summary Update a price plan
          * @param {string} pricePlanId 
          * @param {UpdatePricePlanRequest} updatePricePlanRequest Payload to update price plan
@@ -4747,17 +5059,29 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
     const localVarFp = PricePlansApiFp(configuration)
     return {
         /**
-         * Activate a price plan
+         * Activate a price plan details using price plan id
          * @summary Activate a price plan
          * @param {string} pricePlanId 
+         * @param {ActivatePricePlanRequest} activatePricePlanRequest Payload to activate price plan
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        activatePricePlan(pricePlanId: string, options?: any): AxiosPromise<PricePlan> {
-            return localVarFp.activatePricePlan(pricePlanId, options).then((request) => request(axios, basePath));
+        activatePricePlan(pricePlanId: string, activatePricePlanRequest: ActivatePricePlanRequest, options?: any): AxiosPromise<PricePlan> {
+            return localVarFp.activatePricePlan(pricePlanId, activatePricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create a price plan
+         * Add currencies to a price plan
+         * @summary Add currencies to a price plan
+         * @param {string} pricePlanId 
+         * @param {AddCurrencyToPricePlanRequest} addCurrencyToPricePlanRequest Payload to add currency to price plan
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addCurrencyToPricePlan(pricePlanId: string, addCurrencyToPricePlanRequest: AddCurrencyToPricePlanRequest, options?: any): AxiosPromise<PricePlan> {
+            return localVarFp.addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Create a price plan and associate with customers to it  A price plan is a collection of pre-set conditions with prices that convert usage metrics into billable value. Price Plans and the roll up of items comprising the pricing plans are used to assign a customer to get the final bill value. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
          * @param {*} [options] Override http request option.
@@ -4767,7 +5091,7 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
             return localVarFp.createPricePlan(createPricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get a price plan
+         * Get a price plan details using price plan id
          * @summary Get a price plan
          * @param {string} pricePlanId 
          * @param {*} [options] Override http request option.
@@ -4777,7 +5101,7 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
             return localVarFp.getPricePlan(pricePlanId, options).then((request) => request(axios, basePath));
         },
         /**
-         * List price plans with pagination and sort
+         * Get a list of price plans
          * @summary List price plans
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
@@ -4788,7 +5112,18 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
             return localVarFp.getPricePlans(nextToken, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update a price plan
+         * Remove a draft currency from a price plan
+         * @summary Remove a draft currency from a price plan
+         * @param {string} pricePlanId 
+         * @param {string} currencyId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeCurrencyFromPricePlan(pricePlanId: string, currencyId: string, options?: any): AxiosPromise<PricePlan> {
+            return localVarFp.removeCurrencyFromPricePlan(pricePlanId, currencyId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update a draft state price plan  Only DRAFT state Price Plans are allowed to Update. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
          * @summary Update a price plan
          * @param {string} pricePlanId 
          * @param {UpdatePricePlanRequest} updatePricePlanRequest Payload to update price plan
@@ -4809,19 +5144,33 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
  */
 export class PricePlansApi extends BaseAPI {
     /**
-     * Activate a price plan
+     * Activate a price plan details using price plan id
      * @summary Activate a price plan
      * @param {string} pricePlanId 
+     * @param {ActivatePricePlanRequest} activatePricePlanRequest Payload to activate price plan
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PricePlansApi
      */
-    public activatePricePlan(pricePlanId: string, options?: AxiosRequestConfig) {
-        return PricePlansApiFp(this.configuration).activatePricePlan(pricePlanId, options).then((request) => request(this.axios, this.basePath));
+    public activatePricePlan(pricePlanId: string, activatePricePlanRequest: ActivatePricePlanRequest, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).activatePricePlan(pricePlanId, activatePricePlanRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Create a price plan
+     * Add currencies to a price plan
+     * @summary Add currencies to a price plan
+     * @param {string} pricePlanId 
+     * @param {AddCurrencyToPricePlanRequest} addCurrencyToPricePlanRequest Payload to add currency to price plan
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PricePlansApi
+     */
+    public addCurrencyToPricePlan(pricePlanId: string, addCurrencyToPricePlanRequest: AddCurrencyToPricePlanRequest, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Create a price plan and associate with customers to it  A price plan is a collection of pre-set conditions with prices that convert usage metrics into billable value. Price Plans and the roll up of items comprising the pricing plans are used to assign a customer to get the final bill value. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
      * @summary Create a price plan
      * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
      * @param {*} [options] Override http request option.
@@ -4833,7 +5182,7 @@ export class PricePlansApi extends BaseAPI {
     }
 
     /**
-     * Get a price plan
+     * Get a price plan details using price plan id
      * @summary Get a price plan
      * @param {string} pricePlanId 
      * @param {*} [options] Override http request option.
@@ -4845,7 +5194,7 @@ export class PricePlansApi extends BaseAPI {
     }
 
     /**
-     * List price plans with pagination and sort
+     * Get a list of price plans
      * @summary List price plans
      * @param {string} [nextToken] 
      * @param {number} [pageSize] 
@@ -4858,7 +5207,20 @@ export class PricePlansApi extends BaseAPI {
     }
 
     /**
-     * Update a price plan
+     * Remove a draft currency from a price plan
+     * @summary Remove a draft currency from a price plan
+     * @param {string} pricePlanId 
+     * @param {string} currencyId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PricePlansApi
+     */
+    public removeCurrencyFromPricePlan(pricePlanId: string, currencyId: string, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).removeCurrencyFromPricePlan(pricePlanId, currencyId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update a draft state price plan  Only DRAFT state Price Plans are allowed to Update. Learn more about [Price plans](https://docs.togai.com/docs/priceplan) from our Guides 
      * @summary Update a price plan
      * @param {string} pricePlanId 
      * @param {UpdatePricePlanRequest} updatePricePlanRequest Payload to update price plan
@@ -4921,7 +5283,7 @@ export const UsageMetersApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * Create an usage meter
+         * Create an usage meter and associate with an event schema
          * @summary Create an usage meter
          * @param {string} eventSchemaName 
          * @param {CreateUsageMeterRequest} createUsageMeterRequest Payload to create usage meter
@@ -4965,7 +5327,7 @@ export const UsageMetersApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * Deactivate usage meter
+         * Make an existing active usage meter to be inactive  Only active Usage Meters are allowed to deactivate. Active Usage Meters with active Pricing Plan attached can also be deactivated. 
          * @summary Deactivate usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5007,45 +5369,7 @@ export const UsageMetersApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * Delete an Usage Meter
-         * @summary Delete an Usage Meter
-         * @param {string} usageMeterId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteUsageMeter: async (usageMeterId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'usageMeterId' is not null or undefined
-            assertParamExists('deleteUsageMeter', 'usageMeterId', usageMeterId)
-            const localVarPath = `/usage_meter/{usage_meter_id}`
-                .replace(`{${"usage_meter_id"}}`, encodeURIComponent(String(usageMeterId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Get usage meter
+         * Get an usage meter using event schema name and usage meter id.
          * @summary Get usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5087,18 +5411,17 @@ export const UsageMetersApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * List usage meters for event schema with pagination and sort
+         * Get a list of usage meters associated with an event schema
          * @summary List usage meters for event schema
          * @param {string} eventSchemaName 
-         * @param {string} [statuses] Filter by provided statuses
-         * @param {string} [aggregations] Filter by provided aggregations
+         * @param {'ACTIVE' | 'INACTIVE'} [statuses] Filter usage meter by it’s current active/inactive state to aggregate across state level usage meters. Aggregation param is mandatory if you’re passing value in this. 
+         * @param {'SUM' | 'COUNT'} [aggregations] This parameter will aggregate across usage meter level using the processed usage meter value. Read more about [usage meter](https://docs.togai.com/docs/usagemeter). Statuses param is mandatory if you’re passing value in this. 
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
-         * @param {'ASC' | 'DESC'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUsageMetersForEventSchema: async (eventSchemaName: string, statuses?: string, aggregations?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getUsageMetersForEventSchema: async (eventSchemaName: string, statuses?: 'ACTIVE' | 'INACTIVE', aggregations?: 'SUM' | 'COUNT', nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'eventSchemaName' is not null or undefined
             assertParamExists('getUsageMetersForEventSchema', 'eventSchemaName', eventSchemaName)
             const localVarPath = `/event_schema/{event_schema_name}/usage_meters`
@@ -5134,10 +5457,6 @@ export const UsageMetersApiAxiosParamCreator = function (configuration?: Configu
                 localVarQueryParameter['pageSize'] = pageSize;
             }
 
-            if (sortOrder !== undefined) {
-                localVarQueryParameter['sortOrder'] = sortOrder;
-            }
-
 
     
             setSearchParams(localVarUrlObj, localVarQueryParameter);
@@ -5150,7 +5469,7 @@ export const UsageMetersApiAxiosParamCreator = function (configuration?: Configu
             };
         },
         /**
-         * Update an usage meter
+         * Updating an usage meter is supported only for usage meters in the DRAFT state currently. In case you like to update an usage meter, we suggest you create a new usage meter and associate it with accounts. 
          * @summary Update an usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5220,7 +5539,7 @@ export const UsageMetersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create an usage meter
+         * Create an usage meter and associate with an event schema
          * @summary Create an usage meter
          * @param {string} eventSchemaName 
          * @param {CreateUsageMeterRequest} createUsageMeterRequest Payload to create usage meter
@@ -5232,7 +5551,7 @@ export const UsageMetersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Deactivate usage meter
+         * Make an existing active usage meter to be inactive  Only active Usage Meters are allowed to deactivate. Active Usage Meters with active Pricing Plan attached can also be deactivated. 
          * @summary Deactivate usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5244,18 +5563,7 @@ export const UsageMetersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Delete an Usage Meter
-         * @summary Delete an Usage Meter
-         * @param {string} usageMeterId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async deleteUsageMeter(usageMeterId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteUsageMeter(usageMeterId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Get usage meter
+         * Get an usage meter using event schema name and usage meter id.
          * @summary Get usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5267,23 +5575,22 @@ export const UsageMetersApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * List usage meters for event schema with pagination and sort
+         * Get a list of usage meters associated with an event schema
          * @summary List usage meters for event schema
          * @param {string} eventSchemaName 
-         * @param {string} [statuses] Filter by provided statuses
-         * @param {string} [aggregations] Filter by provided aggregations
+         * @param {'ACTIVE' | 'INACTIVE'} [statuses] Filter usage meter by it’s current active/inactive state to aggregate across state level usage meters. Aggregation param is mandatory if you’re passing value in this. 
+         * @param {'SUM' | 'COUNT'} [aggregations] This parameter will aggregate across usage meter level using the processed usage meter value. Read more about [usage meter](https://docs.togai.com/docs/usagemeter). Statuses param is mandatory if you’re passing value in this. 
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
-         * @param {'ASC' | 'DESC'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getUsageMetersForEventSchema(eventSchemaName: string, statuses?: string, aggregations?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UsageMeterPaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getUsageMetersForEventSchema(eventSchemaName, statuses, aggregations, nextToken, pageSize, sortOrder, options);
+        async getUsageMetersForEventSchema(eventSchemaName: string, statuses?: 'ACTIVE' | 'INACTIVE', aggregations?: 'SUM' | 'COUNT', nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UsageMeterPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUsageMetersForEventSchema(eventSchemaName, statuses, aggregations, nextToken, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Update an usage meter
+         * Updating an usage meter is supported only for usage meters in the DRAFT state currently. In case you like to update an usage meter, we suggest you create a new usage meter and associate it with accounts. 
          * @summary Update an usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5317,7 +5624,7 @@ export const UsageMetersApiFactory = function (configuration?: Configuration, ba
             return localVarFp.activateUsageMeter(eventSchemaName, usageMeterId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create an usage meter
+         * Create an usage meter and associate with an event schema
          * @summary Create an usage meter
          * @param {string} eventSchemaName 
          * @param {CreateUsageMeterRequest} createUsageMeterRequest Payload to create usage meter
@@ -5328,7 +5635,7 @@ export const UsageMetersApiFactory = function (configuration?: Configuration, ba
             return localVarFp.createUsageMeter(eventSchemaName, createUsageMeterRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Deactivate usage meter
+         * Make an existing active usage meter to be inactive  Only active Usage Meters are allowed to deactivate. Active Usage Meters with active Pricing Plan attached can also be deactivated. 
          * @summary Deactivate usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5339,17 +5646,7 @@ export const UsageMetersApiFactory = function (configuration?: Configuration, ba
             return localVarFp.deactivateUsageMeter(eventSchemaName, usageMeterId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Delete an Usage Meter
-         * @summary Delete an Usage Meter
-         * @param {string} usageMeterId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        deleteUsageMeter(usageMeterId: string, options?: any): AxiosPromise<BaseSuccessResponse> {
-            return localVarFp.deleteUsageMeter(usageMeterId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Get usage meter
+         * Get an usage meter using event schema name and usage meter id.
          * @summary Get usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5360,22 +5657,21 @@ export const UsageMetersApiFactory = function (configuration?: Configuration, ba
             return localVarFp.getUsageMeter(eventSchemaName, usageMeterId, options).then((request) => request(axios, basePath));
         },
         /**
-         * List usage meters for event schema with pagination and sort
+         * Get a list of usage meters associated with an event schema
          * @summary List usage meters for event schema
          * @param {string} eventSchemaName 
-         * @param {string} [statuses] Filter by provided statuses
-         * @param {string} [aggregations] Filter by provided aggregations
+         * @param {'ACTIVE' | 'INACTIVE'} [statuses] Filter usage meter by it’s current active/inactive state to aggregate across state level usage meters. Aggregation param is mandatory if you’re passing value in this. 
+         * @param {'SUM' | 'COUNT'} [aggregations] This parameter will aggregate across usage meter level using the processed usage meter value. Read more about [usage meter](https://docs.togai.com/docs/usagemeter). Statuses param is mandatory if you’re passing value in this. 
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
-         * @param {'ASC' | 'DESC'} [sortOrder] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getUsageMetersForEventSchema(eventSchemaName: string, statuses?: string, aggregations?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options?: any): AxiosPromise<UsageMeterPaginatedResponse> {
-            return localVarFp.getUsageMetersForEventSchema(eventSchemaName, statuses, aggregations, nextToken, pageSize, sortOrder, options).then((request) => request(axios, basePath));
+        getUsageMetersForEventSchema(eventSchemaName: string, statuses?: 'ACTIVE' | 'INACTIVE', aggregations?: 'SUM' | 'COUNT', nextToken?: string, pageSize?: number, options?: any): AxiosPromise<UsageMeterPaginatedResponse> {
+            return localVarFp.getUsageMetersForEventSchema(eventSchemaName, statuses, aggregations, nextToken, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
-         * Update an usage meter
+         * Updating an usage meter is supported only for usage meters in the DRAFT state currently. In case you like to update an usage meter, we suggest you create a new usage meter and associate it with accounts. 
          * @summary Update an usage meter
          * @param {string} eventSchemaName 
          * @param {string} usageMeterId 
@@ -5410,7 +5706,7 @@ export class UsageMetersApi extends BaseAPI {
     }
 
     /**
-     * Create an usage meter
+     * Create an usage meter and associate with an event schema
      * @summary Create an usage meter
      * @param {string} eventSchemaName 
      * @param {CreateUsageMeterRequest} createUsageMeterRequest Payload to create usage meter
@@ -5423,7 +5719,7 @@ export class UsageMetersApi extends BaseAPI {
     }
 
     /**
-     * Deactivate usage meter
+     * Make an existing active usage meter to be inactive  Only active Usage Meters are allowed to deactivate. Active Usage Meters with active Pricing Plan attached can also be deactivated. 
      * @summary Deactivate usage meter
      * @param {string} eventSchemaName 
      * @param {string} usageMeterId 
@@ -5436,19 +5732,7 @@ export class UsageMetersApi extends BaseAPI {
     }
 
     /**
-     * Delete an Usage Meter
-     * @summary Delete an Usage Meter
-     * @param {string} usageMeterId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof UsageMetersApi
-     */
-    public deleteUsageMeter(usageMeterId: string, options?: AxiosRequestConfig) {
-        return UsageMetersApiFp(this.configuration).deleteUsageMeter(usageMeterId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Get usage meter
+     * Get an usage meter using event schema name and usage meter id.
      * @summary Get usage meter
      * @param {string} eventSchemaName 
      * @param {string} usageMeterId 
@@ -5461,24 +5745,23 @@ export class UsageMetersApi extends BaseAPI {
     }
 
     /**
-     * List usage meters for event schema with pagination and sort
+     * Get a list of usage meters associated with an event schema
      * @summary List usage meters for event schema
      * @param {string} eventSchemaName 
-     * @param {string} [statuses] Filter by provided statuses
-     * @param {string} [aggregations] Filter by provided aggregations
+     * @param {'ACTIVE' | 'INACTIVE'} [statuses] Filter usage meter by it’s current active/inactive state to aggregate across state level usage meters. Aggregation param is mandatory if you’re passing value in this. 
+     * @param {'SUM' | 'COUNT'} [aggregations] This parameter will aggregate across usage meter level using the processed usage meter value. Read more about [usage meter](https://docs.togai.com/docs/usagemeter). Statuses param is mandatory if you’re passing value in this. 
      * @param {string} [nextToken] 
      * @param {number} [pageSize] 
-     * @param {'ASC' | 'DESC'} [sortOrder] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UsageMetersApi
      */
-    public getUsageMetersForEventSchema(eventSchemaName: string, statuses?: string, aggregations?: string, nextToken?: string, pageSize?: number, sortOrder?: 'ASC' | 'DESC', options?: AxiosRequestConfig) {
-        return UsageMetersApiFp(this.configuration).getUsageMetersForEventSchema(eventSchemaName, statuses, aggregations, nextToken, pageSize, sortOrder, options).then((request) => request(this.axios, this.basePath));
+    public getUsageMetersForEventSchema(eventSchemaName: string, statuses?: 'ACTIVE' | 'INACTIVE', aggregations?: 'SUM' | 'COUNT', nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
+        return UsageMetersApiFp(this.configuration).getUsageMetersForEventSchema(eventSchemaName, statuses, aggregations, nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
-     * Update an usage meter
+     * Updating an usage meter is supported only for usage meters in the DRAFT state currently. In case you like to update an usage meter, we suggest you create a new usage meter and associate it with accounts. 
      * @summary Update an usage meter
      * @param {string} eventSchemaName 
      * @param {string} usageMeterId 
