@@ -23,7 +23,7 @@ import {
     PriceType,
 } from "togai-client";
 
-const API_TOKEN = "<YOUR_API_TOKEN>"; 
+const API_TOKEN = process.env.API_TOKEN; 
 const BASE_PATH = "https://sandbox-api.togai.com"
 
 const configuration = new Configuration({
@@ -97,6 +97,7 @@ async function sample() {
     const createPricePlanRequest: CreatePricePlanRequest = {
         name: "price-plan" + "-" + randomSeed,
         pricePlanDetails: {
+            supportedCurrencies: ["USD"],
             pricingCycleConfig: {
                 interval: PricingCycleConfigIntervalEnum.Monthly,
                 startOffset: {
@@ -140,7 +141,8 @@ async function sample() {
                         }
                     ]
                 }
-            ]
+            ],
+            fixedFeeRateCards: []
         }
     };
     const pricePlanApi = new PricePlansApi(configuration);
