@@ -259,62 +259,6 @@ export interface AddOnPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
- * Request to associate a price plan to an account
- * @export
- * @interface AssociatePricePlanRequest
- */
-export interface AssociatePricePlanRequest {
-    /**
-     * Id of the price plan
-     * @type {string}
-     * @memberof AssociatePricePlanRequest
-     */
-    'pricePlanId': string;
-    /**
-     * Date of effectiveness of the association. - Expected only if the account already has a price plan associated with it. 
-     * @type {string}
-     * @memberof AssociatePricePlanRequest
-     */
-    'effectiveFrom': string;
-    /**
-     * Date until which the association must be effective. - Expected only if effectiveFrom is present. 
-     * @type {string}
-     * @memberof AssociatePricePlanRequest
-     */
-    'effectiveUntil': string;
-    /**
-     * 
-     * @type {CreatePricePlanDetailsOverride}
-     * @memberof AssociatePricePlanRequest
-     */
-    'pricePlanDetailsOverride'?: CreatePricePlanDetailsOverride;
-}
-/**
- * 
- * @export
- * @interface AssociatePricePlanResponse
- */
-export interface AssociatePricePlanResponse {
-    /**
-     * Identifier of the account
-     * @type {string}
-     * @memberof AssociatePricePlanResponse
-     */
-    'accountId': string;
-    /**
-     * Name of the Account
-     * @type {string}
-     * @memberof AssociatePricePlanResponse
-     */
-    'accountName': string;
-    /**
-     * 
-     * @type {Array<PlanOverride>}
-     * @memberof AssociatePricePlanResponse
-     */
-    'pricingSchedules': Array<PlanOverride>;
-}
-/**
  * Metric to be recorded
  * @export
  * @interface Attribute
@@ -336,6 +280,31 @@ export interface Attribute {
      * Unit with which the attribute value was measured. Natively supported units - \"Meters, Miles, Kilometers, Grams, Kilograms, ounces, Pounds, Minutes, Hours, Seconds, Milliseconds, Microseconds, None\". Clients are free to add any other custom units.
      * @type {string}
      * @memberof Attribute
+     */
+    'unit'?: string;
+}
+/**
+ * Metric to be recorded
+ * @export
+ * @interface Attribute1
+ */
+export interface Attribute1 {
+    /**
+     * Name of the event attribute
+     * @type {string}
+     * @memberof Attribute1
+     */
+    'name': string;
+    /**
+     * Value of the event attribute
+     * @type {string}
+     * @memberof Attribute1
+     */
+    'value': string;
+    /**
+     * Unit with which the attribute value was measured. Natively supported units - \"Meters, Miles, Kilometers, Grams, Kilograms, ounces, Pounds, Minutes, Hours, Seconds, Milliseconds, Microseconds, None\". Clients are free to add any other custom units.
+     * @type {string}
+     * @memberof Attribute1
      */
     'unit'?: string;
 }
@@ -658,6 +627,12 @@ export interface CreateEventSchemaRequest {
      * @memberof CreateEventSchemaRequest
      */
     'dimensions': Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof CreateEventSchemaRequest
+     */
+    'enrichments'?: Enrichments;
 }
 /**
  * 
@@ -1319,6 +1294,38 @@ export interface CustomerPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
+ * 
+ * @export
+ * @interface Dependency
+ */
+export interface Dependency {
+    /**
+     * 
+     * @type {string}
+     * @memberof Dependency
+     */
+    'type': DependencyTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Dependency
+     */
+    'key': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Dependency
+     */
+    'alias'?: string;
+}
+
+export const DependencyTypeEnum = {
+    Setting: 'SETTING'
+} as const;
+
+export type DependencyTypeEnum = typeof DependencyTypeEnum[keyof typeof DependencyTypeEnum];
+
+/**
  * Structure of dimensions
  * @export
  * @interface DimensionsSchema
@@ -1330,6 +1337,96 @@ export interface DimensionsSchema {
      * @memberof DimensionsSchema
      */
     'name': string;
+}
+/**
+ * enriched field
+ * @export
+ * @interface EnrichedField
+ */
+export interface EnrichedField {
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichedField
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichedField
+     */
+    'type': EnrichedFieldTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichedField
+     */
+    'value': string;
+}
+
+export const EnrichedFieldTypeEnum = {
+    Attribute: 'ATTRIBUTE',
+    Dimension: 'DIMENSION'
+} as const;
+
+export type EnrichedFieldTypeEnum = typeof EnrichedFieldTypeEnum[keyof typeof EnrichedFieldTypeEnum];
+
+/**
+ * enrichment dependency
+ * @export
+ * @interface EnrichmentDependency
+ */
+export interface EnrichmentDependency {
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'key': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'type': EnrichmentDependencyTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'alias'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'value': string;
+}
+
+export const EnrichmentDependencyTypeEnum = {
+    Setting: 'SETTING'
+} as const;
+
+export type EnrichmentDependencyTypeEnum = typeof EnrichmentDependencyTypeEnum[keyof typeof EnrichmentDependencyTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface Enrichments
+ */
+export interface Enrichments {
+    /**
+     * 
+     * @type {Array<Dependency>}
+     * @memberof Enrichments
+     */
+    'dependencies'?: Array<Dependency>;
+    /**
+     * 
+     * @type {Array<Field>}
+     * @memberof Enrichments
+     */
+    'fields': Array<Field>;
 }
 /**
  * 
@@ -1388,6 +1485,49 @@ export interface Event {
     'dimensions': { [key: string]: string; };
 }
 /**
+ * Contents of the event
+ * @export
+ * @interface Event1
+ */
+export interface Event1 {
+    /**
+     * Name of the Event Schema.  Know more about [event schema](https://docs.togai.com/docs/event-schemas) 
+     * @type {string}
+     * @memberof Event1
+     */
+    'schemaName': string;
+    /**
+     * A unique value to identify the event instance. This unique value should be generated by the client and it acts as the **idempotency key**. Togai server will use this key to recognize subsequent retries of the same request and avoid metering multiple times for that same request. This id can be created in any format but we recommend using UUIDv4 to reduce collision occurance.    NOTE1: Expiry time for idempotency validation will be until the end of the billing cycle. Any request which comes after the billing cycle with the same id will be treated as new request and ingested for metering.   NOTE2: If the billing cycle is not configured for the idempotency validation will be until **10 days** of the event ingestion.
+     * @type {string}
+     * @memberof Event1
+     */
+    'id': string;
+    /**
+     * Source time stamp of the event. This timestamp must be in ISO 8601 format.
+     * @type {string}
+     * @memberof Event1
+     */
+    'timestamp': string;
+    /**
+     * The event will be associated with the provided account
+     * @type {string}
+     * @memberof Event1
+     */
+    'accountId': string;
+    /**
+     * Attributes are numeric values. It can be usage metric which you push to Togai
+     * @type {Array<Attribute1>}
+     * @memberof Event1
+     */
+    'attributes': Array<Attribute1>;
+    /**
+     * Dimensions are tags/labels associated with the events.
+     * @type {{ [key: string]: string; }}
+     * @memberof Event1
+     */
+    'dimensions': { [key: string]: string; };
+}
+/**
  * Structure of an event attribute
  * @export
  * @interface EventAttributeSchema
@@ -1442,6 +1582,12 @@ export interface EventPipelineInfo {
      * @memberof EventPipelineInfo
      */
     'customer'?: EventPipelineInfoCustomer;
+    /**
+     * 
+     * @type {EventPipelineInfoEnrichments}
+     * @memberof EventPipelineInfo
+     */
+    'enrichments'?: EventPipelineInfoEnrichments;
 }
 /**
  * 
@@ -1480,6 +1626,31 @@ export interface EventPipelineInfoCustomer {
      * @memberof EventPipelineInfoCustomer
      */
     'name': string;
+}
+/**
+ * 
+ * @export
+ * @interface EventPipelineInfoEnrichments
+ */
+export interface EventPipelineInfoEnrichments {
+    /**
+     * 
+     * @type {Array<EnrichedField>}
+     * @memberof EventPipelineInfoEnrichments
+     */
+    'attributes'?: Array<EnrichedField>;
+    /**
+     * 
+     * @type {Array<EnrichedField>}
+     * @memberof EventPipelineInfoEnrichments
+     */
+    'dimensions'?: Array<EnrichedField>;
+    /**
+     * 
+     * @type {Array<EnrichmentDependency>}
+     * @memberof EventPipelineInfoEnrichments
+     */
+    'dependencies'?: Array<EnrichmentDependency>;
 }
 /**
  * 
@@ -1632,6 +1803,12 @@ export interface EventSchema {
     'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
+     * @type {Enrichments}
+     * @memberof EventSchema
+     */
+    'enrichments'?: Enrichments;
+    /**
+     * 
      * @type {string}
      * @memberof EventSchema
      */
@@ -1695,6 +1872,12 @@ export interface EventSchemaListData {
      * @memberof EventSchemaListData
      */
     'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof EventSchemaListData
+     */
+    'enrichments'?: Enrichments;
     /**
      * 
      * @type {string}
@@ -1783,10 +1966,10 @@ export interface EventSchemaVersionsResponse {
 export interface EventWithStatus {
     /**
      * 
-     * @type {Event}
+     * @type {Event1}
      * @memberof EventWithStatus
      */
-    'eventPayload': Event;
+    'eventPayload': Event1;
     /**
      * 
      * @type {IngestionStatus}
@@ -1808,10 +1991,10 @@ export interface EventWithStatus {
 export interface EventWithStatusAndEventPipelineInfo {
     /**
      * 
-     * @type {Event}
+     * @type {Event1}
      * @memberof EventWithStatusAndEventPipelineInfo
      */
-    'eventPayload': Event;
+    'eventPayload': Event1;
     /**
      * 
      * @type {IngestionStatus}
@@ -1844,6 +2027,63 @@ export interface EventWithStatusAndEventPipelineInfoAllOf {
      */
     'EventPipelineInfo'?: EventPipelineInfo;
 }
+/**
+ * 
+ * @export
+ * @interface Field
+ */
+export interface Field {
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'type': FieldTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'enrichmentType': FieldEnrichmentTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'value': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'defaultValue'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Field
+     */
+    'order': number;
+}
+
+export const FieldTypeEnum = {
+    Attribute: 'ATTRIBUTE',
+    Dimension: 'DIMENSION'
+} as const;
+
+export type FieldTypeEnum = typeof FieldTypeEnum[keyof typeof FieldTypeEnum];
+export const FieldEnrichmentTypeEnum = {
+    Value: 'VALUE',
+    JsonLogic: 'JSON_LOGIC'
+} as const;
+
+export type FieldEnrichmentTypeEnum = typeof FieldEnrichmentTypeEnum[keyof typeof FieldEnrichmentTypeEnum];
+
 /**
  * 
  * @export
@@ -2053,6 +2293,7 @@ export const IngestionStatusStatusEnum = {
     IngestionInProgress: 'INGESTION_IN_PROGRESS',
     IngestionFailed: 'INGESTION_FAILED',
     IngestionFailedSchemaNotDefined: 'INGESTION_FAILED_SCHEMA_NOT_DEFINED',
+    IngestionFailedEnrichmentFailed: 'INGESTION_FAILED_ENRICHMENT_FAILED',
     IngestionFailedUnitsInvalid: 'INGESTION_FAILED_UNITS_INVALID',
     IngestionFailedEventInvalid: 'INGESTION_FAILED_EVENT_INVALID',
     IngestionCompletedNoMatchingMeters: 'INGESTION_COMPLETED_NO_MATCHING_METERS',
@@ -3681,6 +3922,12 @@ export interface UpdateEventSchemaRequest {
      * @memberof UpdateEventSchemaRequest
      */
     'dimensions': Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof UpdateEventSchemaRequest
+     */
+    'enrichments'?: Enrichments;
 }
 /**
  * 
@@ -3713,6 +3960,76 @@ export interface UpdatePricePlanRequest {
      * @memberof UpdatePricePlanRequest
      */
     'pricePlanDetails'?: CreatePricePlanDetailsOverride;
+}
+/**
+ * Request to dis/associate a price plan to an account
+ * @export
+ * @interface UpdatePricingScheduleRequest
+ */
+export interface UpdatePricingScheduleRequest {
+    /**
+     * Mode of request to create dis/association
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'mode': UpdatePricingScheduleRequestModeEnum;
+    /**
+     * Id of the price plan if association request
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'pricePlanId'?: string;
+    /**
+     * Date of effectiveness of the association. - Expected only if the account already has a price plan associated with it. 
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'effectiveFrom': string;
+    /**
+     * Date until which the association must be effective. - Expected only if effectiveFrom is present. 
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'effectiveUntil': string;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'pricePlanDetailsOverride'?: CreatePricePlanDetailsOverride;
+}
+
+export const UpdatePricingScheduleRequestModeEnum = {
+    Associate: 'ASSOCIATE',
+    Disassociate: 'DISASSOCIATE'
+} as const;
+
+export type UpdatePricingScheduleRequestModeEnum = typeof UpdatePricingScheduleRequestModeEnum[keyof typeof UpdatePricingScheduleRequestModeEnum];
+
+/**
+ * 
+ * @export
+ * @interface UpdatePricingScheduleResponse
+ */
+export interface UpdatePricingScheduleResponse {
+    /**
+     * Identifier of the account
+     * @type {string}
+     * @memberof UpdatePricingScheduleResponse
+     */
+    'accountId': string;
+    /**
+     * Name of the Account
+     * @type {string}
+     * @memberof UpdatePricingScheduleResponse
+     */
+    'accountName': string;
+    /**
+     * 
+     * @type {Array<PlanOverride>}
+     * @memberof UpdatePricingScheduleResponse
+     */
+    'pricingSchedules': Array<PlanOverride>;
 }
 /**
  * Request to update usage meter
@@ -4098,54 +4415,6 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * This API let’s you to assign a price plan to an existing account
-         * @summary Associate a plan to an account
-         * @param {string} customerId 
-         * @param {string} accountId 
-         * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        associatePricePlan: async (customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'customerId' is not null or undefined
-            assertParamExists('associatePricePlan', 'customerId', customerId)
-            // verify required parameter 'accountId' is not null or undefined
-            assertParamExists('associatePricePlan', 'accountId', accountId)
-            // verify required parameter 'associatePricePlanRequest' is not null or undefined
-            assertParamExists('associatePricePlan', 'associatePricePlanRequest', associatePricePlanRequest)
-            const localVarPath = `/customers/{customer_id}/accounts/{account_id}/price_plans`
-                .replace(`{${"customer_id"}}`, encodeURIComponent(String(customerId)))
-                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(associatePricePlanRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * This API let’s you to create an account for a customer using customer_id.
          * @summary Create an account
          * @param {string} customerId 
@@ -4417,6 +4686,54 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This API let’s you to detach/attach a price plan from/to an existing account
+         * @summary Dis/associate a plan from/to an account
+         * @param {string} customerId 
+         * @param {string} accountId 
+         * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePricingSchedule: async (customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'customerId' is not null or undefined
+            assertParamExists('updatePricingSchedule', 'customerId', customerId)
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('updatePricingSchedule', 'accountId', accountId)
+            // verify required parameter 'updatePricingScheduleRequest' is not null or undefined
+            assertParamExists('updatePricingSchedule', 'updatePricingScheduleRequest', updatePricingScheduleRequest)
+            const localVarPath = `/customers/{customer_id}/accounts/{account_id}/price_plans`
+                .replace(`{${"customer_id"}}`, encodeURIComponent(String(customerId)))
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updatePricingScheduleRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -4438,19 +4755,6 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          */
         async addAliases(customerId: string, accountId: string, addAccountAliasesRequest: AddAccountAliasesRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Account>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.addAliases(customerId, accountId, addAccountAliasesRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * This API let’s you to assign a price plan to an existing account
-         * @summary Associate a plan to an account
-         * @param {string} customerId 
-         * @param {string} accountId 
-         * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async associatePricePlan(customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssociatePricePlanResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.associatePricePlan(customerId, accountId, associatePricePlanRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4528,6 +4832,19 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateAccount(customerId, accountId, updateAccountRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * This API let’s you to detach/attach a price plan from/to an existing account
+         * @summary Dis/associate a plan from/to an account
+         * @param {string} customerId 
+         * @param {string} accountId 
+         * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updatePricingSchedule(customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UpdatePricingScheduleResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePricingSchedule(customerId, accountId, updatePricingScheduleRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -4549,18 +4866,6 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          */
         addAliases(customerId: string, accountId: string, addAccountAliasesRequest: AddAccountAliasesRequest, options?: any): AxiosPromise<Account> {
             return localVarFp.addAliases(customerId, accountId, addAccountAliasesRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This API let’s you to assign a price plan to an existing account
-         * @summary Associate a plan to an account
-         * @param {string} customerId 
-         * @param {string} accountId 
-         * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        associatePricePlan(customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options?: any): AxiosPromise<AssociatePricePlanResponse> {
-            return localVarFp.associatePricePlan(customerId, accountId, associatePricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * This API let’s you to create an account for a customer using customer_id.
@@ -4631,6 +4936,18 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
         updateAccount(customerId: string, accountId: string, updateAccountRequest: UpdateAccountRequest, options?: any): AxiosPromise<Account> {
             return localVarFp.updateAccount(customerId, accountId, updateAccountRequest, options).then((request) => request(axios, basePath));
         },
+        /**
+         * This API let’s you to detach/attach a price plan from/to an existing account
+         * @summary Dis/associate a plan from/to an account
+         * @param {string} customerId 
+         * @param {string} accountId 
+         * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePricingSchedule(customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options?: any): AxiosPromise<UpdatePricingScheduleResponse> {
+            return localVarFp.updatePricingSchedule(customerId, accountId, updatePricingScheduleRequest, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -4653,20 +4970,6 @@ export class AccountsApi extends BaseAPI {
      */
     public addAliases(customerId: string, accountId: string, addAccountAliasesRequest: AddAccountAliasesRequest, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).addAliases(customerId, accountId, addAccountAliasesRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This API let’s you to assign a price plan to an existing account
-     * @summary Associate a plan to an account
-     * @param {string} customerId 
-     * @param {string} accountId 
-     * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountsApi
-     */
-    public associatePricePlan(customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).associatePricePlan(customerId, accountId, associatePricePlanRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4748,6 +5051,20 @@ export class AccountsApi extends BaseAPI {
      */
     public updateAccount(customerId: string, accountId: string, updateAccountRequest: UpdateAccountRequest, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).updateAccount(customerId, accountId, updateAccountRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to detach/attach a price plan from/to an existing account
+     * @summary Dis/associate a plan from/to an account
+     * @param {string} customerId 
+     * @param {string} accountId 
+     * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public updatePricingSchedule(customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).updatePricingSchedule(customerId, accountId, updatePricingScheduleRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
