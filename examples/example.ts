@@ -10,7 +10,7 @@ import {
     CreatePricePlanRequest,
     CreateCustomerRequest,
     CustomersApi,
-    AssociatePricePlanRequest,
+    UpdatePricingScheduleRequest,
     AccountsApi,
     EventIngestionApi,
     IngestEventRequest,
@@ -23,7 +23,7 @@ import {
     PriceType,
 } from "togai-client";
 
-const API_TOKEN = process.env.API_TOKEN; 
+const API_TOKEN = process.env.API_TOKEN;
 const BASE_PATH = "https://sandbox-api.togai.com"
 
 const configuration = new Configuration({
@@ -158,29 +158,29 @@ async function sample() {
     console.log("Price Plan activated", pricePlan);
 
     // Step 7: Create customers to associate price plans
-    const createCustomerRequest:CreateCustomerRequest = {
+    const createCustomerRequest: CreateCustomerRequest = {
         name: "customer1" + "-" + randomSeed,
         id: "1" + "-" + randomSeed,
         billingAddress: "address",
         primaryEmail: "email@togai.com"
-    } 
+    }
     const customersApi = new CustomersApi(configuration);
     const customer = (await customersApi.createCustomer(createCustomerRequest)).data;
     console.log("Customer created", customer);
 
     // Step 8: Associate the customer/account to the price plan
-    const associatePricePlanRequest:AssociatePricePlanRequest = {
+    const associatePricePlanRequest: UpdatePricingScheduleRequest = {
         pricePlanId: pricePlan.id,
         effectiveFrom: new Date().toISOString().substring(0, 10),
         effectiveUntil: "9999-01-01"
     }
     const associatePricePlanApi = new AccountsApi(configuration);
-    const associatePricePlan = (await associatePricePlanApi.associatePricePlan(customer.id, customer.id, associatePricePlanRequest)).data;
+    const associatePricePlan = (await associatePricePlanApi.updatePricingSchedule(customer.id, customer.id, associatePricePlanRequest)).data;
     console.log("Price Plan associated", associatePricePlan);
 
     //Step 9: Ingest events
     const eventsApi = new EventIngestionApi(configuration);
-    const eventRequest:IngestEventRequest = {
+    const eventRequest: IngestEventRequest = {
         event: {
             id: "random-string" + Math.random(),
             schemaName: eventSchema.name,
@@ -188,7 +188,7 @@ async function sample() {
             accountId: customer.id,
             attributes: [{
                 name: "sms_id",
-                value: "random-string" + Math.random()
+                value: `${Math.random()}`
             }],
             dimensions: {
                 "country": "US"
@@ -206,7 +206,7 @@ async function sample() {
     yesterday.setDate(yesterday.getDate() - 1);
 
     const metricsApi = new MetricsApi(configuration);
-    const usageMetricsRequest:GetMetricsRequest = {
+    const usageMetricsRequest: GetMetricsRequest = {
         startTime: yesterday.toISOString(),
         endTime: now.toISOString(),
         metricQueries: [
@@ -223,7 +223,7 @@ async function sample() {
     //Step 11: Get the revenue metrics
     //Revenue metrics might take a bit of time to be reflected in the system
     //You can check the docs on the amount of time it takes for events to get processed for revenue.
-    const revenueMetricsRequest:GetMetricsRequest = {
+    const revenueMetricsRequest: GetMetricsRequest = {
         startTime: yesterday.toISOString(),
         endTime: now.toISOString(),
         metricQueries: [
@@ -238,7 +238,7 @@ async function sample() {
     console.log("Revenue Metrics", JSON.stringify(revenueMetrics, null, 2));
 
     // Revenue metrics for a specific customer
-    const customerRevenueMetricsRequest:GetMetricsRequest = {
+    const customerRevenueMetricsRequest: GetMetricsRequest = {
         startTime: yesterday.toISOString(),
         endTime: now.toISOString(),
         metricQueries: [
