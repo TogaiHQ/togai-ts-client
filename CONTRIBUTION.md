@@ -1,3 +1,9 @@
+## Generate and set API_TOKEN
+
+```bash
+export API_TOKEN=<API Token generated from Togai App>
+```
+
 ## Run examples
 
 ```

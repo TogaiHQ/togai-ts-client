@@ -259,62 +259,6 @@ export interface AddOnPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
- * Request to associate a price plan to an account
- * @export
- * @interface AssociatePricePlanRequest
- */
-export interface AssociatePricePlanRequest {
-    /**
-     * Id of the price plan
-     * @type {string}
-     * @memberof AssociatePricePlanRequest
-     */
-    'pricePlanId': string;
-    /**
-     * Date of effectiveness of the association. - Expected only if the account already has a price plan associated with it. 
-     * @type {string}
-     * @memberof AssociatePricePlanRequest
-     */
-    'effectiveFrom': string;
-    /**
-     * Date until which the association must be effective. - Expected only if effectiveFrom is present. 
-     * @type {string}
-     * @memberof AssociatePricePlanRequest
-     */
-    'effectiveUntil': string;
-    /**
-     * 
-     * @type {CreatePricePlanDetailsOverride}
-     * @memberof AssociatePricePlanRequest
-     */
-    'pricePlanDetailsOverride'?: CreatePricePlanDetailsOverride;
-}
-/**
- * 
- * @export
- * @interface AssociatePricePlanResponse
- */
-export interface AssociatePricePlanResponse {
-    /**
-     * Identifier of the account
-     * @type {string}
-     * @memberof AssociatePricePlanResponse
-     */
-    'accountId': string;
-    /**
-     * Name of the Account
-     * @type {string}
-     * @memberof AssociatePricePlanResponse
-     */
-    'accountName': string;
-    /**
-     * 
-     * @type {Array<PlanOverride>}
-     * @memberof AssociatePricePlanResponse
-     */
-    'pricingSchedules': Array<PlanOverride>;
-}
-/**
  * Metric to be recorded
  * @export
  * @interface Attribute
@@ -658,6 +602,12 @@ export interface CreateEventSchemaRequest {
      * @memberof CreateEventSchemaRequest
      */
     'dimensions': Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof CreateEventSchemaRequest
+     */
+    'enrichments'?: Enrichments;
 }
 /**
  * 
@@ -1319,6 +1269,38 @@ export interface CustomerPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
+ * 
+ * @export
+ * @interface Dependency
+ */
+export interface Dependency {
+    /**
+     * 
+     * @type {string}
+     * @memberof Dependency
+     */
+    'type': DependencyTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Dependency
+     */
+    'key': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Dependency
+     */
+    'alias'?: string;
+}
+
+export const DependencyTypeEnum = {
+    Setting: 'SETTING'
+} as const;
+
+export type DependencyTypeEnum = typeof DependencyTypeEnum[keyof typeof DependencyTypeEnum];
+
+/**
  * Structure of dimensions
  * @export
  * @interface DimensionsSchema
@@ -1330,6 +1312,96 @@ export interface DimensionsSchema {
      * @memberof DimensionsSchema
      */
     'name': string;
+}
+/**
+ * enriched field
+ * @export
+ * @interface EnrichedField
+ */
+export interface EnrichedField {
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichedField
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichedField
+     */
+    'type': EnrichedFieldTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichedField
+     */
+    'value': string;
+}
+
+export const EnrichedFieldTypeEnum = {
+    Attribute: 'ATTRIBUTE',
+    Dimension: 'DIMENSION'
+} as const;
+
+export type EnrichedFieldTypeEnum = typeof EnrichedFieldTypeEnum[keyof typeof EnrichedFieldTypeEnum];
+
+/**
+ * enrichment dependency
+ * @export
+ * @interface EnrichmentDependency
+ */
+export interface EnrichmentDependency {
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'key': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'type': EnrichmentDependencyTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'alias'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EnrichmentDependency
+     */
+    'value': string;
+}
+
+export const EnrichmentDependencyTypeEnum = {
+    Setting: 'SETTING'
+} as const;
+
+export type EnrichmentDependencyTypeEnum = typeof EnrichmentDependencyTypeEnum[keyof typeof EnrichmentDependencyTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface Enrichments
+ */
+export interface Enrichments {
+    /**
+     * 
+     * @type {Array<Dependency>}
+     * @memberof Enrichments
+     */
+    'dependencies'?: Array<Dependency>;
+    /**
+     * 
+     * @type {Array<Field>}
+     * @memberof Enrichments
+     */
+    'fields': Array<Field>;
 }
 /**
  * 
@@ -1442,6 +1514,12 @@ export interface EventPipelineInfo {
      * @memberof EventPipelineInfo
      */
     'customer'?: EventPipelineInfoCustomer;
+    /**
+     * 
+     * @type {EventPipelineInfoEnrichments}
+     * @memberof EventPipelineInfo
+     */
+    'enrichments'?: EventPipelineInfoEnrichments;
 }
 /**
  * 
@@ -1480,6 +1558,31 @@ export interface EventPipelineInfoCustomer {
      * @memberof EventPipelineInfoCustomer
      */
     'name': string;
+}
+/**
+ * 
+ * @export
+ * @interface EventPipelineInfoEnrichments
+ */
+export interface EventPipelineInfoEnrichments {
+    /**
+     * 
+     * @type {Array<EnrichedField>}
+     * @memberof EventPipelineInfoEnrichments
+     */
+    'attributes'?: Array<EnrichedField>;
+    /**
+     * 
+     * @type {Array<EnrichedField>}
+     * @memberof EventPipelineInfoEnrichments
+     */
+    'dimensions'?: Array<EnrichedField>;
+    /**
+     * 
+     * @type {Array<EnrichmentDependency>}
+     * @memberof EventPipelineInfoEnrichments
+     */
+    'dependencies'?: Array<EnrichmentDependency>;
 }
 /**
  * 
@@ -1623,13 +1726,19 @@ export interface EventSchema {
      * @type {Array<EventAttributeSchema>}
      * @memberof EventSchema
      */
-    'attributes': Array<EventAttributeSchema>;
+    'attributes'?: Array<EventAttributeSchema>;
     /**
      * 
      * @type {Array<DimensionsSchema>}
      * @memberof EventSchema
      */
     'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof EventSchema
+     */
+    'enrichments'?: Enrichments;
     /**
      * 
      * @type {string}
@@ -1688,13 +1797,19 @@ export interface EventSchemaListData {
      * @type {Array<EventAttributeSchema>}
      * @memberof EventSchemaListData
      */
-    'attributes': Array<EventAttributeSchema>;
+    'attributes'?: Array<EventAttributeSchema>;
     /**
      * 
      * @type {Array<DimensionsSchema>}
      * @memberof EventSchemaListData
      */
     'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof EventSchemaListData
+     */
+    'enrichments'?: Enrichments;
     /**
      * 
      * @type {string}
@@ -1844,6 +1959,63 @@ export interface EventWithStatusAndEventPipelineInfoAllOf {
      */
     'EventPipelineInfo'?: EventPipelineInfo;
 }
+/**
+ * 
+ * @export
+ * @interface Field
+ */
+export interface Field {
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'type': FieldTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'enrichmentType': FieldEnrichmentTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'value': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Field
+     */
+    'defaultValue'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Field
+     */
+    'order': number;
+}
+
+export const FieldTypeEnum = {
+    Attribute: 'ATTRIBUTE',
+    Dimension: 'DIMENSION'
+} as const;
+
+export type FieldTypeEnum = typeof FieldTypeEnum[keyof typeof FieldTypeEnum];
+export const FieldEnrichmentTypeEnum = {
+    Value: 'VALUE',
+    JsonLogic: 'JSON_LOGIC'
+} as const;
+
+export type FieldEnrichmentTypeEnum = typeof FieldEnrichmentTypeEnum[keyof typeof FieldEnrichmentTypeEnum];
+
 /**
  * 
  * @export
@@ -2053,6 +2225,7 @@ export const IngestionStatusStatusEnum = {
     IngestionInProgress: 'INGESTION_IN_PROGRESS',
     IngestionFailed: 'INGESTION_FAILED',
     IngestionFailedSchemaNotDefined: 'INGESTION_FAILED_SCHEMA_NOT_DEFINED',
+    IngestionFailedEnrichmentFailed: 'INGESTION_FAILED_ENRICHMENT_FAILED',
     IngestionFailedUnitsInvalid: 'INGESTION_FAILED_UNITS_INVALID',
     IngestionFailedEventInvalid: 'INGESTION_FAILED_EVENT_INVALID',
     IngestionCompletedNoMatchingMeters: 'INGESTION_COMPLETED_NO_MATCHING_METERS',
@@ -3674,13 +3847,19 @@ export interface UpdateEventSchemaRequest {
      * @type {Array<EventAttributeSchema>}
      * @memberof UpdateEventSchemaRequest
      */
-    'attributes': Array<EventAttributeSchema>;
+    'attributes'?: Array<EventAttributeSchema>;
     /**
      * 
      * @type {Array<DimensionsSchema>}
      * @memberof UpdateEventSchemaRequest
      */
-    'dimensions': Array<DimensionsSchema>;
+    'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Enrichments}
+     * @memberof UpdateEventSchemaRequest
+     */
+    'enrichments'?: Enrichments;
 }
 /**
  * 
@@ -3713,6 +3892,76 @@ export interface UpdatePricePlanRequest {
      * @memberof UpdatePricePlanRequest
      */
     'pricePlanDetails'?: CreatePricePlanDetailsOverride;
+}
+/**
+ * Request to dis/associate a price plan to an account
+ * @export
+ * @interface UpdatePricingScheduleRequest
+ */
+export interface UpdatePricingScheduleRequest {
+    /**
+     * Mode of request to create dis/association
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'mode'?: UpdatePricingScheduleRequestModeEnum;
+    /**
+     * Id of the price plan if association request
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'pricePlanId'?: string;
+    /**
+     * Date of effectiveness of the association. - Expected only if the account already has a price plan associated with it. 
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'effectiveFrom': string;
+    /**
+     * Date until which the association must be effective. - Expected only if effectiveFrom is present. 
+     * @type {string}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'effectiveUntil': string;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof UpdatePricingScheduleRequest
+     */
+    'pricePlanDetailsOverride'?: CreatePricePlanDetailsOverride;
+}
+
+export const UpdatePricingScheduleRequestModeEnum = {
+    Associate: 'ASSOCIATE',
+    Disassociate: 'DISASSOCIATE'
+} as const;
+
+export type UpdatePricingScheduleRequestModeEnum = typeof UpdatePricingScheduleRequestModeEnum[keyof typeof UpdatePricingScheduleRequestModeEnum];
+
+/**
+ * 
+ * @export
+ * @interface UpdatePricingScheduleResponse
+ */
+export interface UpdatePricingScheduleResponse {
+    /**
+     * Identifier of the account
+     * @type {string}
+     * @memberof UpdatePricingScheduleResponse
+     */
+    'accountId': string;
+    /**
+     * Name of the Account
+     * @type {string}
+     * @memberof UpdatePricingScheduleResponse
+     */
+    'accountName': string;
+    /**
+     * 
+     * @type {Array<PlanOverride>}
+     * @memberof UpdatePricingScheduleResponse
+     */
+    'pricingSchedules': Array<PlanOverride>;
 }
 /**
  * Request to update usage meter
@@ -4053,7 +4302,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4091,54 +4340,6 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
             localVarRequestOptions.data = serializeDataIfNeeded(addAccountAliasesRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This API let’s you to assign a price plan to an existing account
-         * @summary Associate a plan to an account
-         * @param {string} customerId 
-         * @param {string} accountId 
-         * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        associatePricePlan: async (customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'customerId' is not null or undefined
-            assertParamExists('associatePricePlan', 'customerId', customerId)
-            // verify required parameter 'accountId' is not null or undefined
-            assertParamExists('associatePricePlan', 'accountId', accountId)
-            // verify required parameter 'associatePricePlanRequest' is not null or undefined
-            assertParamExists('associatePricePlan', 'associatePricePlanRequest', associatePricePlanRequest)
-            const localVarPath = `/customers/{customer_id}/accounts/{account_id}/price_plans`
-                .replace(`{${"customer_id"}}`, encodeURIComponent(String(customerId)))
-                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(associatePricePlanRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -4193,7 +4394,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4235,7 +4436,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4325,7 +4526,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4373,7 +4574,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4417,6 +4618,54 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This API let’s you to detach/attach a price plan from/to an existing account
+         * @summary Dis/associate a plan from/to an account
+         * @param {string} customerId 
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePricingSchedule: async (customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'customerId' is not null or undefined
+            assertParamExists('updatePricingSchedule', 'customerId', customerId)
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('updatePricingSchedule', 'accountId', accountId)
+            // verify required parameter 'updatePricingScheduleRequest' is not null or undefined
+            assertParamExists('updatePricingSchedule', 'updatePricingScheduleRequest', updatePricingScheduleRequest)
+            const localVarPath = `/customers/{customer_id}/accounts/{account_id}/price_plans`
+                .replace(`{${"customer_id"}}`, encodeURIComponent(String(customerId)))
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updatePricingScheduleRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -4431,26 +4680,13 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         async addAliases(customerId: string, accountId: string, addAccountAliasesRequest: AddAccountAliasesRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Account>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.addAliases(customerId, accountId, addAccountAliasesRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * This API let’s you to assign a price plan to an existing account
-         * @summary Associate a plan to an account
-         * @param {string} customerId 
-         * @param {string} accountId 
-         * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async associatePricePlan(customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AssociatePricePlanResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.associatePricePlan(customerId, accountId, associatePricePlanRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -4469,7 +4705,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4481,7 +4717,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4506,7 +4742,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4519,13 +4755,26 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         async updateAccount(customerId: string, accountId: string, updateAccountRequest: UpdateAccountRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Account>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updateAccount(customerId, accountId, updateAccountRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to detach/attach a price plan from/to an existing account
+         * @summary Dis/associate a plan from/to an account
+         * @param {string} customerId 
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updatePricingSchedule(customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UpdatePricingScheduleResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updatePricingSchedule(customerId, accountId, updatePricingScheduleRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -4542,25 +4791,13 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         addAliases(customerId: string, accountId: string, addAccountAliasesRequest: AddAccountAliasesRequest, options?: any): AxiosPromise<Account> {
             return localVarFp.addAliases(customerId, accountId, addAccountAliasesRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This API let’s you to assign a price plan to an existing account
-         * @summary Associate a plan to an account
-         * @param {string} customerId 
-         * @param {string} accountId 
-         * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        associatePricePlan(customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options?: any): AxiosPromise<AssociatePricePlanResponse> {
-            return localVarFp.associatePricePlan(customerId, accountId, associatePricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * This API let’s you to create an account for a customer using customer_id.
@@ -4577,7 +4814,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4588,7 +4825,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4611,7 +4848,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4623,13 +4860,25 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
         updateAccount(customerId: string, accountId: string, updateAccountRequest: UpdateAccountRequest, options?: any): AxiosPromise<Account> {
             return localVarFp.updateAccount(customerId, accountId, updateAccountRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to detach/attach a price plan from/to an existing account
+         * @summary Dis/associate a plan from/to an account
+         * @param {string} customerId 
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updatePricingSchedule(customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options?: any): AxiosPromise<UpdatePricingScheduleResponse> {
+            return localVarFp.updatePricingSchedule(customerId, accountId, updatePricingScheduleRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -4645,7 +4894,7 @@ export class AccountsApi extends BaseAPI {
      * Add aliases to an account using customer_id and account_id.
      * @summary Add Aliases to account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4653,20 +4902,6 @@ export class AccountsApi extends BaseAPI {
      */
     public addAliases(customerId: string, accountId: string, addAccountAliasesRequest: AddAccountAliasesRequest, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).addAliases(customerId, accountId, addAccountAliasesRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This API let’s you to assign a price plan to an existing account
-     * @summary Associate a plan to an account
-     * @param {string} customerId 
-     * @param {string} accountId 
-     * @param {AssociatePricePlanRequest} associatePricePlanRequest Payload to associate a price plan to an account
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountsApi
-     */
-    public associatePricePlan(customerId: string, accountId: string, associatePricePlanRequest: AssociatePricePlanRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).associatePricePlan(customerId, accountId, associatePricePlanRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -4686,7 +4921,7 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to delete a customer using customer_id and account_id.
      * @summary Delete an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
@@ -4699,7 +4934,7 @@ export class AccountsApi extends BaseAPI {
      * Get account information using customer_id and account_id.
      * @summary Get an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
@@ -4726,7 +4961,7 @@ export class AccountsApi extends BaseAPI {
      * Remove existing aliases tagged to an account using this API
      * @summary Remove Aliases to account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4740,7 +4975,7 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to update an account’s information using customer_id and account_id.
      * @summary Update an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4748,6 +4983,20 @@ export class AccountsApi extends BaseAPI {
      */
     public updateAccount(customerId: string, accountId: string, updateAccountRequest: UpdateAccountRequest, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).updateAccount(customerId, accountId, updateAccountRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to detach/attach a price plan from/to an existing account
+     * @summary Dis/associate a plan from/to an account
+     * @param {string} customerId 
+     * @param {string} accountId account_id corresponding to an account
+     * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public updatePricingSchedule(customerId: string, accountId: string, updatePricingScheduleRequest: UpdatePricingScheduleRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).updatePricingSchedule(customerId, accountId, updatePricingScheduleRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -5141,7 +5390,7 @@ export const CreditsApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * Credit balance for Account
          * @summary Credit balance for Account
-         * @param {string} accountId Filter option to filter based on account id.
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5218,7 +5467,7 @@ export const CreditsApiAxiosParamCreator = function (configuration?: Configurati
          * Get all credits
          * @summary List credits
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [id] Filter option to filter based on credit id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -5335,7 +5584,7 @@ export const CreditsApiFp = function(configuration?: Configuration) {
         /**
          * Credit balance for Account
          * @summary Credit balance for Account
-         * @param {string} accountId Filter option to filter based on account id.
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5358,7 +5607,7 @@ export const CreditsApiFp = function(configuration?: Configuration) {
          * Get all credits
          * @summary List credits
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [id] Filter option to filter based on credit id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -5403,7 +5652,7 @@ export const CreditsApiFactory = function (configuration?: Configuration, basePa
         /**
          * Credit balance for Account
          * @summary Credit balance for Account
-         * @param {string} accountId Filter option to filter based on account id.
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5424,7 +5673,7 @@ export const CreditsApiFactory = function (configuration?: Configuration, basePa
          * Get all credits
          * @summary List credits
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [id] Filter option to filter based on credit id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -5469,7 +5718,7 @@ export class CreditsApi extends BaseAPI {
     /**
      * Credit balance for Account
      * @summary Credit balance for Account
-     * @param {string} accountId Filter option to filter based on account id.
+     * @param {string} accountId account_id corresponding to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CreditsApi
@@ -5494,7 +5743,7 @@ export class CreditsApi extends BaseAPI {
      * Get all credits
      * @summary List credits
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-     * @param {string} [status] Filter option to filter by processed/unprocessed status.
+     * @param {string} [status] Filter option to filter by status.
      * @param {string} [accountId] Filter option to filter based on account id.
      * @param {string} [id] Filter option to filter based on credit id.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -6127,8 +6376,8 @@ export const EventManagementApiAxiosParamCreator = function (configuration?: Con
          * This API let’s you to fetch a list of events with multiple query parameters
          * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-         * @param {string} [accountId] Filter option to filter the events based on account id.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
          * @param {*} [options] Override http request option.
@@ -6234,8 +6483,8 @@ export const EventManagementApiFp = function(configuration?: Configuration) {
          * This API let’s you to fetch a list of events with multiple query parameters
          * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-         * @param {string} [accountId] Filter option to filter the events based on account id.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
          * @param {*} [options] Override http request option.
@@ -6270,8 +6519,8 @@ export const EventManagementApiFactory = function (configuration?: Configuration
          * This API let’s you to fetch a list of events with multiple query parameters
          * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-         * @param {string} [accountId] Filter option to filter the events based on account id.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
          * @param {*} [options] Override http request option.
@@ -6304,8 +6553,8 @@ export class EventManagementApi extends BaseAPI {
      * This API let’s you to fetch a list of events with multiple query parameters
      * @summary Get a list of usage events with multiple query options
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-     * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-     * @param {string} [accountId] Filter option to filter the events based on account id.
+     * @param {string} [status] Filter option to filter by status.
+     * @param {string} [accountId] Filter option to filter based on account id.
      * @param {string} [schemaName] Filter option to filter the events based on schema name.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
      * @param {*} [options] Override http request option.
@@ -7020,7 +7269,7 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [customerId] Filter option to filter based on customer id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -7110,7 +7359,7 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [customerId] Filter option to filter based on customer id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -7147,7 +7396,7 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [customerId] Filter option to filter based on customer id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -7185,7 +7434,7 @@ export class InvoicesApi extends BaseAPI {
      * List invoices
      * @summary List invoices
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-     * @param {string} [status] Filter option to filter by processed/unprocessed status.
+     * @param {string} [status] Filter option to filter by status.
      * @param {string} [accountId] Filter option to filter based on account id.
      * @param {string} [customerId] Filter option to filter based on customer id.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
