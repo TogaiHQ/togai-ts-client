@@ -1726,7 +1726,7 @@ export interface EventSchema {
      * @type {Array<EventAttributeSchema>}
      * @memberof EventSchema
      */
-    'attributes': Array<EventAttributeSchema>;
+    'attributes'?: Array<EventAttributeSchema>;
     /**
      * 
      * @type {Array<DimensionsSchema>}
@@ -1797,7 +1797,7 @@ export interface EventSchemaListData {
      * @type {Array<EventAttributeSchema>}
      * @memberof EventSchemaListData
      */
-    'attributes': Array<EventAttributeSchema>;
+    'attributes'?: Array<EventAttributeSchema>;
     /**
      * 
      * @type {Array<DimensionsSchema>}
@@ -3847,13 +3847,13 @@ export interface UpdateEventSchemaRequest {
      * @type {Array<EventAttributeSchema>}
      * @memberof UpdateEventSchemaRequest
      */
-    'attributes': Array<EventAttributeSchema>;
+    'attributes'?: Array<EventAttributeSchema>;
     /**
      * 
      * @type {Array<DimensionsSchema>}
      * @memberof UpdateEventSchemaRequest
      */
-    'dimensions': Array<DimensionsSchema>;
+    'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
      * @type {Enrichments}
@@ -4302,7 +4302,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4394,7 +4394,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4436,7 +4436,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4526,7 +4526,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4574,7 +4574,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4622,7 +4622,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to detach/attach a price plan from/to an existing account
          * @summary Dis/associate a plan from/to an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4680,7 +4680,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4705,7 +4705,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4717,7 +4717,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4742,7 +4742,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4755,7 +4755,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4768,7 +4768,7 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to detach/attach a price plan from/to an existing account
          * @summary Dis/associate a plan from/to an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4791,7 +4791,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Add aliases to an account using customer_id and account_id.
          * @summary Add Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4814,7 +4814,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4825,7 +4825,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -4848,7 +4848,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4860,7 +4860,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to update an account’s information using customer_id and account_id.
          * @summary Update an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4872,7 +4872,7 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to detach/attach a price plan from/to an existing account
          * @summary Dis/associate a plan from/to an account
          * @param {string} customerId 
-         * @param {string} accountId 
+         * @param {string} accountId account_id corresponding to an account
          * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -4894,7 +4894,7 @@ export class AccountsApi extends BaseAPI {
      * Add aliases to an account using customer_id and account_id.
      * @summary Add Aliases to account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {AddAccountAliasesRequest} addAccountAliasesRequest Payload to add aliases to account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4921,7 +4921,7 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to delete a customer using customer_id and account_id.
      * @summary Delete an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
@@ -4934,7 +4934,7 @@ export class AccountsApi extends BaseAPI {
      * Get account information using customer_id and account_id.
      * @summary Get an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
@@ -4961,7 +4961,7 @@ export class AccountsApi extends BaseAPI {
      * Remove existing aliases tagged to an account using this API
      * @summary Remove Aliases to account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {RemoveAccountAliasesRequest} removeAccountAliasesRequest Payload to remove aliases from account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4975,7 +4975,7 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to update an account’s information using customer_id and account_id.
      * @summary Update an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {UpdateAccountRequest} updateAccountRequest Payload to update account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -4989,7 +4989,7 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to detach/attach a price plan from/to an existing account
      * @summary Dis/associate a plan from/to an account
      * @param {string} customerId 
-     * @param {string} accountId 
+     * @param {string} accountId account_id corresponding to an account
      * @param {UpdatePricingScheduleRequest} updatePricingScheduleRequest Payload to dis/associate a price plan to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -5390,7 +5390,7 @@ export const CreditsApiAxiosParamCreator = function (configuration?: Configurati
         /**
          * Credit balance for Account
          * @summary Credit balance for Account
-         * @param {string} accountId Filter option to filter based on account id.
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5467,7 +5467,7 @@ export const CreditsApiAxiosParamCreator = function (configuration?: Configurati
          * Get all credits
          * @summary List credits
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [id] Filter option to filter based on credit id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -5584,7 +5584,7 @@ export const CreditsApiFp = function(configuration?: Configuration) {
         /**
          * Credit balance for Account
          * @summary Credit balance for Account
-         * @param {string} accountId Filter option to filter based on account id.
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5607,7 +5607,7 @@ export const CreditsApiFp = function(configuration?: Configuration) {
          * Get all credits
          * @summary List credits
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [id] Filter option to filter based on credit id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -5652,7 +5652,7 @@ export const CreditsApiFactory = function (configuration?: Configuration, basePa
         /**
          * Credit balance for Account
          * @summary Credit balance for Account
-         * @param {string} accountId Filter option to filter based on account id.
+         * @param {string} accountId account_id corresponding to an account
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
@@ -5673,7 +5673,7 @@ export const CreditsApiFactory = function (configuration?: Configuration, basePa
          * Get all credits
          * @summary List credits
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [id] Filter option to filter based on credit id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -5718,7 +5718,7 @@ export class CreditsApi extends BaseAPI {
     /**
      * Credit balance for Account
      * @summary Credit balance for Account
-     * @param {string} accountId Filter option to filter based on account id.
+     * @param {string} accountId account_id corresponding to an account
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof CreditsApi
@@ -5743,7 +5743,7 @@ export class CreditsApi extends BaseAPI {
      * Get all credits
      * @summary List credits
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-     * @param {string} [status] Filter option to filter by processed/unprocessed status.
+     * @param {string} [status] Filter option to filter by status.
      * @param {string} [accountId] Filter option to filter based on account id.
      * @param {string} [id] Filter option to filter based on credit id.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -6376,8 +6376,8 @@ export const EventManagementApiAxiosParamCreator = function (configuration?: Con
          * This API let’s you to fetch a list of events with multiple query parameters
          * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-         * @param {string} [accountId] Filter option to filter the events based on account id.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
          * @param {*} [options] Override http request option.
@@ -6483,8 +6483,8 @@ export const EventManagementApiFp = function(configuration?: Configuration) {
          * This API let’s you to fetch a list of events with multiple query parameters
          * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-         * @param {string} [accountId] Filter option to filter the events based on account id.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
          * @param {*} [options] Override http request option.
@@ -6519,8 +6519,8 @@ export const EventManagementApiFactory = function (configuration?: Configuration
          * This API let’s you to fetch a list of events with multiple query parameters
          * @summary Get a list of usage events with multiple query options
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-         * @param {string} [accountId] Filter option to filter the events based on account id.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [schemaName] Filter option to filter the events based on schema name.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
          * @param {*} [options] Override http request option.
@@ -6553,8 +6553,8 @@ export class EventManagementApi extends BaseAPI {
      * This API let’s you to fetch a list of events with multiple query parameters
      * @summary Get a list of usage events with multiple query options
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-     * @param {string} [status] Filter option to filter the events by processed/unprocessed status.
-     * @param {string} [accountId] Filter option to filter the events based on account id.
+     * @param {string} [status] Filter option to filter by status.
+     * @param {string} [accountId] Filter option to filter based on account id.
      * @param {string} [schemaName] Filter option to filter the events based on schema name.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
      * @param {*} [options] Override http request option.
@@ -7269,7 +7269,7 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [customerId] Filter option to filter based on customer id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -7359,7 +7359,7 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [customerId] Filter option to filter based on customer id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -7396,7 +7396,7 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-         * @param {string} [status] Filter option to filter by processed/unprocessed status.
+         * @param {string} [status] Filter option to filter by status.
          * @param {string} [accountId] Filter option to filter based on account id.
          * @param {string} [customerId] Filter option to filter based on customer id.
          * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
@@ -7434,7 +7434,7 @@ export class InvoicesApi extends BaseAPI {
      * List invoices
      * @summary List invoices
      * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
-     * @param {string} [status] Filter option to filter by processed/unprocessed status.
+     * @param {string} [status] Filter option to filter by status.
      * @param {string} [accountId] Filter option to filter based on account id.
      * @param {string} [customerId] Filter option to filter based on customer id.
      * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
