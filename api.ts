@@ -57,6 +57,12 @@ export interface Account {
      * @memberof Account
      */
     'status': AccountStatusEnum;
+    /**
+     * 
+     * @type {Array<CreateEntitySetting>}
+     * @memberof Account
+     */
+    'settings'?: Array<CreateEntitySetting>;
 }
 
 export const AccountStatusEnum = {
@@ -205,6 +211,12 @@ export interface AddOn {
      * @memberof AddOn
      */
     'createdAt': string;
+    /**
+     * status of addon
+     * @type {string}
+     * @memberof AddOn
+     */
+    'status': AddOnStatusEnum;
 }
 
 export const AddOnTypeEnum = {
@@ -213,6 +225,12 @@ export const AddOnTypeEnum = {
 } as const;
 
 export type AddOnTypeEnum = typeof AddOnTypeEnum[keyof typeof AddOnTypeEnum];
+export const AddOnStatusEnum = {
+    Active: 'ACTIVE',
+    Archived: 'ARCHIVED'
+} as const;
+
+export type AddOnStatusEnum = typeof AddOnStatusEnum[keyof typeof AddOnStatusEnum];
 
 /**
  * 
@@ -232,7 +250,21 @@ export interface AddOnAllOf {
      * @memberof AddOnAllOf
      */
     'createdAt': string;
+    /**
+     * status of addon
+     * @type {string}
+     * @memberof AddOnAllOf
+     */
+    'status': AddOnAllOfStatusEnum;
 }
+
+export const AddOnAllOfStatusEnum = {
+    Active: 'ACTIVE',
+    Archived: 'ARCHIVED'
+} as const;
+
+export type AddOnAllOfStatusEnum = typeof AddOnAllOfStatusEnum[keyof typeof AddOnAllOfStatusEnum];
+
 /**
  * 
  * @export
@@ -370,6 +402,12 @@ export interface Computation {
      * @memberof Computation
      */
     'computation': string;
+    /**
+     * The order in which multiple matched computations will get evaluated
+     * @type {number}
+     * @memberof Computation
+     */
+    'order': number;
 }
 /**
  * 
@@ -427,6 +465,12 @@ export interface CreateAccountRequest {
      * @memberof CreateAccountRequest
      */
     'aliases'?: Array<string>;
+    /**
+     * 
+     * @type {Array<CreateEntitySetting>}
+     * @memberof CreateAccountRequest
+     */
+    'settings'?: Array<CreateEntitySetting>;
 }
 /**
  * Request to create an addon
@@ -496,7 +540,7 @@ export interface CreateCreditRequest {
      * @type {number}
      * @memberof CreateCreditRequest
      */
-    'priority'?: number;
+    'priority': number;
 }
 /**
  * Payload to create customer
@@ -528,6 +572,12 @@ export interface CreateCustomerRequest {
      * @memberof CreateCustomerRequest
      */
     'billingAddress': string;
+    /**
+     * 
+     * @type {Array<CreateEntitySetting>}
+     * @memberof CreateCustomerRequest
+     */
+    'settings'?: Array<CreateEntitySetting>;
     /**
      * 
      * @type {CreateAccountRequest}
@@ -567,10 +617,53 @@ export interface CreateCustomerResponse {
     'billingAddress': string;
     /**
      * 
+     * @type {Array<CreateEntitySetting>}
+     * @memberof CreateCustomerResponse
+     */
+    'settings'?: Array<CreateEntitySetting>;
+    /**
+     * 
      * @type {Account}
      * @memberof CreateCustomerResponse
      */
     'account'?: Account;
+}
+/**
+ * Represents a setting
+ * @export
+ * @interface CreateEntitySetting
+ */
+export interface CreateEntitySetting {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEntitySetting
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEntitySetting
+     */
+    'value': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEntitySetting
+     */
+    'namespace': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateEntitySetting
+     */
+    'name': string;
+    /**
+     * 
+     * @type {SettingDataType}
+     * @memberof CreateEntitySetting
+     */
+    'dataType': SettingDataType;
 }
 /**
  * Request to create event schema
@@ -799,7 +892,7 @@ export interface Credit {
      * @type {number}
      * @memberof Credit
      */
-    'priority'?: number;
+    'priority': number;
     /**
      * Identifier of credits
      * @type {string}
@@ -1002,7 +1095,7 @@ export interface CreditDetailsResponse {
      * @type {number}
      * @memberof CreditDetailsResponse
      */
-    'priority'?: number;
+    'priority': number;
     /**
      * Identifier of credits
      * @type {string}
@@ -1291,7 +1384,7 @@ export interface Dependency {
      * @type {string}
      * @memberof Dependency
      */
-    'alias'?: string;
+    'name': string;
 }
 
 export const DependencyTypeEnum = {
@@ -1991,12 +2084,6 @@ export interface Field {
     'value': string;
     /**
      * 
-     * @type {string}
-     * @memberof Field
-     */
-    'defaultValue'?: string;
-    /**
-     * 
      * @type {number}
      * @memberof Field
      */
@@ -2053,6 +2140,12 @@ export interface FixedFeeRateCard {
      * @memberof FixedFeeRateCard
      */
     'displayName'?: string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof FixedFeeRateCard
+     */
+    'invoiceTiming'?: InvoiceTiming;
     /**
      * 
      * @type {Array<CurrencyRateValue>}
@@ -2266,6 +2359,12 @@ export interface InternalFixedFeeRateCard {
      * @memberof InternalFixedFeeRateCard
      */
     'rate': number;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof InternalFixedFeeRateCard
+     */
+    'invoiceTiming': InvoiceTiming;
 }
 /**
  * 
@@ -2591,6 +2690,20 @@ export interface InvoiceLineItem {
      */
     'lineItems': Array<InvoiceLineItem>;
 }
+/**
+ * If IN_ADVANCE, the fixed fee will be invoiced in the previous billing cycle. If IN_ARREARS, the fixed fee will be invoiced in the current billing cycle. 
+ * @export
+ * @enum {string}
+ */
+
+export const InvoiceTiming = {
+    IN_ADVANCE: 'IN_ADVANCE',
+    IN_ARREARS: 'IN_ARREARS'
+} as const;
+
+export type InvoiceTiming = typeof InvoiceTiming[keyof typeof InvoiceTiming];
+
+
 /**
  * List credits response
  * @export
@@ -3516,7 +3629,7 @@ export interface RevenueSummaryResponseRevenueSummary {
     'fixedFeeRevenue'?: number;
 }
 /**
- * Represents user_setting
+ * Represents a setting
  * @export
  * @interface Setting
  */
@@ -3526,13 +3639,13 @@ export interface Setting {
      * @type {string}
      * @memberof Setting
      */
-    'settingName': string;
+    'id': string;
     /**
      * 
      * @type {string}
      * @memberof Setting
      */
-    'settingValue': string;
+    'value': string;
     /**
      * 
      * @type {string}
@@ -3545,6 +3658,65 @@ export interface Setting {
      * @memberof Setting
      */
     'entityId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Setting
+     */
+    'namespace': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Setting
+     */
+    'name': string;
+    /**
+     * 
+     * @type {SettingDataType}
+     * @memberof Setting
+     */
+    'dataType': SettingDataType;
+}
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const SettingDataType = {
+    String: 'STRING',
+    Numeric: 'NUMERIC',
+    Json: 'JSON',
+    JsonLogic: 'JSON_LOGIC'
+} as const;
+
+export type SettingDataType = typeof SettingDataType[keyof typeof SettingDataType];
+
+
+/**
+ * 
+ * @export
+ * @interface SettingPaginatedResponse
+ */
+export interface SettingPaginatedResponse {
+    /**
+     * 
+     * @type {Array<Setting>}
+     * @memberof SettingPaginatedResponse
+     */
+    'data'?: Array<Setting>;
+    /**
+     * 
+     * @type {string}
+     * @memberof SettingPaginatedResponse
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof SettingPaginatedResponse
+     */
+    'context'?: PaginationOptions;
 }
 /**
  * Payload to signup
@@ -3964,6 +4136,31 @@ export interface UpdatePricingScheduleResponse {
     'pricingSchedules': Array<PlanOverride>;
 }
 /**
+ * Update Settings
+ * @export
+ * @interface UpdateSettingRequest
+ */
+export interface UpdateSettingRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateSettingRequest
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateSettingRequest
+     */
+    'value'?: string;
+    /**
+     * 
+     * @type {SettingDataType}
+     * @memberof UpdateSettingRequest
+     */
+    'dataType'?: SettingDataType;
+}
+/**
  * Request to update usage meter
  * @export
  * @interface UpdateUsageMeterRequest
@@ -3980,13 +4177,13 @@ export interface UpdateUsageMeterRequest {
      * @type {string}
      * @memberof UpdateUsageMeterRequest
      */
-    'type': UpdateUsageMeterRequestTypeEnum;
+    'type'?: UpdateUsageMeterRequestTypeEnum;
     /**
      * Aggregation to be applied on usage meter result * COUNT - Counts number of events matching the usage meter * SUM - Sums up results of computation of all events matching usage meter 
      * @type {string}
      * @memberof UpdateUsageMeterRequest
      */
-    'aggregation': UpdateUsageMeterRequestAggregationEnum;
+    'aggregation'?: UpdateUsageMeterRequestAggregationEnum;
     /**
      * 
      * @type {Array<Computation>}
@@ -5048,6 +5245,44 @@ export const AddOnsApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Archive an addOn
+         * @summary Delete an addon
+         * @param {string} addonId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAddOn: async (addonId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'addonId' is not null or undefined
+            assertParamExists('deleteAddOn', 'addonId', addonId)
+            const localVarPath = `/addons/{addon_id}`
+                .replace(`{${"addon_id"}}`, encodeURIComponent(String(addonId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get details of an addon
          * @summary Get an addon
          * @param {string} addonId 
@@ -5088,12 +5323,13 @@ export const AddOnsApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * Get a list of add-ons
          * @summary List addOns
+         * @param {'ACTIVE' | 'ARCHIVED'} [status] Filter by status 
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAddOns: async (nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAddOns: async (status?: 'ACTIVE' | 'ARCHIVED', nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/addons`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -5109,6 +5345,10 @@ export const AddOnsApiAxiosParamCreator = function (configuration?: Configuratio
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
 
             if (nextToken !== undefined) {
                 localVarQueryParameter['nextToken'] = nextToken;
@@ -5195,6 +5435,17 @@ export const AddOnsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Archive an addOn
+         * @summary Delete an addon
+         * @param {string} addonId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteAddOn(addonId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteAddOn(addonId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get details of an addon
          * @summary Get an addon
          * @param {string} addonId 
@@ -5208,13 +5459,14 @@ export const AddOnsApiFp = function(configuration?: Configuration) {
         /**
          * Get a list of add-ons
          * @summary List addOns
+         * @param {'ACTIVE' | 'ARCHIVED'} [status] Filter by status 
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAddOns(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AddOnPaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAddOns(nextToken, pageSize, options);
+        async getAddOns(status?: 'ACTIVE' | 'ARCHIVED', nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AddOnPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAddOns(status, nextToken, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -5250,6 +5502,16 @@ export const AddOnsApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.createAddOn(createAddOnRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Archive an addOn
+         * @summary Delete an addon
+         * @param {string} addonId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteAddOn(addonId: string, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.deleteAddOn(addonId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get details of an addon
          * @summary Get an addon
          * @param {string} addonId 
@@ -5262,13 +5524,14 @@ export const AddOnsApiFactory = function (configuration?: Configuration, basePat
         /**
          * Get a list of add-ons
          * @summary List addOns
+         * @param {'ACTIVE' | 'ARCHIVED'} [status] Filter by status 
          * @param {string} [nextToken] 
          * @param {number} [pageSize] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAddOns(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<AddOnPaginatedResponse> {
-            return localVarFp.getAddOns(nextToken, pageSize, options).then((request) => request(axios, basePath));
+        getAddOns(status?: 'ACTIVE' | 'ARCHIVED', nextToken?: string, pageSize?: number, options?: any): AxiosPromise<AddOnPaginatedResponse> {
+            return localVarFp.getAddOns(status, nextToken, pageSize, options).then((request) => request(axios, basePath));
         },
         /**
          * Update an existing addon 
@@ -5304,6 +5567,18 @@ export class AddOnsApi extends BaseAPI {
     }
 
     /**
+     * Archive an addOn
+     * @summary Delete an addon
+     * @param {string} addonId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AddOnsApi
+     */
+    public deleteAddOn(addonId: string, options?: AxiosRequestConfig) {
+        return AddOnsApiFp(this.configuration).deleteAddOn(addonId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get details of an addon
      * @summary Get an addon
      * @param {string} addonId 
@@ -5318,14 +5593,15 @@ export class AddOnsApi extends BaseAPI {
     /**
      * Get a list of add-ons
      * @summary List addOns
+     * @param {'ACTIVE' | 'ARCHIVED'} [status] Filter by status 
      * @param {string} [nextToken] 
      * @param {number} [pageSize] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AddOnsApi
      */
-    public getAddOns(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
-        return AddOnsApiFp(this.configuration).getAddOns(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
+    public getAddOns(status?: 'ACTIVE' | 'ARCHIVED', nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
+        return AddOnsApiFp(this.configuration).getAddOns(status, nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8246,6 +8522,372 @@ export class PricePlansApi extends BaseAPI {
      */
     public updatePricePlan(pricePlanId: string, updatePricePlanRequest: UpdatePricePlanRequest, options?: AxiosRequestConfig) {
         return PricePlansApiFp(this.configuration).updatePricePlan(pricePlanId, updatePricePlanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * SettingsApi - axios parameter creator
+ * @export
+ */
+export const SettingsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Get a setting
+         * @summary Get a setting
+         * @param {string} settingIdStr 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSetting: async (settingIdStr: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'settingIdStr' is not null or undefined
+            assertParamExists('getSetting', 'settingIdStr', settingIdStr)
+            const localVarPath = `/settings/{setting_id_str}`
+                .replace(`{${"setting_id_str"}}`, encodeURIComponent(String(settingIdStr)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Create a setting
+         * @summary Create a setting
+         * @param {Setting} setting Payload to insert setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        insertSetting: async (setting: Setting, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'setting' is not null or undefined
+            assertParamExists('insertSetting', 'setting', setting)
+            const localVarPath = `/settings`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(setting, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List settings
+         * @summary Lists settings
+         * @param {string} entityType 
+         * @param {string} entityId 
+         * @param {string} settingId 
+         * @param {string} namespace 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSetting: async (entityType: string, entityId: string, settingId: string, namespace: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'entityType' is not null or undefined
+            assertParamExists('listSetting', 'entityType', entityType)
+            // verify required parameter 'entityId' is not null or undefined
+            assertParamExists('listSetting', 'entityId', entityId)
+            // verify required parameter 'settingId' is not null or undefined
+            assertParamExists('listSetting', 'settingId', settingId)
+            // verify required parameter 'namespace' is not null or undefined
+            assertParamExists('listSetting', 'namespace', namespace)
+            const localVarPath = `/settings`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (entityType !== undefined) {
+                localVarQueryParameter['entity_type'] = entityType;
+            }
+
+            if (entityId !== undefined) {
+                localVarQueryParameter['entity_id'] = entityId;
+            }
+
+            if (settingId !== undefined) {
+                localVarQueryParameter['setting_id'] = settingId;
+            }
+
+            if (namespace !== undefined) {
+                localVarQueryParameter['namespace'] = namespace;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update a setting
+         * @summary Update a setting
+         * @param {string} settingIdStr 
+         * @param {UpdateSettingRequest} updateSettingRequest Payload to update setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateSetting: async (settingIdStr: string, updateSettingRequest: UpdateSettingRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'settingIdStr' is not null or undefined
+            assertParamExists('updateSetting', 'settingIdStr', settingIdStr)
+            // verify required parameter 'updateSettingRequest' is not null or undefined
+            assertParamExists('updateSetting', 'updateSettingRequest', updateSettingRequest)
+            const localVarPath = `/settings/{setting_id_str}`
+                .replace(`{${"setting_id_str"}}`, encodeURIComponent(String(settingIdStr)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateSettingRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * SettingsApi - functional programming interface
+ * @export
+ */
+export const SettingsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = SettingsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Get a setting
+         * @summary Get a setting
+         * @param {string} settingIdStr 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getSetting(settingIdStr: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getSetting(settingIdStr, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Create a setting
+         * @summary Create a setting
+         * @param {Setting} setting Payload to insert setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async insertSetting(setting: Setting, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.insertSetting(setting, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * List settings
+         * @summary Lists settings
+         * @param {string} entityType 
+         * @param {string} entityId 
+         * @param {string} settingId 
+         * @param {string} namespace 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listSetting(entityType: string, entityId: string, settingId: string, namespace: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listSetting(entityType, entityId, settingId, namespace, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Update a setting
+         * @summary Update a setting
+         * @param {string} settingIdStr 
+         * @param {UpdateSettingRequest} updateSettingRequest Payload to update setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateSetting(settingIdStr: string, updateSettingRequest: UpdateSettingRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Setting>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateSetting(settingIdStr, updateSettingRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * SettingsApi - factory interface
+ * @export
+ */
+export const SettingsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = SettingsApiFp(configuration)
+    return {
+        /**
+         * Get a setting
+         * @summary Get a setting
+         * @param {string} settingIdStr 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getSetting(settingIdStr: string, options?: any): AxiosPromise<Setting> {
+            return localVarFp.getSetting(settingIdStr, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Create a setting
+         * @summary Create a setting
+         * @param {Setting} setting Payload to insert setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        insertSetting(setting: Setting, options?: any): AxiosPromise<Setting> {
+            return localVarFp.insertSetting(setting, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List settings
+         * @summary Lists settings
+         * @param {string} entityType 
+         * @param {string} entityId 
+         * @param {string} settingId 
+         * @param {string} namespace 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listSetting(entityType: string, entityId: string, settingId: string, namespace: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
+            return localVarFp.listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update a setting
+         * @summary Update a setting
+         * @param {string} settingIdStr 
+         * @param {UpdateSettingRequest} updateSettingRequest Payload to update setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateSetting(settingIdStr: string, updateSettingRequest: UpdateSettingRequest, options?: any): AxiosPromise<Setting> {
+            return localVarFp.updateSetting(settingIdStr, updateSettingRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * SettingsApi - object-oriented interface
+ * @export
+ * @class SettingsApi
+ * @extends {BaseAPI}
+ */
+export class SettingsApi extends BaseAPI {
+    /**
+     * Get a setting
+     * @summary Get a setting
+     * @param {string} settingIdStr 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SettingsApi
+     */
+    public getSetting(settingIdStr: string, options?: AxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).getSetting(settingIdStr, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Create a setting
+     * @summary Create a setting
+     * @param {Setting} setting Payload to insert setting
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SettingsApi
+     */
+    public insertSetting(setting: Setting, options?: AxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).insertSetting(setting, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List settings
+     * @summary Lists settings
+     * @param {string} entityType 
+     * @param {string} entityId 
+     * @param {string} settingId 
+     * @param {string} namespace 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SettingsApi
+     */
+    public listSetting(entityType: string, entityId: string, settingId: string, namespace: string, options?: AxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update a setting
+     * @summary Update a setting
+     * @param {string} settingIdStr 
+     * @param {UpdateSettingRequest} updateSettingRequest Payload to update setting
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof SettingsApi
+     */
+    public updateSetting(settingIdStr: string, updateSettingRequest: UpdateSettingRequest, options?: AxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).updateSetting(settingIdStr, updateSettingRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
