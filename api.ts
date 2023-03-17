@@ -8638,22 +8638,14 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * List settings
          * @summary Lists settings
-         * @param {string} entityType 
-         * @param {string} entityId 
-         * @param {string} settingId 
-         * @param {string} namespace 
+         * @param {string} [entityType] 
+         * @param {string} [entityId] 
+         * @param {string} [settingId] 
+         * @param {string} [namespace] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listSetting: async (entityType: string, entityId: string, settingId: string, namespace: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'entityType' is not null or undefined
-            assertParamExists('listSetting', 'entityType', entityType)
-            // verify required parameter 'entityId' is not null or undefined
-            assertParamExists('listSetting', 'entityId', entityId)
-            // verify required parameter 'settingId' is not null or undefined
-            assertParamExists('listSetting', 'settingId', settingId)
-            // verify required parameter 'namespace' is not null or undefined
-            assertParamExists('listSetting', 'namespace', namespace)
+        listSetting: async (entityType?: string, entityId?: string, settingId?: string, namespace?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/settings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -8776,14 +8768,14 @@ export const SettingsApiFp = function(configuration?: Configuration) {
         /**
          * List settings
          * @summary Lists settings
-         * @param {string} entityType 
-         * @param {string} entityId 
-         * @param {string} settingId 
-         * @param {string} namespace 
+         * @param {string} [entityType] 
+         * @param {string} [entityId] 
+         * @param {string} [settingId] 
+         * @param {string} [namespace] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listSetting(entityType: string, entityId: string, settingId: string, namespace: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
+        async listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listSetting(entityType, entityId, settingId, namespace, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -8832,14 +8824,14 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
         /**
          * List settings
          * @summary Lists settings
-         * @param {string} entityType 
-         * @param {string} entityId 
-         * @param {string} settingId 
-         * @param {string} namespace 
+         * @param {string} [entityType] 
+         * @param {string} [entityId] 
+         * @param {string} [settingId] 
+         * @param {string} [namespace] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listSetting(entityType: string, entityId: string, settingId: string, namespace: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
+        listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
             return localVarFp.listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(axios, basePath));
         },
         /**
@@ -8890,15 +8882,15 @@ export class SettingsApi extends BaseAPI {
     /**
      * List settings
      * @summary Lists settings
-     * @param {string} entityType 
-     * @param {string} entityId 
-     * @param {string} settingId 
-     * @param {string} namespace 
+     * @param {string} [entityType] 
+     * @param {string} [entityId] 
+     * @param {string} [settingId] 
+     * @param {string} [namespace] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof SettingsApi
      */
-    public listSetting(entityType: string, entityId: string, settingId: string, namespace: string, options?: AxiosRequestConfig) {
+    public listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig) {
         return SettingsApiFp(this.configuration).listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(this.axios, this.basePath));
     }
 
