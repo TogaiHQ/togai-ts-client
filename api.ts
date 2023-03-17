@@ -367,6 +367,12 @@ export interface CalculateRevenueResponse {
     'currency': string;
     /**
      * 
+     * @type {UsageLookupRange}
+     * @memberof CalculateRevenueResponse
+     */
+    'usageLookupRange'?: UsageLookupRange;
+    /**
+     * 
      * @type {PricePlanDetails}
      * @memberof CalculateRevenueResponse
      */
@@ -4287,6 +4293,25 @@ export interface UsageConfigLookupRange {
      * @memberof UsageConfigLookupRange
      */
     'accountId': string;
+}
+/**
+ * Start and end dates of usage lookup if usage mode is LOOKUP
+ * @export
+ * @interface UsageLookupRange
+ */
+export interface UsageLookupRange {
+    /**
+     * 
+     * @type {string}
+     * @memberof UsageLookupRange
+     */
+    'start': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsageLookupRange
+     */
+    'end': string;
 }
 /**
  * Structure of usage meter
