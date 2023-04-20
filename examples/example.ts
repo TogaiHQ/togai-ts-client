@@ -21,6 +21,7 @@ import {
     PricingCycleConfigIntervalEnum,
     PricingModel,
     PriceType,
+    UpdatePricingScheduleRequestModeEnum,
 } from "togai-client";
 
 const API_TOKEN = process.env.API_TOKEN;
@@ -66,8 +67,10 @@ async function sample() {
         name: "message_count" + "-" + randomSeed,
         type: CreateUsageMeterRequestTypeEnum.Counter,
         aggregation: CreateUsageMeterRequestAggregationEnum.Count,
+        eventSchemaName: eventSchema.name,
         computations: [
             {
+                order: 1,
                 // The filters are written in Json Logic format
                 matcher: `{
                     "==": [
@@ -84,14 +87,13 @@ async function sample() {
     const usageMeterApi = new UsageMetersApi(configuration);
     const usageMeter = (
         await usageMeterApi.createUsageMeter(
-            eventSchema.name,
             createUsageMeterRequest
         )
     ).data;
     console.log("Usage Meter created", usageMeter);
 
     // Step 4: Activate a usage meter
-    await usageMeterApi.activateUsageMeter(eventSchema.name, usageMeter.id);
+    await usageMeterApi.activateUsageMeter(usageMeter.id);
 
     // Step 5: Create a Price plan to convert the usage into a billable price
     const createPricePlanRequest: CreatePricePlanRequest = {
@@ -172,10 +174,11 @@ async function sample() {
     const associatePricePlanRequest: UpdatePricingScheduleRequest = {
         pricePlanId: pricePlan.id,
         effectiveFrom: new Date().toISOString().substring(0, 10),
-        effectiveUntil: "9999-01-01"
+        effectiveUntil: "9999-01-01",
+        mode: UpdatePricingScheduleRequestModeEnum.Associate
     }
     const associatePricePlanApi = new AccountsApi(configuration);
-    const associatePricePlan = (await associatePricePlanApi.updatePricingSchedule(customer.id, customer.id, associatePricePlanRequest)).data;
+    const associatePricePlan = (await associatePricePlanApi.updatePricingSchedule(customer.id, associatePricePlanRequest)).data;
     console.log("Price Plan associated", associatePricePlan);
 
     //Step 9: Ingest events
