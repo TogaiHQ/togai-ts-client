@@ -2102,6 +2102,12 @@ export interface EventWithStatus {
      * @memberof EventWithStatus
      */
     'source'?: EventSource;
+    /**
+     * Created time stamp of the event. This timestamp must be in ISO 8601 format.
+     * @type {string}
+     * @memberof EventWithStatus
+     */
+    'createdAt': string;
 }
 /**
  * 
@@ -2133,6 +2139,12 @@ export interface EventWithStatusAndEventPipelineInfo {
      * @memberof EventWithStatusAndEventPipelineInfo
      */
     'source'?: EventSource;
+    /**
+     * Created time stamp of the event. This timestamp must be in ISO 8601 format.
+     * @type {string}
+     * @memberof EventWithStatusAndEventPipelineInfo
+     */
+    'createdAt': string;
     /**
      * 
      * @type {EventPipelineInfo}
