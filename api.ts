@@ -477,43 +477,6 @@ export interface CreateAccountRequest {
 /**
  * Payload to create account
  * @export
- * @interface CreateAccountRequestOld
- */
-export interface CreateAccountRequestOld {
-    /**
-     * Identifier of the account
-     * @type {string}
-     * @memberof CreateAccountRequestOld
-     */
-    'id': string;
-    /**
-     * Name of the Account
-     * @type {string}
-     * @memberof CreateAccountRequestOld
-     */
-    'name': string;
-    /**
-     * Use [ISO 4217](https://en.wikipedia.org/wiki/ISO_4217) currency code in which the account must be invoiced.   For example: AED is the currency code for United Arab Emirates dirham. 
-     * @type {string}
-     * @memberof CreateAccountRequestOld
-     */
-    'invoiceCurrency'?: string;
-    /**
-     * Aliases are tags that are associated with an account. Multiple aliases are allowed for a single account.
-     * @type {Array<string>}
-     * @memberof CreateAccountRequestOld
-     */
-    'aliases'?: Array<string>;
-    /**
-     * 
-     * @type {Array<CreateEntitySetting>}
-     * @memberof CreateAccountRequestOld
-     */
-    'settings'?: Array<CreateEntitySetting>;
-}
-/**
- * Payload to create account
- * @export
  * @interface CreateAccountRequestWithoutCustomerId
  */
 export interface CreateAccountRequestWithoutCustomerId {
@@ -926,56 +889,6 @@ export const CreateUsageMeterRequestAggregationEnum = {
 } as const;
 
 export type CreateUsageMeterRequestAggregationEnum = typeof CreateUsageMeterRequestAggregationEnum[keyof typeof CreateUsageMeterRequestAggregationEnum];
-
-/**
- * Request to create usage meter
- * @export
- * @interface CreateUsageMeterRequestOld
- */
-export interface CreateUsageMeterRequestOld {
-    /**
-     * Name of the event. Must be unique for an organization.
-     * @type {string}
-     * @memberof CreateUsageMeterRequestOld
-     */
-    'name': string;
-    /**
-     * Description of the event
-     * @type {string}
-     * @memberof CreateUsageMeterRequestOld
-     */
-    'description'?: string;
-    /**
-     * Type of usage meter
-     * @type {string}
-     * @memberof CreateUsageMeterRequestOld
-     */
-    'type': CreateUsageMeterRequestOldTypeEnum;
-    /**
-     * Aggregation to be applied on usage meter result
-     * @type {string}
-     * @memberof CreateUsageMeterRequestOld
-     */
-    'aggregation': CreateUsageMeterRequestOldAggregationEnum;
-    /**
-     * 
-     * @type {Array<Computation>}
-     * @memberof CreateUsageMeterRequestOld
-     */
-    'computations'?: Array<Computation>;
-}
-
-export const CreateUsageMeterRequestOldTypeEnum = {
-    Counter: 'COUNTER'
-} as const;
-
-export type CreateUsageMeterRequestOldTypeEnum = typeof CreateUsageMeterRequestOldTypeEnum[keyof typeof CreateUsageMeterRequestOldTypeEnum];
-export const CreateUsageMeterRequestOldAggregationEnum = {
-    Count: 'COUNT',
-    Sum: 'SUM'
-} as const;
-
-export type CreateUsageMeterRequestOldAggregationEnum = typeof CreateUsageMeterRequestOldAggregationEnum[keyof typeof CreateUsageMeterRequestOldAggregationEnum];
 
 /**
  * 
@@ -1702,6 +1615,12 @@ export interface Event {
      * @memberof Event
      */
     'dimensions': { [key: string]: string; };
+    /**
+     * Created time stamp of the event. This timestamp must be in ISO 8601 format.
+     * @type {string}
+     * @memberof Event
+     */
+    'createdAt': string;
 }
 /**
  * Structure of an event attribute
@@ -2183,6 +2102,12 @@ export interface EventWithStatus {
      * @memberof EventWithStatus
      */
     'source'?: EventSource;
+    /**
+     * Created time stamp of the event. This timestamp must be in ISO 8601 format.
+     * @type {string}
+     * @memberof EventWithStatus
+     */
+    'createdAt': string;
 }
 /**
  * 
@@ -2214,6 +2139,12 @@ export interface EventWithStatusAndEventPipelineInfo {
      * @memberof EventWithStatusAndEventPipelineInfo
      */
     'source'?: EventSource;
+    /**
+     * Created time stamp of the event. This timestamp must be in ISO 8601 format.
+     * @type {string}
+     * @memberof EventWithStatusAndEventPipelineInfo
+     */
+    'createdAt': string;
     /**
      * 
      * @type {EventPipelineInfo}
@@ -2341,6 +2272,12 @@ export interface FixedFeeRateCard {
      * @memberof FixedFeeRateCard
      */
     'rateValues': Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof FixedFeeRateCard
+     */
+    'enableProration': boolean;
 }
 
 
@@ -2442,31 +2379,6 @@ export interface IngestBatchEventRequest {
     'events': Array<Event>;
 }
 /**
- * @type IngestBatchEventResponse
- * @export
- */
-export type IngestBatchEventResponse = BaseSuccessResponse | IngestError;
-
-/**
- * 
- * @export
- * @interface IngestError
- */
-export interface IngestError {
-    /**
-     * 
-     * @type {string}
-     * @memberof IngestError
-     */
-    'message'?: string;
-    /**
-     * 
-     * @type {Event}
-     * @memberof IngestError
-     */
-    'eventPayload'?: Event;
-}
-/**
  * Payload for ingesting events
  * @export
  * @interface IngestEventRequest
@@ -2486,11 +2398,41 @@ export interface IngestEventRequest {
  */
 export interface IngestEventResponse {
     /**
-     * On successful ingestion acceptance request, ingestion request id will be returned. This ingestion id can be used by clients to query the status of ingestion (IN_PROGRESS, COMPLETED).
+     * 
+     * @type {boolean}
+     * @memberof IngestEventResponse
+     */
+    'success'?: boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof IngestEventResponse
+     */
+    'statusCode'?: number;
+    /**
+     * 
      * @type {string}
      * @memberof IngestEventResponse
      */
-    'ingestionRequestId': string;
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IngestEventResponse
+     */
+    'message'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof IngestEventResponse
+     */
+    'code'?: string;
+    /**
+     * 
+     * @type {object}
+     * @memberof IngestEventResponse
+     */
+    'details'?: object;
 }
 /**
  * Status about the event ingestion.
@@ -2568,6 +2510,18 @@ export interface InternalFixedFeeRateCard {
      * @memberof InternalFixedFeeRateCard
      */
     'type'?: FixedFeeType;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof InternalFixedFeeRateCard
+     */
+    'enableProration': boolean;
+    /**
+     * number of days into the pricing cycle after which the fixed fee must be applied.
+     * @type {number}
+     * @memberof InternalFixedFeeRateCard
+     */
+    'startPeriod': number;
 }
 
 
@@ -2958,6 +2912,19 @@ export interface ListInvoicesResponse {
     'nextToken'?: string;
 }
 /**
+ * Payload to update custom line items
+ * @export
+ * @interface ManageMiscellaneousChargesRequest
+ */
+export interface ManageMiscellaneousChargesRequest {
+    /**
+     * 
+     * @type {Array<MiscellaneousCharge>}
+     * @memberof ManageMiscellaneousChargesRequest
+     */
+    'items': Array<MiscellaneousCharge>;
+}
+/**
  * 
  * @export
  * @interface MetricDataPoints
@@ -3134,6 +3101,38 @@ export interface MinimumCommitment {
      * @memberof MinimumCommitment
      */
     'rateValues': Array<CurrencyRateValue>;
+}
+/**
+ * Miscellaneous charges are the charges that can be added to the invoice
+ * @export
+ * @interface MiscellaneousCharge
+ */
+export interface MiscellaneousCharge {
+    /**
+     * Name of the miscellaneous charge
+     * @type {string}
+     * @memberof MiscellaneousCharge
+     */
+    'name': string;
+    /**
+     * Value of the charge
+     * @type {string}
+     * @memberof MiscellaneousCharge
+     */
+    'value': string;
+}
+/**
+ * Miscellaneous charges response
+ * @export
+ * @interface MiscellaneousChargesResponse
+ */
+export interface MiscellaneousChargesResponse {
+    /**
+     * 
+     * @type {Array<MiscellaneousCharge>}
+     * @memberof MiscellaneousChargesResponse
+     */
+    'data': Array<MiscellaneousCharge>;
 }
 /**
  * 
@@ -3428,6 +3427,12 @@ export interface PricePlanListData {
      */
     'name': string;
     /**
+     * Version of the price plan
+     * @type {number}
+     * @memberof PricePlanListData
+     */
+    'version': number;
+    /**
      * Description of price plan
      * @type {string}
      * @memberof PricePlanListData
@@ -3611,6 +3616,12 @@ export interface PricingSchedule {
      * @memberof PricingSchedule
      */
     'endDate': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PricingSchedule
+     */
+    'version': number;
 }
 /**
  * 
@@ -3620,10 +3631,10 @@ export interface PricingSchedule {
 export interface PricingSchedulePaginatedResponse {
     /**
      * 
-     * @type {Array<PricingSchedule>}
+     * @type {Array<PricingScheduleWithPricePlanId>}
      * @memberof PricingSchedulePaginatedResponse
      */
-    'data'?: Array<PricingSchedule>;
+    'data'?: Array<PricingScheduleWithPricePlanId>;
     /**
      * 
      * @type {string}
@@ -3636,6 +3647,62 @@ export interface PricingSchedulePaginatedResponse {
      * @memberof PricingSchedulePaginatedResponse
      */
     'previousToken'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface PricingScheduleWithPricePlanId
+ */
+export interface PricingScheduleWithPricePlanId {
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'id': string;
+    /**
+     * 
+     * @type {PricePlanDetails}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'pricePlanDetails'?: PricePlanDetails;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'startDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'endDate': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'version': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'pricePlanId': string;
+}
+/**
+ * 
+ * @export
+ * @interface PricingScheduleWithPricePlanIdAllOf
+ */
+export interface PricingScheduleWithPricePlanIdAllOf {
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanIdAllOf
+     */
+    'pricePlanId': string;
 }
 /**
  * Contains all rate related configurations
@@ -4332,7 +4399,36 @@ export interface UpdatePricePlanRequest {
      * @memberof UpdatePricePlanRequest
      */
     'pricePlanDetails'?: CreatePricePlanDetailsOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdatePricePlanRequest
+     */
+    'migrationMode'?: UpdatePricePlanRequestMigrationModeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdatePricePlanRequest
+     */
+    'versionsToMigrate'?: UpdatePricePlanRequestVersionsToMigrateEnum;
 }
+
+export const UpdatePricePlanRequestMigrationModeEnum = {
+    Immediate: 'IMMEDIATE',
+    ImmediateIgnoreOverride: 'IMMEDIATE_IGNORE_OVERRIDE',
+    NextCycle: 'NEXT_CYCLE',
+    NextCycleIgnoreOverride: 'NEXT_CYCLE_IGNORE_OVERRIDE',
+    None: 'NONE'
+} as const;
+
+export type UpdatePricePlanRequestMigrationModeEnum = typeof UpdatePricePlanRequestMigrationModeEnum[keyof typeof UpdatePricePlanRequestMigrationModeEnum];
+export const UpdatePricePlanRequestVersionsToMigrateEnum = {
+    LatestVersion: 'LATEST_VERSION',
+    AllVersion: 'ALL_VERSION'
+} as const;
+
+export type UpdatePricePlanRequestVersionsToMigrateEnum = typeof UpdatePricePlanRequestVersionsToMigrateEnum[keyof typeof UpdatePricePlanRequestVersionsToMigrateEnum];
+
 /**
  * Request to dis/associate a price plan to an account
  * @export
@@ -6977,7 +7073,7 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ingest(ingestEventRequest: IngestEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+        async ingest(ingestEventRequest: IngestEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestEventResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.ingest(ingestEventRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -6988,7 +7084,7 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestBatchEventResponse>> {
+        async ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestEventResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.ingestBatch(ingestBatchEventRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -7009,7 +7105,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ingest(ingestEventRequest: IngestEventRequest, options?: any): AxiosPromise<void> {
+        ingest(ingestEventRequest: IngestEventRequest, options?: any): AxiosPromise<IngestEventResponse> {
             return localVarFp.ingest(ingestEventRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -7019,7 +7115,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: any): AxiosPromise<IngestBatchEventResponse> {
+        ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: any): AxiosPromise<IngestEventResponse> {
             return localVarFp.ingestBatch(ingestBatchEventRequest, options).then((request) => request(axios, basePath));
         },
     };
@@ -8026,6 +8122,90 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Add or update miscellaneous charges in upcoming Invoice for a account
+         * @summary Add or update miscellaneous charges in upcoming Invoice for a account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        manageMiscellaneousChargesInAccount: async (accountId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('manageMiscellaneousChargesInAccount', 'accountId', accountId)
+            const localVarPath = `/accounts/{account_id}/miscellaneous_charges`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(manageMiscellaneousChargesRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Add or update miscellaneous charges in Invoice
+         * @summary Add or update miscellaneous charges in Invoice
+         * @param {string} invoiceId 
+         * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        manageMiscellaneousChargesInInvoice: async (invoiceId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invoiceId' is not null or undefined
+            assertParamExists('manageMiscellaneousChargesInInvoice', 'invoiceId', invoiceId)
+            const localVarPath = `/invoices/{invoice_id}/miscellaneous_charges`
+                .replace(`{${"invoice_id"}}`, encodeURIComponent(String(invoiceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(manageMiscellaneousChargesRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -8064,6 +8244,30 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listInvoices(nextToken, status, accountId, customerId, pageSize, startTime, endTime, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Add or update miscellaneous charges in upcoming Invoice for a account
+         * @summary Add or update miscellaneous charges in upcoming Invoice for a account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async manageMiscellaneousChargesInAccount(accountId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MiscellaneousChargesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.manageMiscellaneousChargesInAccount(accountId, manageMiscellaneousChargesRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Add or update miscellaneous charges in Invoice
+         * @summary Add or update miscellaneous charges in Invoice
+         * @param {string} invoiceId 
+         * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async manageMiscellaneousChargesInInvoice(invoiceId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MiscellaneousChargesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.manageMiscellaneousChargesInInvoice(invoiceId, manageMiscellaneousChargesRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -8099,6 +8303,28 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
          */
         listInvoices(nextToken?: string, status?: string, accountId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: any): AxiosPromise<ListInvoicesResponse> {
             return localVarFp.listInvoices(nextToken, status, accountId, customerId, pageSize, startTime, endTime, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Add or update miscellaneous charges in upcoming Invoice for a account
+         * @summary Add or update miscellaneous charges in upcoming Invoice for a account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        manageMiscellaneousChargesInAccount(accountId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: any): AxiosPromise<MiscellaneousChargesResponse> {
+            return localVarFp.manageMiscellaneousChargesInAccount(accountId, manageMiscellaneousChargesRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Add or update miscellaneous charges in Invoice
+         * @summary Add or update miscellaneous charges in Invoice
+         * @param {string} invoiceId 
+         * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        manageMiscellaneousChargesInInvoice(invoiceId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: any): AxiosPromise<MiscellaneousChargesResponse> {
+            return localVarFp.manageMiscellaneousChargesInInvoice(invoiceId, manageMiscellaneousChargesRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8138,6 +8364,32 @@ export class InvoicesApi extends BaseAPI {
      */
     public listInvoices(nextToken?: string, status?: string, accountId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: AxiosRequestConfig) {
         return InvoicesApiFp(this.configuration).listInvoices(nextToken, status, accountId, customerId, pageSize, startTime, endTime, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Add or update miscellaneous charges in upcoming Invoice for a account
+     * @summary Add or update miscellaneous charges in upcoming Invoice for a account
+     * @param {string} accountId account_id corresponding to an account
+     * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoicesApi
+     */
+    public manageMiscellaneousChargesInAccount(accountId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: AxiosRequestConfig) {
+        return InvoicesApiFp(this.configuration).manageMiscellaneousChargesInAccount(accountId, manageMiscellaneousChargesRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Add or update miscellaneous charges in Invoice
+     * @summary Add or update miscellaneous charges in Invoice
+     * @param {string} invoiceId 
+     * @param {ManageMiscellaneousChargesRequest} [manageMiscellaneousChargesRequest] Payload to update custom line items
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoicesApi
+     */
+    public manageMiscellaneousChargesInInvoice(invoiceId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: AxiosRequestConfig) {
+        return InvoicesApiFp(this.configuration).manageMiscellaneousChargesInInvoice(invoiceId, manageMiscellaneousChargesRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -8252,10 +8504,10 @@ export class MetricsApi extends BaseAPI {
 
 
 /**
- * MiscellaneousApi - axios parameter creator
+ * PriceExperimentationApi - axios parameter creator
  * @export
  */
-export const MiscellaneousApiAxiosParamCreator = function (configuration?: Configuration) {
+export const PriceExperimentationApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
          * Calculate and return the revenue for a existing or new price plan
@@ -8301,11 +8553,11 @@ export const MiscellaneousApiAxiosParamCreator = function (configuration?: Confi
 };
 
 /**
- * MiscellaneousApi - functional programming interface
+ * PriceExperimentationApi - functional programming interface
  * @export
  */
-export const MiscellaneousApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = MiscellaneousApiAxiosParamCreator(configuration)
+export const PriceExperimentationApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = PriceExperimentationApiAxiosParamCreator(configuration)
     return {
         /**
          * Calculate and return the revenue for a existing or new price plan
@@ -8322,11 +8574,11 @@ export const MiscellaneousApiFp = function(configuration?: Configuration) {
 };
 
 /**
- * MiscellaneousApi - factory interface
+ * PriceExperimentationApi - factory interface
  * @export
  */
-export const MiscellaneousApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = MiscellaneousApiFp(configuration)
+export const PriceExperimentationApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = PriceExperimentationApiFp(configuration)
     return {
         /**
          * Calculate and return the revenue for a existing or new price plan
@@ -8342,22 +8594,22 @@ export const MiscellaneousApiFactory = function (configuration?: Configuration, 
 };
 
 /**
- * MiscellaneousApi - object-oriented interface
+ * PriceExperimentationApi - object-oriented interface
  * @export
- * @class MiscellaneousApi
+ * @class PriceExperimentationApi
  * @extends {BaseAPI}
  */
-export class MiscellaneousApi extends BaseAPI {
+export class PriceExperimentationApi extends BaseAPI {
     /**
      * Calculate and return the revenue for a existing or new price plan
      * @summary Calculate and return the revenue for a existing or new price plan
      * @param {CalculateRevenueRequest} calculateRevenueRequest Request payload for calculateRevenueAPI
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
-     * @memberof MiscellaneousApi
+     * @memberof PriceExperimentationApi
      */
     public calculateRevenue(calculateRevenueRequest: CalculateRevenueRequest, options?: AxiosRequestConfig) {
-        return MiscellaneousApiFp(this.configuration).calculateRevenue(calculateRevenueRequest, options).then((request) => request(this.axios, this.basePath));
+        return PriceExperimentationApiFp(this.configuration).calculateRevenue(calculateRevenueRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -8500,10 +8752,11 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
          * Get a price plan details using price plan id
          * @summary Get a price plan
          * @param {string} pricePlanId 
+         * @param {number} [version] Optional version to get a specific version. Gets latest version if it is not provided.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPricePlan: async (pricePlanId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getPricePlan: async (pricePlanId: string, version?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pricePlanId' is not null or undefined
             assertParamExists('getPricePlan', 'pricePlanId', pricePlanId)
             const localVarPath = `/price_plans/{price_plan_id}`
@@ -8522,6 +8775,10 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (version !== undefined) {
+                localVarQueryParameter['version'] = version;
+            }
 
 
     
@@ -8713,11 +8970,12 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
          * Get a price plan details using price plan id
          * @summary Get a price plan
          * @param {string} pricePlanId 
+         * @param {number} [version] Optional version to get a specific version. Gets latest version if it is not provided.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPricePlan(pricePlanId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricePlan>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getPricePlan(pricePlanId, options);
+        async getPricePlan(pricePlanId: string, version?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricePlan>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPricePlan(pricePlanId, version, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -8802,11 +9060,12 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
          * Get a price plan details using price plan id
          * @summary Get a price plan
          * @param {string} pricePlanId 
+         * @param {number} [version] Optional version to get a specific version. Gets latest version if it is not provided.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPricePlan(pricePlanId: string, options?: any): AxiosPromise<PricePlan> {
-            return localVarFp.getPricePlan(pricePlanId, options).then((request) => request(axios, basePath));
+        getPricePlan(pricePlanId: string, version?: number, options?: any): AxiosPromise<PricePlan> {
+            return localVarFp.getPricePlan(pricePlanId, version, options).then((request) => request(axios, basePath));
         },
         /**
          * Get a list of price plans
@@ -8893,12 +9152,13 @@ export class PricePlansApi extends BaseAPI {
      * Get a price plan details using price plan id
      * @summary Get a price plan
      * @param {string} pricePlanId 
+     * @param {number} [version] Optional version to get a specific version. Gets latest version if it is not provided.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PricePlansApi
      */
-    public getPricePlan(pricePlanId: string, options?: AxiosRequestConfig) {
-        return PricePlansApiFp(this.configuration).getPricePlan(pricePlanId, options).then((request) => request(this.axios, this.basePath));
+    public getPricePlan(pricePlanId: string, version?: number, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).getPricePlan(pricePlanId, version, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
