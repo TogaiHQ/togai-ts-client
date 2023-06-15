@@ -177,6 +177,12 @@ export interface AddCurrencyToPricePlanRequest {
      */
     'fixedFeeRates'?: Array<FixedFeeRate>;
     /**
+     * Rates for license rate cards
+     * @type {Array<LicenseRate>}
+     * @memberof AddCurrencyToPricePlanRequest
+     */
+    'licenseRates'?: Array<LicenseRate>;
+    /**
      * Rates for minimum commitment.
      * @type {number}
      * @memberof AddCurrencyToPricePlanRequest
@@ -195,6 +201,12 @@ export interface AddOn {
      * @memberof AddOn
      */
     'name': string;
+    /**
+     * 
+     * @type {AddOnType}
+     * @memberof AddOn
+     */
+    'type': AddOnType;
     /**
      * Id of addon
      * @type {string}
@@ -281,6 +293,20 @@ export interface AddOnPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
+ * LICENSE: Addon can be used in license rate cards FIXED_FEE: Addon can be used in fixed fee rate cards 
+ * @export
+ * @enum {string}
+ */
+
+export const AddOnType = {
+    License: 'LICENSE',
+    FixedFee: 'FIXED_FEE'
+} as const;
+
+export type AddOnType = typeof AddOnType[keyof typeof AddOnType];
+
+
+/**
  * Metric to be recorded
  * @export
  * @interface Attribute
@@ -342,6 +368,18 @@ export interface CalculateRevenueRequest {
      * @memberof CalculateRevenueRequest
      */
     'usageConfig': UsageConfig;
+    /**
+     * 
+     * @type {LicenseEntriesConfig}
+     * @memberof CalculateRevenueRequest
+     */
+    'licenseEntriesConfig': LicenseEntriesConfig;
+    /**
+     * 
+     * @type {ProrationConfig}
+     * @memberof CalculateRevenueRequest
+     */
+    'prorationConfig'?: ProrationConfig;
 }
 /**
  * 
@@ -523,7 +561,15 @@ export interface CreateAddOnRequest {
      * @memberof CreateAddOnRequest
      */
     'name': string;
+    /**
+     * 
+     * @type {AddOnType}
+     * @memberof CreateAddOnRequest
+     */
+    'type': AddOnType;
 }
+
+
 /**
  * Payload to grant Credits
  * @export
@@ -767,6 +813,12 @@ export interface CreatePricePlanDetails {
     'fixedFeeRateCards'?: Array<FixedFeeRateCard>;
     /**
      * 
+     * @type {Array<LicenseRateCard>}
+     * @memberof CreatePricePlanDetails
+     */
+    'licenseRateCards'?: Array<LicenseRateCard>;
+    /**
+     * 
      * @type {MinimumCommitment}
      * @memberof CreatePricePlanDetails
      */
@@ -802,6 +854,12 @@ export interface CreatePricePlanDetailsOverride {
      * @memberof CreatePricePlanDetailsOverride
      */
     'fixedFeeRateCards'?: Array<FixedFeeRateCard>;
+    /**
+     * 
+     * @type {Array<LicenseRateCard>}
+     * @memberof CreatePricePlanDetailsOverride
+     */
+    'licenseRateCards'?: Array<LicenseRateCard>;
     /**
      * 
      * @type {MinimumCommitment}
@@ -1615,12 +1673,6 @@ export interface Event {
      * @memberof Event
      */
     'dimensions': { [key: string]: string; };
-    /**
-     * Created time stamp of the event. This timestamp must be in ISO 8601 format.
-     * @type {string}
-     * @memberof Event
-     */
-    'createdAt': string;
 }
 /**
  * Structure of an event attribute
@@ -2282,6 +2334,19 @@ export interface FixedFeeRateCard {
 
 
 /**
+ * 
+ * @export
+ * @interface FixedFeeRevenueSummary
+ */
+export interface FixedFeeRevenueSummary {
+    /**
+     * 
+     * @type {number}
+     * @memberof FixedFeeRevenueSummary
+     */
+    'revenue': number;
+}
+/**
  * Fixed fee applies either for a one-time occurrence or for each cycle.
  * @export
  * @enum {string}
@@ -2324,6 +2389,25 @@ export interface GetEventsResponse {
      * 
      * @type {string}
      * @memberof GetEventsResponse
+     */
+    'nextToken'?: string;
+}
+/**
+ * Get license updates response
+ * @export
+ * @interface GetLicenseUpdatesResponse
+ */
+export interface GetLicenseUpdatesResponse {
+    /**
+     * 
+     * @type {Array<LicenseUpdateResponse>}
+     * @memberof GetLicenseUpdatesResponse
+     */
+    'data': Array<LicenseUpdateResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetLicenseUpdatesResponse
      */
     'nextToken'?: string;
 }
@@ -2522,6 +2606,51 @@ export interface InternalFixedFeeRateCard {
      * @memberof InternalFixedFeeRateCard
      */
     'startPeriod': number;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface InternalLicenseRateCard
+ */
+export interface InternalLicenseRateCard {
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalLicenseRateCard
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalLicenseRateCard
+     */
+    'displayName': string;
+    /**
+     * 
+     * @type {PricingModel}
+     * @memberof InternalLicenseRateCard
+     */
+    'pricingModel': PricingModel;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalLicenseRateCard
+     */
+    'currency': string;
+    /**
+     * 
+     * @type {Array<InternalSlab>}
+     * @memberof InternalLicenseRateCard
+     */
+    'internalSlabs': Array<InternalSlab>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof InternalLicenseRateCard
+     */
+    'enableProration': boolean;
 }
 
 
@@ -2873,6 +3002,323 @@ export const InvoiceTiming = {
 export type InvoiceTiming = typeof InvoiceTiming[keyof typeof InvoiceTiming];
 
 
+/**
+ * Configuration for getting the license entries
+ * @export
+ * @interface LicenseEntriesConfig
+ */
+export interface LicenseEntriesConfig {
+    /**
+     * Mode to get the license entries for the license rate cards - CUSTOM: Use the license entries provided in the request - LOOKUP_RANGE: Use the license entries of a given account for the specified range - LOOKUP_CYCLE: Use the license entries of a given account for the specified cycle 
+     * @type {string}
+     * @memberof LicenseEntriesConfig
+     */
+    'mode': LicenseEntriesConfigModeEnum;
+    /**
+     * List of license entries, this will be considered if mode is CUSTOM
+     * @type {Array<LicenseEntry>}
+     * @memberof LicenseEntriesConfig
+     */
+    'custom'?: Array<LicenseEntry>;
+    /**
+     * 
+     * @type {LicenseEntriesConfigLookupRange}
+     * @memberof LicenseEntriesConfig
+     */
+    'lookupRange'?: LicenseEntriesConfigLookupRange;
+    /**
+     * 
+     * @type {LicenseEntriesConfigLookupCycle}
+     * @memberof LicenseEntriesConfig
+     */
+    'lookupCycle'?: LicenseEntriesConfigLookupCycle;
+}
+
+export const LicenseEntriesConfigModeEnum = {
+    Custom: 'CUSTOM',
+    LookupRange: 'LOOKUP_RANGE',
+    LookupCycle: 'LOOKUP_CYCLE'
+} as const;
+
+export type LicenseEntriesConfigModeEnum = typeof LicenseEntriesConfigModeEnum[keyof typeof LicenseEntriesConfigModeEnum];
+
+/**
+ * Cycle of license entries to be looked up, this will be considered if mode is LOOKUP_CYCLE
+ * @export
+ * @interface LicenseEntriesConfigLookupCycle
+ */
+export interface LicenseEntriesConfigLookupCycle {
+    /**
+     * Effective date of the cycle, will be used to get the license entries of the cycle
+     * @type {string}
+     * @memberof LicenseEntriesConfigLookupCycle
+     */
+    'cycleEffectiveOn'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntriesConfigLookupCycle
+     */
+    'accountId': string;
+}
+/**
+ * Range of license entries to be looked up, this will be considered if mode is LOOKUP_RANGE
+ * @export
+ * @interface LicenseEntriesConfigLookupRange
+ */
+export interface LicenseEntriesConfigLookupRange {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntriesConfigLookupRange
+     */
+    'start': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntriesConfigLookupRange
+     */
+    'end': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntriesConfigLookupRange
+     */
+    'accountId': string;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseEntry
+ */
+export interface LicenseEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntry
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof LicenseEntry
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntry
+     */
+    'effectiveFrom': string;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseEntry1
+ */
+export interface LicenseEntry1 {
+    /**
+     * 
+     * @type {number}
+     * @memberof LicenseEntry1
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseEntry1
+     */
+    'effectiveFrom': string;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseRate
+ */
+export interface LicenseRate {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseRate
+     */
+    'id': string;
+    /**
+     * List of slab rates
+     * @type {Array<SlabRate>}
+     * @memberof LicenseRate
+     */
+    'slabRates': Array<SlabRate>;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseRateCard
+ */
+export interface LicenseRateCard {
+    /**
+     * Unique Identifier of the attached AddOn
+     * @type {string}
+     * @memberof LicenseRateCard
+     */
+    'id': string;
+    /**
+     * Name of the attached AddOn
+     * @type {string}
+     * @memberof LicenseRateCard
+     */
+    'displayName'?: string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof LicenseRateCard
+     */
+    'enableProration': boolean;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof LicenseRateCard
+     */
+    'ratePlan': RatePlan;
+    /**
+     * 
+     * @type {Array<RateValue>}
+     * @memberof LicenseRateCard
+     */
+    'rateValues': Array<RateValue>;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseRevenueSummary
+ */
+export interface LicenseRevenueSummary {
+    /**
+     * 
+     * @type {number}
+     * @memberof LicenseRevenueSummary
+     */
+    'revenue': number;
+}
+/**
+ * License update
+ * @export
+ * @interface LicenseUpdate
+ */
+export interface LicenseUpdate {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdate
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdate
+     */
+    'accountId': string;
+    /**
+     * Absolute quantity of the license
+     * @type {number}
+     * @memberof LicenseUpdate
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdate
+     */
+    'effectiveFrom': string;
+}
+/**
+ * License update request
+ * @export
+ * @interface LicenseUpdateRequest
+ */
+export interface LicenseUpdateRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateRequest
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateRequest
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateRequest
+     */
+    'updateType': LicenseUpdateRequestUpdateTypeEnum;
+    /**
+     * 
+     * @type {number}
+     * @memberof LicenseUpdateRequest
+     */
+    'quantity': number;
+}
+
+export const LicenseUpdateRequestUpdateTypeEnum = {
+    Relative: 'RELATIVE',
+    Absolute: 'ABSOLUTE'
+} as const;
+
+export type LicenseUpdateRequestUpdateTypeEnum = typeof LicenseUpdateRequestUpdateTypeEnum[keyof typeof LicenseUpdateRequestUpdateTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface LicenseUpdateResponse
+ */
+export interface LicenseUpdateResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateResponse
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateResponse
+     */
+    'accountId': string;
+    /**
+     * Absolute quantity of the license
+     * @type {number}
+     * @memberof LicenseUpdateResponse
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateResponse
+     */
+    'effectiveFrom': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateResponse
+     */
+    'createdAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseUpdateResponseAllOf
+ */
+export interface LicenseUpdateResponseAllOf {
+    /**
+     * 
+     * @type {string}
+     * @memberof LicenseUpdateResponseAllOf
+     */
+    'createdAt': string;
+}
 /**
  * List credits response
  * @export
@@ -3301,6 +3747,12 @@ export interface PricePlanDetails {
     'fixedFeeRateCards'?: Array<FixedFeeRateCard>;
     /**
      * 
+     * @type {Array<LicenseRateCard>}
+     * @memberof PricePlanDetails
+     */
+    'licenseRateCards'?: Array<LicenseRateCard>;
+    /**
+     * 
      * @type {MinimumCommitment}
      * @memberof PricePlanDetails
      */
@@ -3388,6 +3840,12 @@ export interface PricePlanDetailsOverride {
      * @memberof PricePlanDetailsOverride
      */
     'fixedFeeRateCards'?: Array<FixedFeeRateCard>;
+    /**
+     * 
+     * @type {Array<LicenseRateCard>}
+     * @memberof PricePlanDetailsOverride
+     */
+    'licenseRateCards'?: Array<LicenseRateCard>;
     /**
      * 
      * @type {MinimumCommitment}
@@ -3705,6 +4163,89 @@ export interface PricingScheduleWithPricePlanIdAllOf {
     'pricePlanId': string;
 }
 /**
+ * Configuration for getting the proration, if not provided no proration will be applied
+ * @export
+ * @interface ProrationConfig
+ */
+export interface ProrationConfig {
+    /**
+     * Mode to get the proration - CUSTOM: Use the proration provided in the request - LOOKUP_CYCLE: Use the proration of a given account for the specified cycle 
+     * @type {string}
+     * @memberof ProrationConfig
+     */
+    'mode': ProrationConfigModeEnum;
+    /**
+     * 
+     * @type {ProrationConfigCustomConfig}
+     * @memberof ProrationConfig
+     */
+    'customConfig'?: ProrationConfigCustomConfig;
+    /**
+     * 
+     * @type {ProrationConfigLookupCycleConfig}
+     * @memberof ProrationConfig
+     */
+    'lookupCycleConfig'?: ProrationConfigLookupCycleConfig;
+}
+
+export const ProrationConfigModeEnum = {
+    Custom: 'CUSTOM',
+    LookupCycle: 'LOOKUP_CYCLE'
+} as const;
+
+export type ProrationConfigModeEnum = typeof ProrationConfigModeEnum[keyof typeof ProrationConfigModeEnum];
+
+/**
+ * Custom proration config, this will be considered if mode is CUSTOM
+ * @export
+ * @interface ProrationConfigCustomConfig
+ */
+export interface ProrationConfigCustomConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProrationConfigCustomConfig
+     */
+    'cycleStartDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProrationConfigCustomConfig
+     */
+    'cycleEndDate': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProrationConfigCustomConfig
+     */
+    'currentDate': string;
+}
+/**
+ * Cycle of proration to be looked up, this will be considered if mode is LOOKUP_CYCLE
+ * @export
+ * @interface ProrationConfigLookupCycleConfig
+ */
+export interface ProrationConfigLookupCycleConfig {
+    /**
+     * Defaults to current date time if not provided
+     * @type {string}
+     * @memberof ProrationConfigLookupCycleConfig
+     */
+    'currentDateTime'?: string;
+    /**
+     * Defaults to current date time if not provided
+     * @type {string}
+     * @memberof ProrationConfigLookupCycleConfig
+     */
+    'cycleEffectiveOn'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProrationConfigLookupCycleConfig
+     */
+    'accountId': string;
+}
+/**
  * Contains all rate related configurations
  * @export
  * @interface RatePlan
@@ -3777,35 +4318,34 @@ export interface RevenueInfo {
     'fixedFeeRateCard'?: FixedFeeRateCard;
     /**
      * 
+     * @type {LicenseRateCard}
+     * @memberof RevenueInfo
+     */
+    'licenseRateCard'?: LicenseRateCard;
+    /**
+     * 
      * @type {{ [key: string]: number; }}
      * @memberof RevenueInfo
      */
     'usages': { [key: string]: number; };
     /**
      * 
-     * @type {RevenueInfoFixedFeeRevenueSummary}
+     * @type {FixedFeeRevenueSummary}
      * @memberof RevenueInfo
      */
-    'fixedFeeRevenueSummary'?: RevenueInfoFixedFeeRevenueSummary;
+    'fixedFeeRevenueSummary'?: FixedFeeRevenueSummary;
+    /**
+     * 
+     * @type {LicenseRevenueSummary}
+     * @memberof RevenueInfo
+     */
+    'licenseRevenueSummary'?: LicenseRevenueSummary;
     /**
      * 
      * @type {Array<SlabRevenueSummary>}
      * @memberof RevenueInfo
      */
     'slabRevenueSummaries'?: Array<SlabRevenueSummary>;
-}
-/**
- * 
- * @export
- * @interface RevenueInfoFixedFeeRevenueSummary
- */
-export interface RevenueInfoFixedFeeRevenueSummary {
-    /**
-     * 
-     * @type {number}
-     * @memberof RevenueInfoFixedFeeRevenueSummary
-     */
-    'revenue': number;
 }
 /**
  * 
@@ -3833,10 +4373,130 @@ export interface RevenueSummaryQuery {
     'usageRateCard'?: InternalUsageRateCard;
     /**
      * 
+     * @type {InternalLicenseRateCard}
+     * @memberof RevenueSummaryQuery
+     */
+    'licenseRateCard'?: InternalLicenseRateCard;
+    /**
+     * 
+     * @type {RevenueSummaryQueryProrationConfig}
+     * @memberof RevenueSummaryQuery
+     */
+    'prorationConfig'?: RevenueSummaryQueryProrationConfig;
+    /**
+     * 
      * @type {RevenueSummaryQueryUsages}
      * @memberof RevenueSummaryQuery
      */
     'usages': RevenueSummaryQueryUsages;
+    /**
+     * 
+     * @type {RevenueSummaryQueryLicenseEntries}
+     * @memberof RevenueSummaryQuery
+     */
+    'licenseEntries'?: RevenueSummaryQueryLicenseEntries;
+}
+/**
+ * 
+ * @export
+ * @interface RevenueSummaryQueryLicenseEntries
+ */
+export interface RevenueSummaryQueryLicenseEntries {
+    /**
+     * 
+     * @type {string}
+     * @memberof RevenueSummaryQueryLicenseEntries
+     */
+    'mode': RevenueSummaryQueryLicenseEntriesModeEnum;
+    /**
+     * 
+     * @type {RevenueSummaryQueryLicenseEntriesLookUpConfig}
+     * @memberof RevenueSummaryQueryLicenseEntries
+     */
+    'lookUpConfig'?: RevenueSummaryQueryLicenseEntriesLookUpConfig;
+    /**
+     * 
+     * @type {RevenueSummaryQueryLicenseEntriesCustomConfig}
+     * @memberof RevenueSummaryQueryLicenseEntries
+     */
+    'customConfig'?: RevenueSummaryQueryLicenseEntriesCustomConfig;
+}
+
+export const RevenueSummaryQueryLicenseEntriesModeEnum = {
+    Lookup: 'LOOKUP',
+    Custom: 'CUSTOM'
+} as const;
+
+export type RevenueSummaryQueryLicenseEntriesModeEnum = typeof RevenueSummaryQueryLicenseEntriesModeEnum[keyof typeof RevenueSummaryQueryLicenseEntriesModeEnum];
+
+/**
+ * License entries for the billing cycle. This will be considered if mode is CUSTOM
+ * @export
+ * @interface RevenueSummaryQueryLicenseEntriesCustomConfig
+ */
+export interface RevenueSummaryQueryLicenseEntriesCustomConfig {
+    /**
+     * 
+     * @type {Array<LicenseEntry1>}
+     * @memberof RevenueSummaryQueryLicenseEntriesCustomConfig
+     */
+    'customLicenseEntries': Array<LicenseEntry1>;
+}
+/**
+ * Holder for data required to lookup license entries. This will be considered if mode is LOOKUP
+ * @export
+ * @interface RevenueSummaryQueryLicenseEntriesLookUpConfig
+ */
+export interface RevenueSummaryQueryLicenseEntriesLookUpConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
+     */
+    'start': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
+     */
+    'end': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
+     */
+    'accountId': string;
+}
+/**
+ * Config for prorated entities. If not provided, revenue will be calculated for the entire billing cycle. 
+ * @export
+ * @interface RevenueSummaryQueryProrationConfig
+ */
+export interface RevenueSummaryQueryProrationConfig {
+    /**
+     * Start date of the billing cycle. This is the date when the billing cycle starts for the customer. 
+     * @type {string}
+     * @memberof RevenueSummaryQueryProrationConfig
+     */
+    'startDate': string;
+    /**
+     * Current date till which revenue is to be prorated. 
+     * @type {string}
+     * @memberof RevenueSummaryQueryProrationConfig
+     */
+    'currentDate': string;
+    /**
+     * End date of the billing cycle. This is the date when the billing cycle ends for the customer. 
+     * @type {string}
+     * @memberof RevenueSummaryQueryProrationConfig
+     */
+    'endDate': string;
 }
 /**
  * 
@@ -3958,6 +4618,12 @@ export interface RevenueSummaryResponseRevenueSummary {
      * @memberof RevenueSummaryResponseRevenueSummary
      */
     'fixedFeeRevenue'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RevenueSummaryResponseRevenueSummary
+     */
+    'licenseRevenue'?: number;
 }
 /**
  * Represents a setting
@@ -8390,6 +9056,179 @@ export class InvoicesApi extends BaseAPI {
      */
     public manageMiscellaneousChargesInInvoice(invoiceId: string, manageMiscellaneousChargesRequest?: ManageMiscellaneousChargesRequest, options?: AxiosRequestConfig) {
         return InvoicesApiFp(this.configuration).manageMiscellaneousChargesInInvoice(invoiceId, manageMiscellaneousChargesRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * LicensesApi - axios parameter creator
+ * @export
+ */
+export const LicensesApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * This API let’s you to add a license entry
+         * @summary Update a license entry
+         * @param {LicenseUpdateRequest} [licenseUpdateRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addLicenseUpdateEntry: async (licenseUpdateRequest?: LicenseUpdateRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/license_updates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(licenseUpdateRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to fetch a list of licenses updates with multiple query parameters
+         * @summary Get a list of licenses updates
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLicenseUpdates: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/license_updates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * LicensesApi - functional programming interface
+ * @export
+ */
+export const LicensesApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = LicensesApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * This API let’s you to add a license entry
+         * @summary Update a license entry
+         * @param {LicenseUpdateRequest} [licenseUpdateRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addLicenseUpdateEntry(licenseUpdateRequest?: LicenseUpdateRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<LicenseUpdateResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addLicenseUpdateEntry(licenseUpdateRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to fetch a list of licenses updates with multiple query parameters
+         * @summary Get a list of licenses updates
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getLicenseUpdates(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetLicenseUpdatesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getLicenseUpdates(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * LicensesApi - factory interface
+ * @export
+ */
+export const LicensesApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = LicensesApiFp(configuration)
+    return {
+        /**
+         * This API let’s you to add a license entry
+         * @summary Update a license entry
+         * @param {LicenseUpdateRequest} [licenseUpdateRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addLicenseUpdateEntry(licenseUpdateRequest?: LicenseUpdateRequest, options?: any): AxiosPromise<LicenseUpdateResponse> {
+            return localVarFp.addLicenseUpdateEntry(licenseUpdateRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to fetch a list of licenses updates with multiple query parameters
+         * @summary Get a list of licenses updates
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getLicenseUpdates(options?: any): AxiosPromise<GetLicenseUpdatesResponse> {
+            return localVarFp.getLicenseUpdates(options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * LicensesApi - object-oriented interface
+ * @export
+ * @class LicensesApi
+ * @extends {BaseAPI}
+ */
+export class LicensesApi extends BaseAPI {
+    /**
+     * This API let’s you to add a license entry
+     * @summary Update a license entry
+     * @param {LicenseUpdateRequest} [licenseUpdateRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LicensesApi
+     */
+    public addLicenseUpdateEntry(licenseUpdateRequest?: LicenseUpdateRequest, options?: AxiosRequestConfig) {
+        return LicensesApiFp(this.configuration).addLicenseUpdateEntry(licenseUpdateRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to fetch a list of licenses updates with multiple query parameters
+     * @summary Get a list of licenses updates
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LicensesApi
+     */
+    public getLicenseUpdates(options?: AxiosRequestConfig) {
+        return LicensesApiFp(this.configuration).getLicenseUpdates(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
