@@ -192,6 +192,19 @@ export interface AddCurrencyToPricePlanRequest {
 /**
  * 
  * @export
+ * @interface AddFeatureCreditsRequest
+ */
+export interface AddFeatureCreditsRequest {
+    /**
+     * 
+     * @type {Array<FeatureCreditRequest>}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'creditRequests': Array<FeatureCreditRequest>;
+}
+/**
+ * 
+ * @export
  * @interface AddOn
  */
 export interface AddOn {
@@ -782,6 +795,25 @@ export interface CreateEventSchemaRequest {
     'enrichments'?: Enrichments;
 }
 /**
+ * Create a Feature stand-alone or associate it with schemas
+ * @export
+ * @interface CreateFeatureRequest
+ */
+export interface CreateFeatureRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateFeatureRequest
+     */
+    'name': string;
+    /**
+     * Association of a feature with event_schemas
+     * @type {Array<EventSchemasForFeature>}
+     * @memberof CreateFeatureRequest
+     */
+    'schemaAssociations': Array<EventSchemasForFeature>;
+}
+/**
  * 
  * @export
  * @interface CreatePricePlanDetails
@@ -792,7 +824,7 @@ export interface CreatePricePlanDetails {
      * @type {PricingCycleConfig}
      * @memberof CreatePricePlanDetails
      */
-    'pricingCycleConfig': PricingCycleConfig;
+    'pricingCycleConfig'?: PricingCycleConfig;
     /**
      * List of currencies supported by the price plan
      * @type {Array<string>}
@@ -823,6 +855,18 @@ export interface CreatePricePlanDetails {
      * @memberof CreatePricePlanDetails
      */
     'minimumCommitment'?: MinimumCommitment;
+    /**
+     * 
+     * @type {Array<CurrencyRateValue>}
+     * @memberof CreatePricePlanDetails
+     */
+    'rateValues'?: Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {Array<EntitlementRateCard>}
+     * @memberof CreatePricePlanDetails
+     */
+    'entitlementRateCards'?: Array<EntitlementRateCard>;
 }
 /**
  * 
@@ -866,6 +910,18 @@ export interface CreatePricePlanDetailsOverride {
      * @memberof CreatePricePlanDetailsOverride
      */
     'minimumCommitment'?: MinimumCommitment;
+    /**
+     * 
+     * @type {Array<CurrencyRateValue>}
+     * @memberof CreatePricePlanDetailsOverride
+     */
+    'rateValues'?: Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {Array<EntitlementRateCard>}
+     * @memberof CreatePricePlanDetailsOverride
+     */
+    'entitlementRateCards'?: Array<EntitlementRateCard>;
 }
 /**
  * Request to create a price plan
@@ -887,10 +943,55 @@ export interface CreatePricePlanRequest {
     'description'?: string;
     /**
      * 
+     * @type {string}
+     * @memberof CreatePricePlanRequest
+     */
+    'type'?: CreatePricePlanRequestTypeEnum;
+    /**
+     * 
      * @type {CreatePricePlanDetails}
      * @memberof CreatePricePlanRequest
      */
     'pricePlanDetails': CreatePricePlanDetails;
+}
+
+export const CreatePricePlanRequestTypeEnum = {
+    Billing: 'BILLING',
+    Entitlement: 'ENTITLEMENT'
+} as const;
+
+export type CreatePricePlanRequestTypeEnum = typeof CreatePricePlanRequestTypeEnum[keyof typeof CreatePricePlanRequestTypeEnum];
+
+/**
+ * Create a purchase for an account
+ * @export
+ * @interface CreatePurchaseRequest
+ */
+export interface CreatePurchaseRequest {
+    /**
+     * Id of the price plan
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreatePurchaseRequest
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof CreatePurchaseRequest
+     */
+    'purchasePlanOverride'?: PurchasePlanOverride;
 }
 /**
  * Request to create usage meter
@@ -1619,6 +1720,31 @@ export interface Enrichments {
     'fields': Array<Field>;
 }
 /**
+ * Entitlement type rate card
+ * @export
+ * @interface EntitlementRateCard
+ */
+export interface EntitlementRateCard {
+    /**
+     * 
+     * @type {string}
+     * @memberof EntitlementRateCard
+     */
+    'featureId': string;
+    /**
+     * Credit value of the feature
+     * @type {number}
+     * @memberof EntitlementRateCard
+     */
+    'featureCredits': number;
+    /**
+     * The validity of the credit value of the feature
+     * @type {number}
+     * @memberof EntitlementRateCard
+     */
+    'expiryDurationSeconds': number;
+}
+/**
  * 
  * @export
  * @interface ErrorResponse
@@ -1950,6 +2076,12 @@ export interface EventSchema {
     'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
+     * @type {FeatureDetails}
+     * @memberof EventSchema
+     */
+    'featureDetails'?: FeatureDetails;
+    /**
+     * 
      * @type {Enrichments}
      * @memberof EventSchema
      */
@@ -2019,6 +2151,12 @@ export interface EventSchemaListData {
      * @memberof EventSchemaListData
      */
     'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {FeatureDetails}
+     * @memberof EventSchemaListData
+     */
+    'featureDetails'?: FeatureDetails;
     /**
      * 
      * @type {Enrichments}
@@ -2104,6 +2242,25 @@ export interface EventSchemaVersionsResponse {
      * @memberof EventSchemaVersionsResponse
      */
     'data': Array<EventSchema>;
+}
+/**
+ * event_schema details that are in association with feature
+ * @export
+ * @interface EventSchemasForFeature
+ */
+export interface EventSchemasForFeature {
+    /**
+     * 
+     * @type {string}
+     * @memberof EventSchemasForFeature
+     */
+    'schemaName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EventSchemasForFeature
+     */
+    'attributeName': string;
 }
 /**
  * Source of ingestion of event
@@ -2216,6 +2373,272 @@ export interface EventWithStatusAndEventPipelineInfoAllOf {
      * @memberof EventWithStatusAndEventPipelineInfoAllOf
      */
     'EventPipelineInfo'?: EventPipelineInfo;
+}
+/**
+ * Represents a Feature
+ * @export
+ * @interface Feature
+ */
+export interface Feature {
+    /**
+     * 
+     * @type {string}
+     * @memberof Feature
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Feature
+     */
+    'name': string;
+    /**
+     * Association of a feature with event_schemas
+     * @type {Array<EventSchemasForFeature>}
+     * @memberof Feature
+     */
+    'schemaAssociations': Array<EventSchemasForFeature>;
+    /**
+     * 
+     * @type {string}
+     * @memberof Feature
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Feature
+     */
+    'updatedAt'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureCredit
+ */
+export interface FeatureCredit {
+    /**
+     * Feature ID
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'featureId': string;
+    /**
+     * Customer ID
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'customerId': string;
+    /**
+     * Account ID
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'accountId': string;
+    /**
+     * The id of the entity that granted the units like purchase id, etc
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'referenceId': string;
+    /**
+     * Quantity of feature credits
+     * @type {number}
+     * @memberof FeatureCredit
+     */
+    'units': number;
+    /**
+     * Effective from date
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'effectiveFrom': string;
+    /**
+     * Effective until date
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'effectiveUntil': string;
+    /**
+     * Description of feature credits
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCredit
+     */
+    'updatedAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureCreditAllOf
+ */
+export interface FeatureCreditAllOf {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCreditAllOf
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCreditAllOf
+     */
+    'updatedAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureCreditRequest
+ */
+export interface FeatureCreditRequest {
+    /**
+     * Feature ID
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'featureId': string;
+    /**
+     * Customer ID
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'customerId': string;
+    /**
+     * Account ID
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'accountId': string;
+    /**
+     * The id of the entity that granted the units like purchase id, etc
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'referenceId': string;
+    /**
+     * Quantity of feature credits
+     * @type {number}
+     * @memberof FeatureCreditRequest
+     */
+    'units': number;
+    /**
+     * Effective from date
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'effectiveFrom': string;
+    /**
+     * Effective until date
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'effectiveUntil': string;
+    /**
+     * Description of feature credits
+     * @type {string}
+     * @memberof FeatureCreditRequest
+     */
+    'description'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureCreditsResponse
+ */
+export interface FeatureCreditsResponse {
+    /**
+     * 
+     * @type {Array<FeatureCredit>}
+     * @memberof FeatureCreditsResponse
+     */
+    'featureCredits': Array<FeatureCredit>;
+}
+/**
+ * details of feature associated with event schema with attribute name
+ * @export
+ * @interface FeatureDetails
+ */
+export interface FeatureDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureDetails
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureDetails
+     */
+    'attributeName': string;
+}
+/**
+ * Represents a Feature for List Response
+ * @export
+ * @interface FeatureListResponse
+ */
+export interface FeatureListResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureListResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureListResponse
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureListResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureListResponse
+     */
+    'updatedAt'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface FeaturePaginatedListData
+ */
+export interface FeaturePaginatedListData {
+    /**
+     * 
+     * @type {Array<FeatureListResponse>}
+     * @memberof FeaturePaginatedListData
+     */
+    'data'?: Array<FeatureListResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeaturePaginatedListData
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof FeaturePaginatedListData
+     */
+    'context'?: PaginationOptions;
 }
 /**
  * 
@@ -2391,6 +2814,31 @@ export interface GetEventsResponse {
      * @memberof GetEventsResponse
      */
     'nextToken'?: string;
+}
+/**
+ * Get feature credits response
+ * @export
+ * @interface GetFeatureCreditsResponse
+ */
+export interface GetFeatureCreditsResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFeatureCreditsResponse
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetFeatureCreditsResponse
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetFeatureCreditsResponse
+     */
+    'balance': number;
 }
 /**
  * Get license updates response
@@ -3732,7 +4180,7 @@ export interface PricePlanDetails {
      * @type {PricingCycleConfig}
      * @memberof PricePlanDetails
      */
-    'pricingCycleConfig': PricingCycleConfig;
+    'pricingCycleConfig'?: PricingCycleConfig;
     /**
      * 
      * @type {Array<UsageRateCard>}
@@ -3757,6 +4205,18 @@ export interface PricePlanDetails {
      * @memberof PricePlanDetails
      */
     'minimumCommitment'?: MinimumCommitment;
+    /**
+     * 
+     * @type {Array<CurrencyRateValue>}
+     * @memberof PricePlanDetails
+     */
+    'rateValues'?: Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {Array<EntitlementRateCard>}
+     * @memberof PricePlanDetails
+     */
+    'entitlementRateCards'?: Array<EntitlementRateCard>;
 }
 /**
  * Configuration for getting the usage rate card
@@ -3852,6 +4312,18 @@ export interface PricePlanDetailsOverride {
      * @memberof PricePlanDetailsOverride
      */
     'minimumCommitment'?: MinimumCommitment;
+    /**
+     * 
+     * @type {Array<CurrencyRateValue>}
+     * @memberof PricePlanDetailsOverride
+     */
+    'rateValues'?: Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {Array<EntitlementRateCard>}
+     * @memberof PricePlanDetailsOverride
+     */
+    'entitlementRateCards'?: Array<EntitlementRateCard>;
 }
 /**
  * 
@@ -4244,6 +4716,160 @@ export interface ProrationConfigLookupCycleConfig {
      * @memberof ProrationConfigLookupCycleConfig
      */
     'accountId': string;
+}
+/**
+ * Represents a Purchase
+ * @export
+ * @interface Purchase
+ */
+export interface Purchase {
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Purchase
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Purchase
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof Purchase
+     */
+    'purchasePlanOverrides'?: PurchasePlanOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'updatedAt'?: string;
+}
+/**
+ * Represents a Purchase for List Response
+ * @export
+ * @interface PurchaseListResponse
+ */
+export interface PurchaseListResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseListResponse
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseListResponse
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'idempotencyKey': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'updatedAt'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface PurchasePaginatedListData
+ */
+export interface PurchasePaginatedListData {
+    /**
+     * 
+     * @type {Array<PurchaseListResponse>}
+     * @memberof PurchasePaginatedListData
+     */
+    'data'?: Array<PurchaseListResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchasePaginatedListData
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof PurchasePaginatedListData
+     */
+    'context'?: PaginationOptions;
+}
+/**
+ * entitlements override options for purchase of a price plan for an account
+ * @export
+ * @interface PurchasePlanOverride
+ */
+export interface PurchasePlanOverride {
+    /**
+     * 
+     * @type {Array<CurrencyRateValue>}
+     * @memberof PurchasePlanOverride
+     */
+    'rateValues': Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {Array<EntitlementRateCard>}
+     * @memberof PurchasePlanOverride
+     */
+    'entitlementRateCards': Array<EntitlementRateCard>;
 }
 /**
  * Contains all rate related configurations
@@ -5035,6 +5661,25 @@ export interface UpdateEventSchemaRequest {
     'enrichments'?: Enrichments;
 }
 /**
+ * Update a Feature properties
+ * @export
+ * @interface UpdateFeatureRequest
+ */
+export interface UpdateFeatureRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateFeatureRequest
+     */
+    'name': string;
+    /**
+     * Association of a feature with event_schemas
+     * @type {Array<EventSchemasForFeature>}
+     * @memberof UpdateFeatureRequest
+     */
+    'schemaAssociations': Array<EventSchemasForFeature>;
+}
+/**
  * 
  * @export
  * @interface UpdateOrganizationSettingRequest
@@ -5707,6 +6352,44 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get purchase information of an account for a specific plan using account_id and price_plan_id
+         * @summary Get a specific purchase of an account
+         * @param {string} purchaseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAccountPurchase: async (purchaseId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'purchaseId' is not null or undefined
+            assertParamExists('getAccountPurchase', 'purchaseId', purchaseId)
+            const localVarPath = `/purchases/{purchase_id}`
+                .replace(`{${"purchase_id"}}`, encodeURIComponent(String(purchaseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} [nextToken] 
@@ -5802,6 +6485,88 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get Purchase information for an account using account_id and price_plan_id
+         * @summary Get all purchases for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAccountPurchases: async (accountId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('listAccountPurchases', 'accountId', accountId)
+            const localVarPath = `/accounts/{account_id}/purchase`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to purchase a one time entitlement plan
+         * @summary Purchase an Entitlement Plan
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        purchaseOneTimeEntitlementPlan: async (accountId: string, createPurchaseRequest: CreatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('purchaseOneTimeEntitlementPlan', 'accountId', accountId)
+            // verify required parameter 'createPurchaseRequest' is not null or undefined
+            assertParamExists('purchaseOneTimeEntitlementPlan', 'createPurchaseRequest', createPurchaseRequest)
+            const localVarPath = `/accounts/{account_id}/purchase`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createPurchaseRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6040,6 +6805,17 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get purchase information of an account for a specific plan using account_id and price_plan_id
+         * @summary Get a specific purchase of an account
+         * @param {string} purchaseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAccountPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAccountPurchase(purchaseId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} [nextToken] 
@@ -6064,6 +6840,29 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          */
         async getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricingSchedulePaginatedResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get Purchase information for an account using account_id and price_plan_id
+         * @summary Get all purchases for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listAccountPurchases(accountId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PurchasePaginatedListData>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAccountPurchases(accountId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to purchase a one time entitlement plan
+         * @summary Purchase an Entitlement Plan
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6166,6 +6965,16 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getAccount(accountId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get purchase information of an account for a specific plan using account_id and price_plan_id
+         * @summary Get a specific purchase of an account
+         * @param {string} purchaseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAccountPurchase(purchaseId: string, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.getAccountPurchase(purchaseId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} [nextToken] 
@@ -6189,6 +6998,27 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          */
         getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, options?: any): AxiosPromise<PricingSchedulePaginatedResponse> {
             return localVarFp.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get Purchase information for an account using account_id and price_plan_id
+         * @summary Get all purchases for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAccountPurchases(accountId: string, options?: any): AxiosPromise<PurchasePaginatedListData> {
+            return localVarFp.listAccountPurchases(accountId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to purchase a one time entitlement plan
+         * @summary Purchase an Entitlement Plan
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Remove existing aliases tagged to an account using this API
@@ -6294,6 +7124,18 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
+     * Get purchase information of an account for a specific plan using account_id and price_plan_id
+     * @summary Get a specific purchase of an account
+     * @param {string} purchaseId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public getAccountPurchase(purchaseId: string, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).getAccountPurchase(purchaseId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Returns a list of accounts of a customer with pagination and sort.
      * @summary List accounts of customer
      * @param {string} [nextToken] 
@@ -6320,6 +7162,31 @@ export class AccountsApi extends BaseAPI {
      */
     public getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get Purchase information for an account using account_id and price_plan_id
+     * @summary Get all purchases for an account
+     * @param {string} accountId account_id corresponding to an account
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public listAccountPurchases(accountId: string, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).listAccountPurchases(accountId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to purchase a one time entitlement plan
+     * @summary Purchase an Entitlement Plan
+     * @param {string} accountId account_id corresponding to an account
+     * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7637,6 +8504,193 @@ export class CustomersApi extends BaseAPI {
 
 
 /**
+ * EntitlementsApi - axios parameter creator
+ * @export
+ */
+export const EntitlementsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * This API let’s you to get the feature credits balance
+         * @summary Get Feature credits balance
+         * @param {string} accountId account_id corresponding to an account
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeatureCredits: async (accountId: string, featureId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('getFeatureCredits', 'accountId', accountId)
+            // verify required parameter 'featureId' is not null or undefined
+            assertParamExists('getFeatureCredits', 'featureId', featureId)
+            const localVarPath = `/accounts/{account_id}/features/{feature_id}`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)))
+                .replace(`{${"feature_id"}}`, encodeURIComponent(String(featureId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to ingest an event if a user is entitled to a feature
+         * @summary Ingest event if a user is entitled to a feature
+         * @param {IngestEventRequest} [ingestEventRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        ingestEntitledEvent: async (ingestEventRequest?: IngestEventRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/entitled`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(ingestEventRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * EntitlementsApi - functional programming interface
+ * @export
+ */
+export const EntitlementsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = EntitlementsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * This API let’s you to get the feature credits balance
+         * @summary Get Feature credits balance
+         * @param {string} accountId account_id corresponding to an account
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFeatureCredits(accountId: string, featureId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetFeatureCreditsResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatureCredits(accountId, featureId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to ingest an event if a user is entitled to a feature
+         * @summary Ingest event if a user is entitled to a feature
+         * @param {IngestEventRequest} [ingestEventRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async ingestEntitledEvent(ingestEventRequest?: IngestEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.ingestEntitledEvent(ingestEventRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * EntitlementsApi - factory interface
+ * @export
+ */
+export const EntitlementsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = EntitlementsApiFp(configuration)
+    return {
+        /**
+         * This API let’s you to get the feature credits balance
+         * @summary Get Feature credits balance
+         * @param {string} accountId account_id corresponding to an account
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeatureCredits(accountId: string, featureId: string, options?: any): AxiosPromise<GetFeatureCreditsResponse> {
+            return localVarFp.getFeatureCredits(accountId, featureId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to ingest an event if a user is entitled to a feature
+         * @summary Ingest event if a user is entitled to a feature
+         * @param {IngestEventRequest} [ingestEventRequest] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        ingestEntitledEvent(ingestEventRequest?: IngestEventRequest, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.ingestEntitledEvent(ingestEventRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * EntitlementsApi - object-oriented interface
+ * @export
+ * @class EntitlementsApi
+ * @extends {BaseAPI}
+ */
+export class EntitlementsApi extends BaseAPI {
+    /**
+     * This API let’s you to get the feature credits balance
+     * @summary Get Feature credits balance
+     * @param {string} accountId account_id corresponding to an account
+     * @param {string} featureId feature_id corresponding to a feature
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EntitlementsApi
+     */
+    public getFeatureCredits(accountId: string, featureId: string, options?: AxiosRequestConfig) {
+        return EntitlementsApiFp(this.configuration).getFeatureCredits(accountId, featureId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to ingest an event if a user is entitled to a feature
+     * @summary Ingest event if a user is entitled to a feature
+     * @param {IngestEventRequest} [ingestEventRequest] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof EntitlementsApi
+     */
+    public ingestEntitledEvent(ingestEventRequest?: IngestEventRequest, options?: AxiosRequestConfig) {
+        return EntitlementsApiFp(this.configuration).ingestEntitledEvent(ingestEventRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * EventIngestionApi - axios parameter creator
  * @export
  */
@@ -8671,6 +9725,348 @@ export class EventSchemasApi extends BaseAPI {
      */
     public listEventSchemas(status?: 'ACTIVE' | 'INACTIVE', nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
         return EventSchemasApiFp(this.configuration).listEventSchemas(status, nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * FeatureApi - axios parameter creator
+ * @export
+ */
+export const FeatureApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Create a Feature optionally associate with one or more event_schemas
+         * @summary Create a Feature and optionally associate with one or more event_schemas
+         * @param {CreateFeatureRequest} createFeatureRequest Payload to create a Feature along the association with event_schemas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFeature: async (createFeatureRequest: CreateFeatureRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createFeatureRequest' is not null or undefined
+            assertParamExists('createFeature', 'createFeatureRequest', createFeatureRequest)
+            const localVarPath = `/feature`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createFeatureRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get details of a Feature
+         * @summary Get a Feature
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeature: async (featureId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'featureId' is not null or undefined
+            assertParamExists('getFeature', 'featureId', featureId)
+            const localVarPath = `/feature/{feature_id}`
+                .replace(`{${"feature_id"}}`, encodeURIComponent(String(featureId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get a list of features along with its associations
+         * @summary List Feature
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeatures: async (nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/feature`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (nextToken !== undefined) {
+                localVarQueryParameter['nextToken'] = nextToken;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update an existing feature and its eventSchema associations 
+         * @summary Update a Feature
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {UpdateFeatureRequest} updateFeatureRequest Payload to update a Feature along the associations with event_schemas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateFeature: async (featureId: string, updateFeatureRequest: UpdateFeatureRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'featureId' is not null or undefined
+            assertParamExists('updateFeature', 'featureId', featureId)
+            // verify required parameter 'updateFeatureRequest' is not null or undefined
+            assertParamExists('updateFeature', 'updateFeatureRequest', updateFeatureRequest)
+            const localVarPath = `/feature/{feature_id}`
+                .replace(`{${"feature_id"}}`, encodeURIComponent(String(featureId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateFeatureRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * FeatureApi - functional programming interface
+ * @export
+ */
+export const FeatureApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = FeatureApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Create a Feature optionally associate with one or more event_schemas
+         * @summary Create a Feature and optionally associate with one or more event_schemas
+         * @param {CreateFeatureRequest} createFeatureRequest Payload to create a Feature along the association with event_schemas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createFeature(createFeatureRequest: CreateFeatureRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Feature>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createFeature(createFeatureRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get details of a Feature
+         * @summary Get a Feature
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFeature(featureId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Feature>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeature(featureId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get a list of features along with its associations
+         * @summary List Feature
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getFeatures(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<FeaturePaginatedListData>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getFeatures(nextToken, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Update an existing feature and its eventSchema associations 
+         * @summary Update a Feature
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {UpdateFeatureRequest} updateFeatureRequest Payload to update a Feature along the associations with event_schemas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateFeature(featureId: string, updateFeatureRequest: UpdateFeatureRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Feature>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateFeature(featureId, updateFeatureRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * FeatureApi - factory interface
+ * @export
+ */
+export const FeatureApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = FeatureApiFp(configuration)
+    return {
+        /**
+         * Create a Feature optionally associate with one or more event_schemas
+         * @summary Create a Feature and optionally associate with one or more event_schemas
+         * @param {CreateFeatureRequest} createFeatureRequest Payload to create a Feature along the association with event_schemas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createFeature(createFeatureRequest: CreateFeatureRequest, options?: any): AxiosPromise<Feature> {
+            return localVarFp.createFeature(createFeatureRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get details of a Feature
+         * @summary Get a Feature
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeature(featureId: string, options?: any): AxiosPromise<Feature> {
+            return localVarFp.getFeature(featureId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get a list of features along with its associations
+         * @summary List Feature
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getFeatures(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<FeaturePaginatedListData> {
+            return localVarFp.getFeatures(nextToken, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Update an existing feature and its eventSchema associations 
+         * @summary Update a Feature
+         * @param {string} featureId feature_id corresponding to a feature
+         * @param {UpdateFeatureRequest} updateFeatureRequest Payload to update a Feature along the associations with event_schemas
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateFeature(featureId: string, updateFeatureRequest: UpdateFeatureRequest, options?: any): AxiosPromise<Feature> {
+            return localVarFp.updateFeature(featureId, updateFeatureRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * FeatureApi - object-oriented interface
+ * @export
+ * @class FeatureApi
+ * @extends {BaseAPI}
+ */
+export class FeatureApi extends BaseAPI {
+    /**
+     * Create a Feature optionally associate with one or more event_schemas
+     * @summary Create a Feature and optionally associate with one or more event_schemas
+     * @param {CreateFeatureRequest} createFeatureRequest Payload to create a Feature along the association with event_schemas
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FeatureApi
+     */
+    public createFeature(createFeatureRequest: CreateFeatureRequest, options?: AxiosRequestConfig) {
+        return FeatureApiFp(this.configuration).createFeature(createFeatureRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get details of a Feature
+     * @summary Get a Feature
+     * @param {string} featureId feature_id corresponding to a feature
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FeatureApi
+     */
+    public getFeature(featureId: string, options?: AxiosRequestConfig) {
+        return FeatureApiFp(this.configuration).getFeature(featureId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get a list of features along with its associations
+     * @summary List Feature
+     * @param {string} [nextToken] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FeatureApi
+     */
+    public getFeatures(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
+        return FeatureApiFp(this.configuration).getFeatures(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update an existing feature and its eventSchema associations 
+     * @summary Update a Feature
+     * @param {string} featureId feature_id corresponding to a feature
+     * @param {UpdateFeatureRequest} updateFeatureRequest Payload to update a Feature along the associations with event_schemas
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof FeatureApi
+     */
+    public updateFeature(featureId: string, updateFeatureRequest: UpdateFeatureRequest, options?: AxiosRequestConfig) {
+        return FeatureApiFp(this.configuration).updateFeature(featureId, updateFeatureRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
