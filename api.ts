@@ -4813,7 +4813,7 @@ export interface PurchaseListResponse {
      * @type {string}
      * @memberof PurchaseListResponse
      */
-    'idempotencyKey': string;
+    'idempotencyKey'?: string;
     /**
      * 
      * @type {string}
@@ -6352,44 +6352,6 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Get purchase information of an account for a specific plan using account_id and price_plan_id
-         * @summary Get a specific purchase of an account
-         * @param {string} purchaseId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getAccountPurchase: async (purchaseId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'purchaseId' is not null or undefined
-            assertParamExists('getAccountPurchase', 'purchaseId', purchaseId)
-            const localVarPath = `/purchases/{purchase_id}`
-                .replace(`{${"purchase_id"}}`, encodeURIComponent(String(purchaseId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} [nextToken] 
@@ -6492,6 +6454,44 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get purchase information of an account for a specific plan using account_id and price_plan_id
+         * @summary Get a specific purchase of an account
+         * @param {string} purchaseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPurchase: async (purchaseId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'purchaseId' is not null or undefined
+            assertParamExists('getPurchase', 'purchaseId', purchaseId)
+            const localVarPath = `/purchases/{purchase_id}`
+                .replace(`{${"purchase_id"}}`, encodeURIComponent(String(purchaseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get Purchase information for an account using account_id and price_plan_id
          * @summary Get all purchases for an account
          * @param {string} accountId account_id corresponding to an account
@@ -6501,7 +6501,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
         listAccountPurchases: async (accountId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'accountId' is not null or undefined
             assertParamExists('listAccountPurchases', 'accountId', accountId)
-            const localVarPath = `/accounts/{account_id}/purchase`
+            const localVarPath = `/accounts/{account_id}/purchases`
                 .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6542,7 +6542,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             assertParamExists('purchaseOneTimeEntitlementPlan', 'accountId', accountId)
             // verify required parameter 'createPurchaseRequest' is not null or undefined
             assertParamExists('purchaseOneTimeEntitlementPlan', 'createPurchaseRequest', createPurchaseRequest)
-            const localVarPath = `/accounts/{account_id}/purchase`
+            const localVarPath = `/accounts/{account_id}/purchases`
                 .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -6805,17 +6805,6 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Get purchase information of an account for a specific plan using account_id and price_plan_id
-         * @summary Get a specific purchase of an account
-         * @param {string} purchaseId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getAccountPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAccountPurchase(purchaseId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} [nextToken] 
@@ -6840,6 +6829,17 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          */
         async getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricingSchedulePaginatedResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get purchase information of an account for a specific plan using account_id and price_plan_id
+         * @summary Get a specific purchase of an account
+         * @param {string} purchaseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPurchase(purchaseId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6965,16 +6965,6 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getAccount(accountId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Get purchase information of an account for a specific plan using account_id and price_plan_id
-         * @summary Get a specific purchase of an account
-         * @param {string} purchaseId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getAccountPurchase(purchaseId: string, options?: any): AxiosPromise<Purchase> {
-            return localVarFp.getAccountPurchase(purchaseId, options).then((request) => request(axios, basePath));
-        },
-        /**
          * Returns a list of accounts of a customer with pagination and sort.
          * @summary List accounts of customer
          * @param {string} [nextToken] 
@@ -6998,6 +6988,16 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          */
         getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, options?: any): AxiosPromise<PricingSchedulePaginatedResponse> {
             return localVarFp.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get purchase information of an account for a specific plan using account_id and price_plan_id
+         * @summary Get a specific purchase of an account
+         * @param {string} purchaseId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getPurchase(purchaseId: string, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.getPurchase(purchaseId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get Purchase information for an account using account_id and price_plan_id
@@ -7124,18 +7124,6 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
-     * Get purchase information of an account for a specific plan using account_id and price_plan_id
-     * @summary Get a specific purchase of an account
-     * @param {string} purchaseId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountsApi
-     */
-    public getAccountPurchase(purchaseId: string, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).getAccountPurchase(purchaseId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
      * Returns a list of accounts of a customer with pagination and sort.
      * @summary List accounts of customer
      * @param {string} [nextToken] 
@@ -7162,6 +7150,18 @@ export class AccountsApi extends BaseAPI {
      */
     public getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get purchase information of an account for a specific plan using account_id and price_plan_id
+     * @summary Get a specific purchase of an account
+     * @param {string} purchaseId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public getPurchase(purchaseId: string, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).getPurchase(purchaseId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
