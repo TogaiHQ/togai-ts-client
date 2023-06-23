@@ -197,10 +197,41 @@ export interface AddCurrencyToPricePlanRequest {
 export interface AddFeatureCreditsRequest {
     /**
      * 
+     * @type {AddFeatureCreditsRequestRevenueDetails}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'revenueDetails'?: AddFeatureCreditsRequestRevenueDetails;
+    /**
+     * 
      * @type {Array<FeatureCreditRequest>}
      * @memberof AddFeatureCreditsRequest
      */
     'creditRequests': Array<FeatureCreditRequest>;
+}
+/**
+ * Revenue details for feature credits
+ * @export
+ * @interface AddFeatureCreditsRequestRevenueDetails
+ */
+export interface AddFeatureCreditsRequestRevenueDetails {
+    /**
+     * Revenue for feature credits
+     * @type {number}
+     * @memberof AddFeatureCreditsRequestRevenueDetails
+     */
+    'revenue': number;
+    /**
+     * Currency conversion rate for feature credits
+     * @type {number}
+     * @memberof AddFeatureCreditsRequestRevenueDetails
+     */
+    'currencyConversionRate': number;
+    /**
+     * Revenue reference id for feature credits to add in revenue entries
+     * @type {string}
+     * @memberof AddFeatureCreditsRequestRevenueDetails
+     */
+    'revenueReferenceId': string;
 }
 /**
  * 
@@ -4130,6 +4161,12 @@ export interface PricePlan {
      */
     'name': string;
     /**
+     * 
+     * @type {PricePlanType}
+     * @memberof PricePlan
+     */
+    'type': PricePlanType;
+    /**
      * Description of price plan
      * @type {string}
      * @memberof PricePlan
@@ -4398,6 +4435,12 @@ export interface PricePlanListData {
      * @memberof PricePlanListData
      */
     'updatedAt': string;
+    /**
+     * 
+     * @type {PricePlanType}
+     * @memberof PricePlanListData
+     */
+    'type': PricePlanType;
 }
 
 export const PricePlanListDataStatusEnum = {
@@ -4433,6 +4476,20 @@ export interface PricePlanPaginatedResponse {
      */
     'context'?: PaginationOptions;
 }
+/**
+ * Type of price plan
+ * @export
+ * @enum {string}
+ */
+
+export const PricePlanType = {
+    Entitlement: 'ENTITLEMENT',
+    Billing: 'BILLING'
+} as const;
+
+export type PricePlanType = typeof PricePlanType[keyof typeof PricePlanType];
+
+
 /**
  * 
  * @export
@@ -9745,7 +9802,7 @@ export const FeatureApiAxiosParamCreator = function (configuration?: Configurati
         createFeature: async (createFeatureRequest: CreateFeatureRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'createFeatureRequest' is not null or undefined
             assertParamExists('createFeature', 'createFeatureRequest', createFeatureRequest)
-            const localVarPath = `/feature`;
+            const localVarPath = `/features`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9785,7 +9842,7 @@ export const FeatureApiAxiosParamCreator = function (configuration?: Configurati
         getFeature: async (featureId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'featureId' is not null or undefined
             assertParamExists('getFeature', 'featureId', featureId)
-            const localVarPath = `/feature/{feature_id}`
+            const localVarPath = `/features/{feature_id}`
                 .replace(`{${"feature_id"}}`, encodeURIComponent(String(featureId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -9822,7 +9879,7 @@ export const FeatureApiAxiosParamCreator = function (configuration?: Configurati
          * @throws {RequiredError}
          */
         getFeatures: async (nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/feature`;
+            const localVarPath = `/features`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -9870,7 +9927,7 @@ export const FeatureApiAxiosParamCreator = function (configuration?: Configurati
             assertParamExists('updateFeature', 'featureId', featureId)
             // verify required parameter 'updateFeatureRequest' is not null or undefined
             assertParamExists('updateFeature', 'updateFeatureRequest', updateFeatureRequest)
-            const localVarPath = `/feature/{feature_id}`
+            const localVarPath = `/features/{feature_id}`
                 .replace(`{${"feature_id"}}`, encodeURIComponent(String(featureId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
