@@ -42,6 +42,12 @@ export interface Account {
      */
     'name': string;
     /**
+     * Identifier of the customer
+     * @type {string}
+     * @memberof Account
+     */
+    'customerId': string;
+    /**
      * [ISO_4217](https://en.wikipedia.org/wiki/ISO_4217) code of the currency in which the account must be invoiced Defaults to Base currency. 
      * @type {string}
      * @memberof Account
@@ -169,7 +175,7 @@ export interface AddCurrencyToPricePlanRequest {
      * @type {Array<UsageRate>}
      * @memberof AddCurrencyToPricePlanRequest
      */
-    'usageRates': Array<UsageRate>;
+    'usageRates'?: Array<UsageRate>;
     /**
      * Rates for fixed fee rate cards
      * @type {Array<FixedFeeRate>}
@@ -188,6 +194,12 @@ export interface AddCurrencyToPricePlanRequest {
      * @memberof AddCurrencyToPricePlanRequest
      */
     'minimumCommitmentRate'?: number;
+    /**
+     * List of slab rates
+     * @type {Array<SlabRate>}
+     * @memberof AddCurrencyToPricePlanRequest
+     */
+    'rateDetailsRate'?: Array<SlabRate>;
 }
 /**
  * 
@@ -196,42 +208,59 @@ export interface AddCurrencyToPricePlanRequest {
  */
 export interface AddFeatureCreditsRequest {
     /**
-     * 
-     * @type {AddFeatureCreditsRequestRevenueDetails}
-     * @memberof AddFeatureCreditsRequest
-     */
-    'revenueDetails'?: AddFeatureCreditsRequestRevenueDetails;
-    /**
-     * 
-     * @type {Array<FeatureCreditRequest>}
-     * @memberof AddFeatureCreditsRequest
-     */
-    'creditRequests': Array<FeatureCreditRequest>;
-}
-/**
- * Revenue details for feature credits
- * @export
- * @interface AddFeatureCreditsRequestRevenueDetails
- */
-export interface AddFeatureCreditsRequestRevenueDetails {
-    /**
-     * Revenue for feature credits
-     * @type {number}
-     * @memberof AddFeatureCreditsRequestRevenueDetails
-     */
-    'revenue': number;
-    /**
-     * Currency conversion rate for feature credits
-     * @type {number}
-     * @memberof AddFeatureCreditsRequestRevenueDetails
-     */
-    'currencyConversionRate': number;
-    /**
-     * Revenue reference id for feature credits to add in revenue entries
+     * Customer ID
      * @type {string}
-     * @memberof AddFeatureCreditsRequestRevenueDetails
+     * @memberof AddFeatureCreditsRequest
+     */
+    'customerId': string;
+    /**
+     * Account ID
+     * @type {string}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'accountId': string;
+    /**
+     * The id of the entity that granted the units like purchase id
+     * @type {string}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'referenceId': string;
+    /**
+     * The price plan id
+     * @type {string}
+     * @memberof AddFeatureCreditsRequest
      */
     'revenueReferenceId': string;
+    /**
+     * 
+     * @type {InternalRateDetails}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'rateDetails': InternalRateDetails;
+    /**
+     * 
+     * @type {Array<EntitlementRateCard>}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'entitlementRateCards': Array<EntitlementRateCard>;
+    /**
+     * Quantity of purchase
+     * @type {number}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'units': number;
+    /**
+     * Invoice currency
+     * @type {string}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'invoiceCurrency': string;
+    /**
+     * currency conversion factors
+     * @type {string}
+     * @memberof AddFeatureCreditsRequest
+     */
+    'conversionFactors': string;
 }
 /**
  * 
@@ -513,6 +542,27 @@ export interface ComputeRevenueSummaryResponse {
      */
     'revenueSummaryResponses': Array<RevenueSummaryResponse>;
 }
+/**
+ * Confirm a purchase for an account
+ * @export
+ * @interface ConfirmPurchaseRequest
+ */
+export interface ConfirmPurchaseRequest {
+    /**
+     * Id of the purchase
+     * @type {string}
+     * @memberof ConfirmPurchaseRequest
+     */
+    'purchaseId': string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof ConfirmPurchaseRequest
+     */
+    'status': PurchaseStatus;
+}
+
+
 /**
  * Payload to create account
  * @export
@@ -845,6 +895,37 @@ export interface CreateFeatureRequest {
     'schemaAssociations': Array<EventSchemasForFeature>;
 }
 /**
+ * Payload to create invoice
+ * @export
+ * @interface CreateInvoiceRequest
+ */
+export interface CreateInvoiceRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateInvoiceRequest
+     */
+    'invoiceTime': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateInvoiceRequest
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof CreateInvoiceRequest
+     */
+    'metadata'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {Array<InvoiceLineItem>}
+     * @memberof CreateInvoiceRequest
+     */
+    'lineItems': Array<InvoiceLineItem>;
+}
+/**
  * 
  * @export
  * @interface CreatePricePlanDetails
@@ -888,17 +969,25 @@ export interface CreatePricePlanDetails {
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof CreatePricePlanDetails
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof CreatePricePlanDetails
      */
     'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {PricePlanType}
+     * @memberof CreatePricePlanDetails
+     */
+    'type'?: PricePlanType;
 }
+
+
 /**
  * 
  * @export
@@ -943,10 +1032,10 @@ export interface CreatePricePlanDetailsOverride {
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof CreatePricePlanDetailsOverride
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
@@ -993,37 +1082,6 @@ export const CreatePricePlanRequestTypeEnum = {
 
 export type CreatePricePlanRequestTypeEnum = typeof CreatePricePlanRequestTypeEnum[keyof typeof CreatePricePlanRequestTypeEnum];
 
-/**
- * Create a purchase for an account
- * @export
- * @interface CreatePurchaseRequest
- */
-export interface CreatePurchaseRequest {
-    /**
-     * Id of the price plan
-     * @type {string}
-     * @memberof CreatePurchaseRequest
-     */
-    'pricePlanId': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof CreatePurchaseRequest
-     */
-    'quantity': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreatePurchaseRequest
-     */
-    'idempotencyKey'?: string;
-    /**
-     * 
-     * @type {PurchasePlanOverride}
-     * @memberof CreatePurchaseRequest
-     */
-    'purchasePlanOverride'?: PurchasePlanOverride;
-}
 /**
  * Request to create usage meter
  * @export
@@ -1763,17 +1821,11 @@ export interface EntitlementRateCard {
      */
     'featureId': string;
     /**
-     * Credit value of the feature
-     * @type {number}
+     * 
+     * @type {Array<FeatureConfig>}
      * @memberof EntitlementRateCard
      */
-    'featureCredits': number;
-    /**
-     * The validity of the credit value of the feature
-     * @type {number}
-     * @memberof EntitlementRateCard
-     */
-    'expiryDurationSeconds': number;
+    'featureConfigs': Array<FeatureConfig>;
 }
 /**
  * 
@@ -2443,6 +2495,31 @@ export interface Feature {
     'updatedAt'?: string;
 }
 /**
+ * Feature configuration object
+ * @export
+ * @interface FeatureConfig
+ */
+export interface FeatureConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureConfig
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureConfig
+     */
+    'effectiveUntil': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeatureConfig
+     */
+    'featureCreditLimit': number;
+}
+/**
  * 
  * @export
  * @interface FeatureCredit
@@ -2498,6 +2575,12 @@ export interface FeatureCredit {
     'description'?: string;
     /**
      * 
+     * @type {number}
+     * @memberof FeatureCredit
+     */
+    'grantedUnits': number;
+    /**
+     * 
      * @type {string}
      * @memberof FeatureCredit
      */
@@ -2517,6 +2600,12 @@ export interface FeatureCredit {
 export interface FeatureCreditAllOf {
     /**
      * 
+     * @type {number}
+     * @memberof FeatureCreditAllOf
+     */
+    'grantedUnits': number;
+    /**
+     * 
      * @type {string}
      * @memberof FeatureCreditAllOf
      */
@@ -2531,57 +2620,107 @@ export interface FeatureCreditAllOf {
 /**
  * 
  * @export
- * @interface FeatureCreditRequest
+ * @interface FeatureCreditForAcc
  */
-export interface FeatureCreditRequest {
+export interface FeatureCreditForAcc {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCreditForAcc
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeatureCreditForAcc
+     */
+    'creditsGranted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeatureCreditForAcc
+     */
+    'creditsAvailable': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCreditForAcc
+     */
+    'lastUpdated': string;
+}
+/**
+ * 
+ * @export
+ * @interface FeatureCreditResponse
+ */
+export interface FeatureCreditResponse {
     /**
      * Feature ID
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'featureId': string;
     /**
      * Customer ID
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'customerId': string;
     /**
      * Account ID
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'accountId': string;
     /**
      * The id of the entity that granted the units like purchase id, etc
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'referenceId': string;
     /**
      * Quantity of feature credits
      * @type {number}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'units': number;
     /**
      * Effective from date
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'effectiveFrom': string;
     /**
      * Effective until date
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'effectiveUntil': string;
     /**
      * Description of feature credits
      * @type {string}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureCreditResponse
      */
     'description'?: string;
+}
+/**
+ * Get feature credits for account response
+ * @export
+ * @interface FeatureCreditsForAccountResponse
+ */
+export interface FeatureCreditsForAccountResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof FeatureCreditsForAccountResponse
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {Array<FeatureCreditForAcc>}
+     * @memberof FeatureCreditsForAccountResponse
+     */
+    'featureCredits': Array<FeatureCreditForAcc>;
 }
 /**
  * 
@@ -2595,6 +2734,12 @@ export interface FeatureCreditsResponse {
      * @memberof FeatureCreditsResponse
      */
     'featureCredits': Array<FeatureCredit>;
+    /**
+     * 
+     * @type {PriceDetails}
+     * @memberof FeatureCreditsResponse
+     */
+    'priceDetails'?: PriceDetails;
 }
 /**
  * details of feature associated with event schema with attribute name
@@ -2633,6 +2778,12 @@ export interface FeatureListResponse {
      * @memberof FeatureListResponse
      */
     'name': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeatureListResponse
+     */
+    'schemaCount': number;
     /**
      * 
      * @type {string}
@@ -2929,6 +3080,130 @@ export interface GetMetricsResponse {
     'results': Array<MetricQueryResponse>;
 }
 /**
+ * 
+ * @export
+ * @interface GetPurchaseResponse
+ */
+export interface GetPurchaseResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponse
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponse
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof GetPurchaseResponse
+     */
+    'purchasePlanOverrides'?: PurchasePlanOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponse
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof GetPurchaseResponse
+     */
+    'status'?: PurchaseStatus;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof GetPurchaseResponse
+     */
+    'purchasePlan': PurchasePlanOverride;
+    /**
+     * 
+     * @type {Array<PurchaseFeatureDetails>}
+     * @memberof GetPurchaseResponse
+     */
+    'features': Array<PurchaseFeatureDetails>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface GetPurchaseResponseAllOf
+ */
+export interface GetPurchaseResponseAllOf {
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'purchasePlan': PurchasePlanOverride;
+    /**
+     * 
+     * @type {Array<PurchaseFeatureDetails>}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'features': Array<PurchaseFeatureDetails>;
+}
+/**
  * Payload for ingesting batch events
  * @export
  * @interface IngestBatchEventRequest
@@ -3032,6 +3307,37 @@ export const IngestionStatusStatusEnum = {
 export type IngestionStatusStatusEnum = typeof IngestionStatusStatusEnum[keyof typeof IngestionStatusStatusEnum];
 
 /**
+ * Create a purchase for an account
+ * @export
+ * @interface InitiatePurchaseRequest
+ */
+export interface InitiatePurchaseRequest {
+    /**
+     * Id of the price plan
+     * @type {string}
+     * @memberof InitiatePurchaseRequest
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof InitiatePurchaseRequest
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof InitiatePurchaseRequest
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof InitiatePurchaseRequest
+     */
+    'purchasePlanOverride'?: PurchasePlanOverride;
+}
+/**
  * 
  * @export
  * @interface InternalFixedFeeRateCard
@@ -3130,6 +3436,39 @@ export interface InternalLicenseRateCard {
      * @memberof InternalLicenseRateCard
      */
     'enableProration': boolean;
+    /**
+     * 
+     * @type {LicenseRateCardConfig}
+     * @memberof InternalLicenseRateCard
+     */
+    'config'?: LicenseRateCardConfig;
+}
+
+
+/**
+ * rate details for a price plan
+ * @export
+ * @interface InternalRateDetails
+ */
+export interface InternalRateDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalRateDetails
+     */
+    'currency': string;
+    /**
+     * 
+     * @type {Array<InternalSlab>}
+     * @memberof InternalRateDetails
+     */
+    'rateValues': Array<InternalSlab>;
+    /**
+     * 
+     * @type {PricingModel}
+     * @memberof InternalRateDetails
+     */
+    'pricingModel': PricingModel;
 }
 
 
@@ -3271,7 +3610,7 @@ export interface Invoice {
      * @type {string}
      * @memberof Invoice
      */
-    'pricePlanId': string;
+    'pricePlanId'?: string;
     /**
      * 
      * @type {Array<InvoiceLineItem>}
@@ -3360,7 +3699,7 @@ export interface InvoiceDetails {
      * @type {string}
      * @memberof InvoiceDetails
      */
-    'pricePlanName': string;
+    'pricePlanName'?: string;
 }
 /**
  * 
@@ -3447,13 +3786,13 @@ export interface InvoiceLineItem {
      * @type {string}
      * @memberof InvoiceLineItem
      */
-    'units'?: string;
+    'units': string;
     /**
      * 
      * @type {number}
      * @memberof InvoiceLineItem
      */
-    'value'?: number;
+    'value': number;
     /**
      * 
      * @type {{ [key: string]: any; }}
@@ -3654,6 +3993,12 @@ export interface LicenseRateCard {
     'enableProration': boolean;
     /**
      * 
+     * @type {LicenseRateCardConfig}
+     * @memberof LicenseRateCard
+     */
+    'config'?: LicenseRateCardConfig;
+    /**
+     * 
      * @type {RatePlan}
      * @memberof LicenseRateCard
      */
@@ -3664,6 +4009,19 @@ export interface LicenseRateCard {
      * @memberof LicenseRateCard
      */
     'rateValues': Array<RateValue>;
+}
+/**
+ * 
+ * @export
+ * @interface LicenseRateCardConfig
+ */
+export interface LicenseRateCardConfig {
+    /**
+     * Max allowed quantity for a particular license in a price plan
+     * @type {number}
+     * @memberof LicenseRateCardConfig
+     */
+    'maxQuantity'?: number;
 }
 /**
  * 
@@ -4143,6 +4501,25 @@ export interface PlanOverride {
     'endDate': string;
 }
 /**
+ * price details of a purchase
+ * @export
+ * @interface PriceDetails
+ */
+export interface PriceDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof PriceDetails
+     */
+    'invoiceCurrency': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PriceDetails
+     */
+    'price': number;
+}
+/**
  * Price plan entity
  * @export
  * @interface PricePlan
@@ -4244,17 +4621,25 @@ export interface PricePlanDetails {
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof PricePlanDetails
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof PricePlanDetails
      */
     'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {PricePlanType}
+     * @memberof PricePlanDetails
+     */
+    'type'?: PricePlanType;
 }
+
+
 /**
  * Configuration for getting the usage rate card
  * @export
@@ -4351,10 +4736,10 @@ export interface PricePlanDetailsOverride {
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof PricePlanDetailsOverride
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
@@ -4834,6 +5219,69 @@ export interface Purchase {
      * @memberof Purchase
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Purchase
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof Purchase
+     */
+    'status'?: PurchaseStatus;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface PurchaseFeatureDetails
+ */
+export interface PurchaseFeatureDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'name': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseFeatureDetails
+     */
+    'creditsGranted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseFeatureDetails
+     */
+    'creditsAvailable': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'effectiveUntil': string;
 }
 /**
  * Represents a Purchase for List Response
@@ -4855,6 +5303,12 @@ export interface PurchaseListResponse {
     'pricePlanId': string;
     /**
      * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'pricePlanName': string;
+    /**
+     * 
      * @type {number}
      * @memberof PurchaseListResponse
      */
@@ -4871,6 +5325,24 @@ export interface PurchaseListResponse {
      * @memberof PurchaseListResponse
      */
     'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof PurchaseListResponse
+     */
+    'purchasePlan': PurchasePlanOverride;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseListResponse
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'invoiceCurrency'?: string;
     /**
      * 
      * @type {string}
@@ -4917,16 +5389,69 @@ export interface PurchasePaginatedListData {
 export interface PurchasePlanOverride {
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof PurchasePlanOverride
      */
-    'rateValues': Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof PurchasePlanOverride
      */
-    'entitlementRateCards': Array<EntitlementRateCard>;
+    'entitlementRateCards'?: Array<EntitlementRateCard>;
+}
+/**
+ * Status of the purchase
+ * @export
+ * @enum {string}
+ */
+
+export const PurchaseStatus = {
+    Success: 'SUCCESS',
+    Failure: 'FAILURE',
+    Pending: 'PENDING'
+} as const;
+
+export type PurchaseStatus = typeof PurchaseStatus[keyof typeof PurchaseStatus];
+
+
+/**
+ * rate details for a price plan
+ * @export
+ * @interface RateDetails
+ */
+export interface RateDetails {
+    /**
+     * 
+     * @type {Array<RateValue>}
+     * @memberof RateDetails
+     */
+    'rateValues': Array<RateValue>;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof RateDetails
+     */
+    'ratePlan': RatePlan;
+}
+/**
+ * rate details for a price plan
+ * @export
+ * @interface RateDetails1
+ */
+export interface RateDetails1 {
+    /**
+     * 
+     * @type {Array<CurrencyRateValue>}
+     * @memberof RateDetails1
+     */
+    'rateValues': Array<CurrencyRateValue>;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof RateDetails1
+     */
+    'ratePlan': RatePlan;
 }
 /**
  * Contains all rate related configurations
@@ -6549,6 +7074,50 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * This API let’s you to initiate a purchase for an account
+         * @summary Initiate a purchase
+         * @param {string} accountId account_id corresponding to an account
+         * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateOneTimeEntitlementPlan: async (accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('initiateOneTimeEntitlementPlan', 'accountId', accountId)
+            // verify required parameter 'initiatePurchaseRequest' is not null or undefined
+            assertParamExists('initiateOneTimeEntitlementPlan', 'initiatePurchaseRequest', initiatePurchaseRequest)
+            const localVarPath = `/accounts/{account_id}/initate_purchase`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(initiatePurchaseRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get Purchase information for an account using account_id and price_plan_id
          * @summary Get all purchases for an account
          * @param {string} accountId account_id corresponding to an account
@@ -6590,15 +7159,15 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to purchase a one time entitlement plan
          * @summary Purchase an Entitlement Plan
          * @param {string} accountId account_id corresponding to an account
-         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+         * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        purchaseOneTimeEntitlementPlan: async (accountId: string, createPurchaseRequest: CreatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        purchaseOneTimeEntitlementPlan: async (accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'accountId' is not null or undefined
             assertParamExists('purchaseOneTimeEntitlementPlan', 'accountId', accountId)
-            // verify required parameter 'createPurchaseRequest' is not null or undefined
-            assertParamExists('purchaseOneTimeEntitlementPlan', 'createPurchaseRequest', createPurchaseRequest)
+            // verify required parameter 'confirmPurchaseRequest' is not null or undefined
+            assertParamExists('purchaseOneTimeEntitlementPlan', 'confirmPurchaseRequest', confirmPurchaseRequest)
             const localVarPath = `/accounts/{account_id}/purchases`
                 .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -6623,7 +7192,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPurchaseRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(confirmPurchaseRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6895,8 +7464,20 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+        async getPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPurchaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPurchase(purchaseId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to initiate a purchase for an account
+         * @summary Initiate a purchase
+         * @param {string} accountId account_id corresponding to an account
+         * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async initiateOneTimeEntitlementPlan(accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateOneTimeEntitlementPlan(accountId, initiatePurchaseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6914,12 +7495,12 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to purchase a one time entitlement plan
          * @summary Purchase an Entitlement Plan
          * @param {string} accountId account_id corresponding to an account
-         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+         * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options);
+        async purchaseOneTimeEntitlementPlan(accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(accountId, confirmPurchaseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7053,8 +7634,19 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPurchase(purchaseId: string, options?: any): AxiosPromise<Purchase> {
+        getPurchase(purchaseId: string, options?: any): AxiosPromise<GetPurchaseResponse> {
             return localVarFp.getPurchase(purchaseId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to initiate a purchase for an account
+         * @summary Initiate a purchase
+         * @param {string} accountId account_id corresponding to an account
+         * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateOneTimeEntitlementPlan(accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.initiateOneTimeEntitlementPlan(accountId, initiatePurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get Purchase information for an account using account_id and price_plan_id
@@ -7070,12 +7662,12 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to purchase a one time entitlement plan
          * @summary Purchase an Entitlement Plan
          * @param {string} accountId account_id corresponding to an account
-         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+         * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
-            return localVarFp.purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(axios, basePath));
+        purchaseOneTimeEntitlementPlan(accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.purchaseOneTimeEntitlementPlan(accountId, confirmPurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Remove existing aliases tagged to an account using this API
@@ -7222,6 +7814,19 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
+     * This API let’s you to initiate a purchase for an account
+     * @summary Initiate a purchase
+     * @param {string} accountId account_id corresponding to an account
+     * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public initiateOneTimeEntitlementPlan(accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).initiateOneTimeEntitlementPlan(accountId, initiatePurchaseRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get Purchase information for an account using account_id and price_plan_id
      * @summary Get all purchases for an account
      * @param {string} accountId account_id corresponding to an account
@@ -7237,13 +7842,13 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to purchase a one time entitlement plan
      * @summary Purchase an Entitlement Plan
      * @param {string} accountId account_id corresponding to an account
-     * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
+     * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
      */
-    public purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
+    public purchaseOneTimeEntitlementPlan(accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(accountId, confirmPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -8757,10 +9362,13 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
          * This API let’s you to ingest events to your Togai account. Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
          * @summary Ingest events to Togai
          * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
+         * @param {string} [xIamUserOrganization] 
+         * @param {string} [togaiSourceId] 
+         * @param {string} [togaiSourceType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ingest: async (ingestEventRequest: IngestEventRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        ingest: async (ingestEventRequest: IngestEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ingestEventRequest' is not null or undefined
             assertParamExists('ingest', 'ingestEventRequest', ingestEventRequest)
             const localVarPath = `/ingest`;
@@ -8778,6 +9386,18 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (xIamUserOrganization != null) {
+                localVarHeaderParameter['X-Iam-User-Organization'] = String(xIamUserOrganization);
+            }
+
+            if (togaiSourceId != null) {
+                localVarHeaderParameter['Togai-Source-Id'] = String(togaiSourceId);
+            }
+
+            if (togaiSourceType != null) {
+                localVarHeaderParameter['Togai-Source-Type'] = String(togaiSourceType);
+            }
 
 
     
@@ -8797,10 +9417,13 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
          * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
+         * @param {string} [xIamUserOrganization] 
+         * @param {string} [togaiSourceId] 
+         * @param {string} [togaiSourceType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ingestBatch: async (ingestBatchEventRequest: IngestBatchEventRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        ingestBatch: async (ingestBatchEventRequest: IngestBatchEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'ingestBatchEventRequest' is not null or undefined
             assertParamExists('ingestBatch', 'ingestBatchEventRequest', ingestBatchEventRequest)
             const localVarPath = `/ingestBatch`;
@@ -8818,6 +9441,18 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (xIamUserOrganization != null) {
+                localVarHeaderParameter['X-Iam-User-Organization'] = String(xIamUserOrganization);
+            }
+
+            if (togaiSourceId != null) {
+                localVarHeaderParameter['Togai-Source-Id'] = String(togaiSourceId);
+            }
+
+            if (togaiSourceType != null) {
+                localVarHeaderParameter['Togai-Source-Type'] = String(togaiSourceType);
+            }
 
 
     
@@ -8847,22 +9482,28 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
          * This API let’s you to ingest events to your Togai account. Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
          * @summary Ingest events to Togai
          * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
+         * @param {string} [xIamUserOrganization] 
+         * @param {string} [togaiSourceId] 
+         * @param {string} [togaiSourceType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ingest(ingestEventRequest: IngestEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestEventResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.ingest(ingestEventRequest, options);
+        async ingest(ingestEventRequest: IngestEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestEventResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.ingest(ingestEventRequest, xIamUserOrganization, togaiSourceId, togaiSourceType, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
          * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
+         * @param {string} [xIamUserOrganization] 
+         * @param {string} [togaiSourceId] 
+         * @param {string} [togaiSourceType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestEventResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.ingestBatch(ingestBatchEventRequest, options);
+        async ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<IngestEventResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.ingestBatch(ingestBatchEventRequest, xIamUserOrganization, togaiSourceId, togaiSourceType, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -8879,21 +9520,27 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
          * This API let’s you to ingest events to your Togai account. Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
          * @summary Ingest events to Togai
          * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
+         * @param {string} [xIamUserOrganization] 
+         * @param {string} [togaiSourceId] 
+         * @param {string} [togaiSourceType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ingest(ingestEventRequest: IngestEventRequest, options?: any): AxiosPromise<IngestEventResponse> {
-            return localVarFp.ingest(ingestEventRequest, options).then((request) => request(axios, basePath));
+        ingest(ingestEventRequest: IngestEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options?: any): AxiosPromise<IngestEventResponse> {
+            return localVarFp.ingest(ingestEventRequest, xIamUserOrganization, togaiSourceId, togaiSourceType, options).then((request) => request(axios, basePath));
         },
         /**
          * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
+         * @param {string} [xIamUserOrganization] 
+         * @param {string} [togaiSourceId] 
+         * @param {string} [togaiSourceType] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: any): AxiosPromise<IngestEventResponse> {
-            return localVarFp.ingestBatch(ingestBatchEventRequest, options).then((request) => request(axios, basePath));
+        ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options?: any): AxiosPromise<IngestEventResponse> {
+            return localVarFp.ingestBatch(ingestBatchEventRequest, xIamUserOrganization, togaiSourceId, togaiSourceType, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -8909,24 +9556,30 @@ export class EventIngestionApi extends BaseAPI {
      * This API let’s you to ingest events to your Togai account. Events ingested using this API will be processed via associated usage meters and further via associated price plans to generate final billable value to invoice the customer Read more about [Event Ingestion](https://docs.togai.com/docs/event-ingestion) 
      * @summary Ingest events to Togai
      * @param {IngestEventRequest} ingestEventRequest Request body to ingest events to Togai usage and billing management service.
+     * @param {string} [xIamUserOrganization] 
+     * @param {string} [togaiSourceId] 
+     * @param {string} [togaiSourceType] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EventIngestionApi
      */
-    public ingest(ingestEventRequest: IngestEventRequest, options?: AxiosRequestConfig) {
-        return EventIngestionApiFp(this.configuration).ingest(ingestEventRequest, options).then((request) => request(this.axios, this.basePath));
+    public ingest(ingestEventRequest: IngestEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options?: AxiosRequestConfig) {
+        return EventIngestionApiFp(this.configuration).ingest(ingestEventRequest, xIamUserOrganization, togaiSourceId, togaiSourceType, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
      * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
      * @summary Ingest events to Togai in batch
      * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
+     * @param {string} [xIamUserOrganization] 
+     * @param {string} [togaiSourceId] 
+     * @param {string} [togaiSourceType] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EventIngestionApi
      */
-    public ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, options?: AxiosRequestConfig) {
-        return EventIngestionApiFp(this.configuration).ingestBatch(ingestBatchEventRequest, options).then((request) => request(this.axios, this.basePath));
+    public ingestBatch(ingestBatchEventRequest: IngestBatchEventRequest, xIamUserOrganization?: string, togaiSourceId?: string, togaiSourceType?: string, options?: AxiosRequestConfig) {
+        return EventIngestionApiFp(this.configuration).ingestBatch(ingestBatchEventRequest, xIamUserOrganization, togaiSourceId, togaiSourceType, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -10124,6 +10777,122 @@ export class FeatureApi extends BaseAPI {
      */
     public updateFeature(featureId: string, updateFeatureRequest: UpdateFeatureRequest, options?: AxiosRequestConfig) {
         return FeatureApiFp(this.configuration).updateFeature(featureId, updateFeatureRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * InternalApi - axios parameter creator
+ * @export
+ */
+export const InternalApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Create an invoice for a account
+         * @summary Create an invoice for a account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreateInvoiceRequest} [createInvoiceRequest] Payload to create invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createInvoiceForAccount: async (accountId: string, createInvoiceRequest?: CreateInvoiceRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('createInvoiceForAccount', 'accountId', accountId)
+            const localVarPath = `/internal/accounts/{account_id}/invoices`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createInvoiceRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * InternalApi - functional programming interface
+ * @export
+ */
+export const InternalApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = InternalApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Create an invoice for a account
+         * @summary Create an invoice for a account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreateInvoiceRequest} [createInvoiceRequest] Payload to create invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createInvoiceForAccount(accountId: string, createInvoiceRequest?: CreateInvoiceRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Invoice>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createInvoiceForAccount(accountId, createInvoiceRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * InternalApi - factory interface
+ * @export
+ */
+export const InternalApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = InternalApiFp(configuration)
+    return {
+        /**
+         * Create an invoice for a account
+         * @summary Create an invoice for a account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreateInvoiceRequest} [createInvoiceRequest] Payload to create invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createInvoiceForAccount(accountId: string, createInvoiceRequest?: CreateInvoiceRequest, options?: any): AxiosPromise<Invoice> {
+            return localVarFp.createInvoiceForAccount(accountId, createInvoiceRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * InternalApi - object-oriented interface
+ * @export
+ * @class InternalApi
+ * @extends {BaseAPI}
+ */
+export class InternalApi extends BaseAPI {
+    /**
+     * Create an invoice for a account
+     * @summary Create an invoice for a account
+     * @param {string} accountId account_id corresponding to an account
+     * @param {CreateInvoiceRequest} [createInvoiceRequest] Payload to create invoice
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InternalApi
+     */
+    public createInvoiceForAccount(accountId: string, createInvoiceRequest?: CreateInvoiceRequest, options?: AxiosRequestConfig) {
+        return InternalApiFp(this.configuration).createInvoiceForAccount(accountId, createInvoiceRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
