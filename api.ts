@@ -543,17 +543,11 @@ export interface ComputeRevenueSummaryResponse {
     'revenueSummaryResponses': Array<RevenueSummaryResponse>;
 }
 /**
- * Confirm a purchase for an account
+ * Confirm a purchase for an account where the status can be marked as SUCCESS or FAILURE
  * @export
  * @interface ConfirmPurchaseRequest
  */
 export interface ConfirmPurchaseRequest {
-    /**
-     * Id of the purchase
-     * @type {string}
-     * @memberof ConfirmPurchaseRequest
-     */
-    'purchaseId': string;
     /**
      * 
      * @type {PurchaseStatus}
@@ -1082,6 +1076,37 @@ export const CreatePricePlanRequestTypeEnum = {
 
 export type CreatePricePlanRequestTypeEnum = typeof CreatePricePlanRequestTypeEnum[keyof typeof CreatePricePlanRequestTypeEnum];
 
+/**
+ * Create a purchase for an account
+ * @export
+ * @interface CreatePurchaseRequest
+ */
+export interface CreatePurchaseRequest {
+    /**
+     * Id of the price plan
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreatePurchaseRequest
+     */
+    'quantity': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof CreatePurchaseRequest
+     */
+    'purchasePlanOverride'?: PurchasePlanOverride;
+}
 /**
  * Request to create usage meter
  * @export
@@ -3307,37 +3332,6 @@ export const IngestionStatusStatusEnum = {
 export type IngestionStatusStatusEnum = typeof IngestionStatusStatusEnum[keyof typeof IngestionStatusStatusEnum];
 
 /**
- * Create a purchase for an account
- * @export
- * @interface InitiatePurchaseRequest
- */
-export interface InitiatePurchaseRequest {
-    /**
-     * Id of the price plan
-     * @type {string}
-     * @memberof InitiatePurchaseRequest
-     */
-    'pricePlanId': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof InitiatePurchaseRequest
-     */
-    'quantity': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof InitiatePurchaseRequest
-     */
-    'idempotencyKey'?: string;
-    /**
-     * 
-     * @type {PurchasePlanOverride}
-     * @memberof InitiatePurchaseRequest
-     */
-    'purchasePlanOverride'?: PurchasePlanOverride;
-}
-/**
  * 
  * @export
  * @interface InternalFixedFeeRateCard
@@ -5321,6 +5315,12 @@ export interface PurchaseListResponse {
     'pricePlanVersion': number;
     /**
      * 
+     * @type {PurchaseStatus}
+     * @memberof PurchaseListResponse
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
      * @type {string}
      * @memberof PurchaseListResponse
      */
@@ -5356,6 +5356,8 @@ export interface PurchaseListResponse {
      */
     'updatedAt'?: string;
 }
+
+
 /**
  * 
  * @export
@@ -7077,16 +7079,16 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * This API let’s you to initiate a purchase for an account
          * @summary Initiate a purchase
          * @param {string} accountId account_id corresponding to an account
-         * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        initiateOneTimeEntitlementPlan: async (accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        initiateOneTimeEntitlementPlan: async (accountId: string, createPurchaseRequest: CreatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'accountId' is not null or undefined
             assertParamExists('initiateOneTimeEntitlementPlan', 'accountId', accountId)
-            // verify required parameter 'initiatePurchaseRequest' is not null or undefined
-            assertParamExists('initiateOneTimeEntitlementPlan', 'initiatePurchaseRequest', initiatePurchaseRequest)
-            const localVarPath = `/accounts/{account_id}/initate_purchase`
+            // verify required parameter 'createPurchaseRequest' is not null or undefined
+            assertParamExists('initiateOneTimeEntitlementPlan', 'createPurchaseRequest', createPurchaseRequest)
+            const localVarPath = `/accounts/{account_id}/purchases`
                 .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -7110,7 +7112,7 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(initiatePurchaseRequest, localVarRequestOptions, configuration)
+            localVarRequestOptions.data = serializeDataIfNeeded(createPurchaseRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -7158,18 +7160,18 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * This API let’s you to purchase a one time entitlement plan
          * @summary Purchase an Entitlement Plan
-         * @param {string} accountId account_id corresponding to an account
+         * @param {string} purchaseId 
          * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        purchaseOneTimeEntitlementPlan: async (accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'accountId' is not null or undefined
-            assertParamExists('purchaseOneTimeEntitlementPlan', 'accountId', accountId)
+        purchaseOneTimeEntitlementPlan: async (purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'purchaseId' is not null or undefined
+            assertParamExists('purchaseOneTimeEntitlementPlan', 'purchaseId', purchaseId)
             // verify required parameter 'confirmPurchaseRequest' is not null or undefined
             assertParamExists('purchaseOneTimeEntitlementPlan', 'confirmPurchaseRequest', confirmPurchaseRequest)
-            const localVarPath = `/accounts/{account_id}/purchases`
-                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            const localVarPath = `/purchases/{purchase_id}/confirm`
+                .replace(`{${"purchase_id"}}`, encodeURIComponent(String(purchaseId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -7472,12 +7474,12 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * This API let’s you to initiate a purchase for an account
          * @summary Initiate a purchase
          * @param {string} accountId account_id corresponding to an account
-         * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async initiateOneTimeEntitlementPlan(accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateOneTimeEntitlementPlan(accountId, initiatePurchaseRequest, options);
+        async initiateOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateOneTimeEntitlementPlan(accountId, createPurchaseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7494,13 +7496,13 @@ export const AccountsApiFp = function(configuration?: Configuration) {
         /**
          * This API let’s you to purchase a one time entitlement plan
          * @summary Purchase an Entitlement Plan
-         * @param {string} accountId account_id corresponding to an account
+         * @param {string} purchaseId 
          * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async purchaseOneTimeEntitlementPlan(accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(accountId, confirmPurchaseRequest, options);
+        async purchaseOneTimeEntitlementPlan(purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(purchaseId, confirmPurchaseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -7641,12 +7643,12 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * This API let’s you to initiate a purchase for an account
          * @summary Initiate a purchase
          * @param {string} accountId account_id corresponding to an account
-         * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        initiateOneTimeEntitlementPlan(accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
-            return localVarFp.initiateOneTimeEntitlementPlan(accountId, initiatePurchaseRequest, options).then((request) => request(axios, basePath));
+        initiateOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.initiateOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Get Purchase information for an account using account_id and price_plan_id
@@ -7661,13 +7663,13 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
         /**
          * This API let’s you to purchase a one time entitlement plan
          * @summary Purchase an Entitlement Plan
-         * @param {string} accountId account_id corresponding to an account
+         * @param {string} purchaseId 
          * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        purchaseOneTimeEntitlementPlan(accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: any): AxiosPromise<Purchase> {
-            return localVarFp.purchaseOneTimeEntitlementPlan(accountId, confirmPurchaseRequest, options).then((request) => request(axios, basePath));
+        purchaseOneTimeEntitlementPlan(purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.purchaseOneTimeEntitlementPlan(purchaseId, confirmPurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Remove existing aliases tagged to an account using this API
@@ -7817,13 +7819,13 @@ export class AccountsApi extends BaseAPI {
      * This API let’s you to initiate a purchase for an account
      * @summary Initiate a purchase
      * @param {string} accountId account_id corresponding to an account
-     * @param {InitiatePurchaseRequest} initiatePurchaseRequest Payload to initiate a purchase
+     * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
      */
-    public initiateOneTimeEntitlementPlan(accountId: string, initiatePurchaseRequest: InitiatePurchaseRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).initiateOneTimeEntitlementPlan(accountId, initiatePurchaseRequest, options).then((request) => request(this.axios, this.basePath));
+    public initiateOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).initiateOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7841,14 +7843,14 @@ export class AccountsApi extends BaseAPI {
     /**
      * This API let’s you to purchase a one time entitlement plan
      * @summary Purchase an Entitlement Plan
-     * @param {string} accountId account_id corresponding to an account
+     * @param {string} purchaseId 
      * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
      */
-    public purchaseOneTimeEntitlementPlan(accountId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(accountId, confirmPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
+    public purchaseOneTimeEntitlementPlan(purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(purchaseId, confirmPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
