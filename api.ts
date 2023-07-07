@@ -3630,6 +3630,12 @@ export interface Invoice {
      */
     'status': InvoiceStatusEnum;
     /**
+     * Payment status of the invoice
+     * @type {string}
+     * @memberof Invoice
+     */
+    'paymentStatus': InvoicePaymentStatusEnum;
+    /**
      * Start date of the invoice
      * @type {string}
      * @memberof Invoice
@@ -3669,6 +3675,12 @@ export const InvoiceStatusEnum = {
 } as const;
 
 export type InvoiceStatusEnum = typeof InvoiceStatusEnum[keyof typeof InvoiceStatusEnum];
+export const InvoicePaymentStatusEnum = {
+    Due: 'DUE',
+    Paid: 'PAID'
+} as const;
+
+export type InvoicePaymentStatusEnum = typeof InvoicePaymentStatusEnum[keyof typeof InvoicePaymentStatusEnum];
 
 /**
  * 
@@ -3800,6 +3812,27 @@ export interface InvoiceLineItem {
      */
     'lineItems': Array<InvoiceLineItem>;
 }
+/**
+ * Payload to update payment information of invoice
+ * @export
+ * @interface InvoicePaymentsRequest
+ */
+export interface InvoicePaymentsRequest {
+    /**
+     * Payment status of the invoice
+     * @type {string}
+     * @memberof InvoicePaymentsRequest
+     */
+    'status': InvoicePaymentsRequestStatusEnum;
+}
+
+export const InvoicePaymentsRequestStatusEnum = {
+    Due: 'DUE',
+    Paid: 'PAID'
+} as const;
+
+export type InvoicePaymentsRequestStatusEnum = typeof InvoicePaymentsRequestStatusEnum[keyof typeof InvoicePaymentsRequestStatusEnum];
+
 /**
  * If IN_ADVANCE, the fixed fee will be invoiced in the previous billing cycle. If IN_ARREARS, the fixed fee will be invoiced in the current billing cycle. 
  * @export
@@ -5270,6 +5303,12 @@ export interface PurchaseFeatureDetails {
      * @memberof PurchaseFeatureDetails
      */
     'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'effectiveFrom': string;
     /**
      * 
      * @type {string}
@@ -10944,6 +10983,48 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Update payment status in Invoice
+         * @summary Update payment status in Invoice
+         * @param {string} invoiceId 
+         * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invoicePayments: async (invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invoiceId' is not null or undefined
+            assertParamExists('invoicePayments', 'invoiceId', invoiceId)
+            const localVarPath = `/invoices/{invoice_id}/payments`
+                .replace(`{${"invoice_id"}}`, encodeURIComponent(String(invoiceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(invoicePaymentsRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
@@ -11118,6 +11199,18 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Update payment status in Invoice
+         * @summary Update payment status in Invoice
+         * @param {string} invoiceId 
+         * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async invoicePayments(invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Invoice>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invoicePayments(invoiceId, invoicePaymentsRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
@@ -11179,6 +11272,17 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getInvoice(invoiceId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Update payment status in Invoice
+         * @summary Update payment status in Invoice
+         * @param {string} invoiceId 
+         * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invoicePayments(invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options?: any): AxiosPromise<Invoice> {
+            return localVarFp.invoicePayments(invoiceId, invoicePaymentsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
@@ -11236,6 +11340,19 @@ export class InvoicesApi extends BaseAPI {
      */
     public getInvoice(invoiceId: string, options?: AxiosRequestConfig) {
         return InvoicesApiFp(this.configuration).getInvoice(invoiceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update payment status in Invoice
+     * @summary Update payment status in Invoice
+     * @param {string} invoiceId 
+     * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoicesApi
+     */
+    public invoicePayments(invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options?: AxiosRequestConfig) {
+        return InvoicesApiFp(this.configuration).invoicePayments(invoiceId, invoicePaymentsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
