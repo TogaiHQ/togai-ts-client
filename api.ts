@@ -543,21 +543,6 @@ export interface ComputeRevenueSummaryResponse {
     'revenueSummaryResponses': Array<RevenueSummaryResponse>;
 }
 /**
- * Confirm a purchase for an account where the status can be marked as SUCCESS or FAILURE
- * @export
- * @interface ConfirmPurchaseRequest
- */
-export interface ConfirmPurchaseRequest {
-    /**
-     * 
-     * @type {PurchaseStatus}
-     * @memberof ConfirmPurchaseRequest
-     */
-    'status': PurchaseStatus;
-}
-
-
-/**
  * Payload to create account
  * @export
  * @interface CreateAccountRequest
@@ -913,12 +898,26 @@ export interface CreateInvoiceRequest {
      */
     'metadata'?: { [key: string]: string; };
     /**
+     * Payment status of the invoice
+     * @type {string}
+     * @memberof CreateInvoiceRequest
+     */
+    'paymentStatus'?: CreateInvoiceRequestPaymentStatusEnum;
+    /**
      * 
      * @type {Array<InvoiceLineItem>}
      * @memberof CreateInvoiceRequest
      */
     'lineItems': Array<InvoiceLineItem>;
 }
+
+export const CreateInvoiceRequestPaymentStatusEnum = {
+    Due: 'DUE',
+    Paid: 'PAID'
+} as const;
+
+export type CreateInvoiceRequestPaymentStatusEnum = typeof CreateInvoiceRequestPaymentStatusEnum[keyof typeof CreateInvoiceRequestPaymentStatusEnum];
+
 /**
  * 
  * @export
@@ -3175,13 +3174,19 @@ export interface GetPurchaseResponse {
      * @type {string}
      * @memberof GetPurchaseResponse
      */
+    'invoiceId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
     'invoiceCurrency'?: string;
     /**
      * 
      * @type {PurchaseStatus}
      * @memberof GetPurchaseResponse
      */
-    'status'?: PurchaseStatus;
+    'status': PurchaseStatus;
     /**
      * 
      * @type {PurchasePlanOverride}
@@ -3326,6 +3331,7 @@ export const IngestionStatusStatusEnum = {
     IngestionCompletedNoMatchingMeters: 'INGESTION_COMPLETED_NO_MATCHING_METERS',
     IngestionCompletedEventMetered: 'INGESTION_COMPLETED_EVENT_METERED',
     IngestionCompletedEventNotMetered: 'INGESTION_COMPLETED_EVENT_NOT_METERED',
+    IngestionFailedPastGracePeriod: 'INGESTION_FAILED_PAST_GRACE_PERIOD',
     Unknown: 'UNKNOWN'
 } as const;
 
@@ -5257,13 +5263,19 @@ export interface Purchase {
      * @type {string}
      * @memberof Purchase
      */
+    'invoiceId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
     'invoiceCurrency'?: string;
     /**
      * 
      * @type {PurchaseStatus}
      * @memberof Purchase
      */
-    'status'?: PurchaseStatus;
+    'status': PurchaseStatus;
 }
 
 
@@ -7197,50 +7209,6 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * This API let’s you to purchase a one time entitlement plan
-         * @summary Purchase an Entitlement Plan
-         * @param {string} purchaseId 
-         * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        purchaseOneTimeEntitlementPlan: async (purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'purchaseId' is not null or undefined
-            assertParamExists('purchaseOneTimeEntitlementPlan', 'purchaseId', purchaseId)
-            // verify required parameter 'confirmPurchaseRequest' is not null or undefined
-            assertParamExists('purchaseOneTimeEntitlementPlan', 'confirmPurchaseRequest', confirmPurchaseRequest)
-            const localVarPath = `/purchases/{purchase_id}/confirm`
-                .replace(`{${"purchase_id"}}`, encodeURIComponent(String(purchaseId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(confirmPurchaseRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} accountId account_id corresponding to an account
@@ -7533,18 +7501,6 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This API let’s you to purchase a one time entitlement plan
-         * @summary Purchase an Entitlement Plan
-         * @param {string} purchaseId 
-         * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async purchaseOneTimeEntitlementPlan(purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(purchaseId, confirmPurchaseRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * Remove existing aliases tagged to an account using this API
          * @summary Remove Aliases to account
          * @param {string} accountId account_id corresponding to an account
@@ -7698,17 +7654,6 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          */
         listAccountPurchases(accountId: string, options?: any): AxiosPromise<PurchasePaginatedListData> {
             return localVarFp.listAccountPurchases(accountId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This API let’s you to purchase a one time entitlement plan
-         * @summary Purchase an Entitlement Plan
-         * @param {string} purchaseId 
-         * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        purchaseOneTimeEntitlementPlan(purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: any): AxiosPromise<Purchase> {
-            return localVarFp.purchaseOneTimeEntitlementPlan(purchaseId, confirmPurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Remove existing aliases tagged to an account using this API
@@ -7877,19 +7822,6 @@ export class AccountsApi extends BaseAPI {
      */
     public listAccountPurchases(accountId: string, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).listAccountPurchases(accountId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This API let’s you to purchase a one time entitlement plan
-     * @summary Purchase an Entitlement Plan
-     * @param {string} purchaseId 
-     * @param {ConfirmPurchaseRequest} confirmPurchaseRequest Payload to make a purchase
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountsApi
-     */
-    public purchaseOneTimeEntitlementPlan(purchaseId: string, confirmPurchaseRequest: ConfirmPurchaseRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(purchaseId, confirmPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -10986,13 +10918,15 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
          * Update payment status in Invoice
          * @summary Update payment status in Invoice
          * @param {string} invoiceId 
-         * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+         * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invoicePayments: async (invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        invoicePayments: async (invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'invoiceId' is not null or undefined
             assertParamExists('invoicePayments', 'invoiceId', invoiceId)
+            // verify required parameter 'invoicePaymentsRequest' is not null or undefined
+            assertParamExists('invoicePayments', 'invoicePaymentsRequest', invoicePaymentsRequest)
             const localVarPath = `/invoices/{invoice_id}/payments`
                 .replace(`{${"invoice_id"}}`, encodeURIComponent(String(invoiceId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
@@ -11202,11 +11136,11 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
          * Update payment status in Invoice
          * @summary Update payment status in Invoice
          * @param {string} invoiceId 
-         * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+         * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async invoicePayments(invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Invoice>> {
+        async invoicePayments(invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Invoice>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.invoicePayments(invoiceId, invoicePaymentsRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -11275,11 +11209,11 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
          * Update payment status in Invoice
          * @summary Update payment status in Invoice
          * @param {string} invoiceId 
-         * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+         * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        invoicePayments(invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options?: any): AxiosPromise<Invoice> {
+        invoicePayments(invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options?: any): AxiosPromise<Invoice> {
             return localVarFp.invoicePayments(invoiceId, invoicePaymentsRequest, options).then((request) => request(axios, basePath));
         },
         /**
@@ -11346,12 +11280,12 @@ export class InvoicesApi extends BaseAPI {
      * Update payment status in Invoice
      * @summary Update payment status in Invoice
      * @param {string} invoiceId 
-     * @param {InvoicePaymentsRequest} [invoicePaymentsRequest] Payload to update payments of invoice
+     * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof InvoicesApi
      */
-    public invoicePayments(invoiceId: string, invoicePaymentsRequest?: InvoicePaymentsRequest, options?: AxiosRequestConfig) {
+    public invoicePayments(invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options?: AxiosRequestConfig) {
         return InvoicesApiFp(this.configuration).invoicePayments(invoiceId, invoicePaymentsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
