@@ -12758,6 +12758,8 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * List settings
          * @summary Lists settings
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
          * @param {string} [entityType] 
          * @param {string} [entityId] 
          * @param {string} [settingId] 
@@ -12765,7 +12767,7 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listSetting: async (entityType?: string, entityId?: string, settingId?: string, namespace?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listSetting: async (nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/settings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -12781,6 +12783,14 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (nextToken !== undefined) {
+                localVarQueryParameter['nextToken'] = nextToken;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
 
             if (entityType !== undefined) {
                 localVarQueryParameter['entity_type'] = entityType;
@@ -12888,6 +12898,8 @@ export const SettingsApiFp = function(configuration?: Configuration) {
         /**
          * List settings
          * @summary Lists settings
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
          * @param {string} [entityType] 
          * @param {string} [entityId] 
          * @param {string} [settingId] 
@@ -12895,8 +12907,8 @@ export const SettingsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listSetting(entityType, entityId, settingId, namespace, options);
+        async listSetting(nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listSetting(nextToken, pageSize, entityType, entityId, settingId, namespace, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -12944,6 +12956,8 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
         /**
          * List settings
          * @summary Lists settings
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
          * @param {string} [entityType] 
          * @param {string} [entityId] 
          * @param {string} [settingId] 
@@ -12951,8 +12965,8 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
-            return localVarFp.listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(axios, basePath));
+        listSetting(nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
+            return localVarFp.listSetting(nextToken, pageSize, entityType, entityId, settingId, namespace, options).then((request) => request(axios, basePath));
         },
         /**
          * Update a setting
@@ -13002,6 +13016,8 @@ export class SettingsApi extends BaseAPI {
     /**
      * List settings
      * @summary Lists settings
+     * @param {string} [nextToken] 
+     * @param {number} [pageSize] 
      * @param {string} [entityType] 
      * @param {string} [entityId] 
      * @param {string} [settingId] 
@@ -13010,8 +13026,8 @@ export class SettingsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof SettingsApi
      */
-    public listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig) {
-        return SettingsApiFp(this.configuration).listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(this.axios, this.basePath));
+    public listSetting(nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).listSetting(nextToken, pageSize, entityType, entityId, settingId, namespace, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
