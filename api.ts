@@ -904,6 +904,12 @@ export interface CreateInvoiceRequest {
      */
     'paymentStatus'?: CreateInvoiceRequestPaymentStatusEnum;
     /**
+     * Order/Invoice type
+     * @type {string}
+     * @memberof CreateInvoiceRequest
+     */
+    'orderInvoiceType': CreateInvoiceRequestOrderInvoiceTypeEnum;
+    /**
      * 
      * @type {Array<InvoiceLineItem>}
      * @memberof CreateInvoiceRequest
@@ -917,6 +923,12 @@ export const CreateInvoiceRequestPaymentStatusEnum = {
 } as const;
 
 export type CreateInvoiceRequestPaymentStatusEnum = typeof CreateInvoiceRequestPaymentStatusEnum[keyof typeof CreateInvoiceRequestPaymentStatusEnum];
+export const CreateInvoiceRequestOrderInvoiceTypeEnum = {
+    Order: 'ORDER',
+    Invoice: 'INVOICE'
+} as const;
+
+export type CreateInvoiceRequestOrderInvoiceTypeEnum = typeof CreateInvoiceRequestOrderInvoiceTypeEnum[keyof typeof CreateInvoiceRequestOrderInvoiceTypeEnum];
 
 /**
  * 
@@ -1498,6 +1510,20 @@ export interface CreditDetailsResponseAllOf {
     'transactions': Array<CreditTransaction>;
 }
 /**
+ * Credit grant applies either for a one-time occurrence or for each cycle.
+ * @export
+ * @enum {string}
+ */
+
+export const CreditGrantType = {
+    OneTime: 'ONE_TIME',
+    Recurring: 'RECURRING'
+} as const;
+
+export type CreditGrantType = typeof CreditGrantType[keyof typeof CreditGrantType];
+
+
+/**
  * 
  * @export
  * @interface CreditTransaction
@@ -1964,6 +1990,12 @@ export interface EventPipelineInfo {
     'customer'?: EventPipelineInfoCustomer;
     /**
      * 
+     * @type {EventPipelineInfoFeatureDetails}
+     * @memberof EventPipelineInfo
+     */
+    'featureDetails'?: EventPipelineInfoFeatureDetails;
+    /**
+     * 
      * @type {EventPipelineInfoEnrichments}
      * @memberof EventPipelineInfo
      */
@@ -2050,6 +2082,25 @@ export interface EventPipelineInfoEventSchema {
      * @memberof EventPipelineInfoEventSchema
      */
     'version': number;
+}
+/**
+ * 
+ * @export
+ * @interface EventPipelineInfoFeatureDetails
+ */
+export interface EventPipelineInfoFeatureDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof EventPipelineInfoFeatureDetails
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EventPipelineInfoFeatureDetails
+     */
+    'mappedAttribute': string;
 }
 /**
  * 
@@ -2481,6 +2532,21 @@ export interface EventWithStatusAndEventPipelineInfoAllOf {
      */
     'EventPipelineInfo'?: EventPipelineInfo;
 }
+/**
+ * Expiry type of grant
+ * @export
+ * @enum {string}
+ */
+
+export const ExpiryType = {
+    PricingCycle: 'PRICING_CYCLE',
+    NoExpiry: 'NO_EXPIRY',
+    Custom: 'CUSTOM'
+} as const;
+
+export type ExpiryType = typeof ExpiryType[keyof typeof ExpiryType];
+
+
 /**
  * Represents a Feature
  * @export
@@ -2965,6 +3031,19 @@ export interface FixedFeeRateCard {
 /**
  * 
  * @export
+ * @interface FixedFeeRateCardConfig
+ */
+export interface FixedFeeRateCardConfig {
+    /**
+     * Represents the number of pricing cycles after which the fixed fee will be charged
+     * @type {number}
+     * @memberof FixedFeeRateCardConfig
+     */
+    'recurrenceInterval'?: number;
+}
+/**
+ * 
+ * @export
  * @interface FixedFeeRevenueSummary
  */
 export interface FixedFeeRevenueSummary {
@@ -3039,6 +3118,12 @@ export interface GetFeatureCreditsResponse {
      * @memberof GetFeatureCreditsResponse
      */
     'featureId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetFeatureCreditsResponse
+     */
+    'granted': number;
     /**
      * 
      * @type {number}
@@ -3340,6 +3425,189 @@ export type IngestionStatusStatusEnum = typeof IngestionStatusStatusEnum[keyof t
 /**
  * 
  * @export
+ * @interface InternalBillingEntitlementRateCard
+ */
+export interface InternalBillingEntitlementRateCard {
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {Array<FeatureConfig>}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'featureConfigs': Array<FeatureConfig>;
+    /**
+     * A tag string to group rate cards
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'tag'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'displayName': string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'invoiceTiming': InvoiceTiming;
+    /**
+     * 
+     * @type {PricingModel}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'pricingModel': PricingModel;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'currency': string;
+    /**
+     * 
+     * @type {Array<InternalSlab>}
+     * @memberof InternalBillingEntitlementRateCard
+     */
+    'internalSlabs': Array<InternalSlab>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface InternalBillingEntitlementRateCardAllOf
+ */
+export interface InternalBillingEntitlementRateCardAllOf {
+    /**
+     * A tag string to group rate cards
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCardAllOf
+     */
+    'tag'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCardAllOf
+     */
+    'displayName': string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof InternalBillingEntitlementRateCardAllOf
+     */
+    'invoiceTiming': InvoiceTiming;
+    /**
+     * 
+     * @type {PricingModel}
+     * @memberof InternalBillingEntitlementRateCardAllOf
+     */
+    'pricingModel': PricingModel;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalBillingEntitlementRateCardAllOf
+     */
+    'currency': string;
+    /**
+     * 
+     * @type {Array<InternalSlab>}
+     * @memberof InternalBillingEntitlementRateCardAllOf
+     */
+    'internalSlabs': Array<InternalSlab>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface InternalCreditGrantRateCard
+ */
+export interface InternalCreditGrantRateCard {
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'displayName'?: string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'invoiceTiming': InvoiceTiming;
+    /**
+     * 
+     * @type {CreditGrantType}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'type': CreditGrantType;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'currency': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'creditAmount': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'priority': number;
+    /**
+     * 
+     * @type {ExpiryType}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'expiryType': ExpiryType;
+    /**
+     * 
+     * @type {string}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'expiryDuration'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'applicableEntityIds'?: Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'rate': number;
+    /**
+     * A tag string to group creditGrantRateCard
+     * @type {string}
+     * @memberof InternalCreditGrantRateCard
+     */
+    'tag'?: string;
+}
+
+
+/**
+ * 
+ * @export
  * @interface InternalFixedFeeRateCard
  */
 export interface InternalFixedFeeRateCard {
@@ -3355,6 +3623,12 @@ export interface InternalFixedFeeRateCard {
      * @memberof InternalFixedFeeRateCard
      */
     'displayName': string;
+    /**
+     * A tag string to group fixedFeeRateCards
+     * @type {string}
+     * @memberof InternalFixedFeeRateCard
+     */
+    'tag'?: string;
     /**
      * 
      * @type {string}
@@ -3391,6 +3665,12 @@ export interface InternalFixedFeeRateCard {
      * @memberof InternalFixedFeeRateCard
      */
     'startPeriod': number;
+    /**
+     * 
+     * @type {FixedFeeRateCardConfig}
+     * @memberof InternalFixedFeeRateCard
+     */
+    'config'?: FixedFeeRateCardConfig;
 }
 
 
@@ -3412,6 +3692,12 @@ export interface InternalLicenseRateCard {
      * @memberof InternalLicenseRateCard
      */
     'displayName': string;
+    /**
+     * A tag string to group fixedFeeRateCards
+     * @type {string}
+     * @memberof InternalLicenseRateCard
+     */
+    'tag'?: string;
     /**
      * 
      * @type {PricingModel}
@@ -3554,6 +3840,12 @@ export interface InternalUsageRateCard {
      * @memberof InternalUsageRateCard
      */
     'displayName': string;
+    /**
+     * A tag string to group fixedFeeRateCards
+     * @type {string}
+     * @memberof InternalUsageRateCard
+     */
+    'tag'?: string;
     /**
      * 
      * @type {string}
@@ -3833,8 +4125,9 @@ export interface InvoicePaymentsRequest {
 }
 
 export const InvoicePaymentsRequestStatusEnum = {
-    Due: 'DUE',
-    Paid: 'PAID'
+    Paid: 'PAID',
+    Void: 'VOID',
+    UnCollectible: 'UN_COLLECTIBLE'
 } as const;
 
 export type InvoicePaymentsRequestStatusEnum = typeof InvoicePaymentsRequestStatusEnum[keyof typeof InvoicePaymentsRequestStatusEnum];
@@ -5628,6 +5921,18 @@ export interface RevenueSummaryQuery {
     'fixedFeeRateCard'?: InternalFixedFeeRateCard;
     /**
      * 
+     * @type {InternalBillingEntitlementRateCard}
+     * @memberof RevenueSummaryQuery
+     */
+    'billingEntitlementRateCard'?: InternalBillingEntitlementRateCard;
+    /**
+     * 
+     * @type {InternalCreditGrantRateCard}
+     * @memberof RevenueSummaryQuery
+     */
+    'creditGrantRateCard'?: InternalCreditGrantRateCard;
+    /**
+     * 
      * @type {InternalUsageRateCard}
      * @memberof RevenueSummaryQuery
      */
@@ -5869,10 +6174,10 @@ export interface RevenueSummaryResponse {
 export interface RevenueSummaryResponseRevenueSummary {
     /**
      * 
-     * @type {Array<SlabRevenue>}
+     * @type {Array<SlabRevenueWithMetadata>}
      * @memberof RevenueSummaryResponseRevenueSummary
      */
-    'slabRevenues'?: Array<SlabRevenue>;
+    'slabRevenues'?: Array<SlabRevenueWithMetadata>;
     /**
      * 
      * @type {number}
@@ -5884,7 +6189,19 @@ export interface RevenueSummaryResponseRevenueSummary {
      * @type {number}
      * @memberof RevenueSummaryResponseRevenueSummary
      */
+    'billingEntitlementRevenue'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RevenueSummaryResponseRevenueSummary
+     */
     'licenseRevenue'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof RevenueSummaryResponseRevenueSummary
+     */
+    'creditGrantRevenue'?: number;
 }
 /**
  * Represents a setting
@@ -6104,12 +6421,6 @@ export interface SlabRevenue {
      * @memberof SlabRevenue
      */
     'revenue': number;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof SlabRevenue
-     */
-    'metadata'?: { [key: string]: string; };
 }
 /**
  * 
@@ -6166,6 +6477,50 @@ export interface SlabRevenueSummary {
      * @memberof SlabRevenueSummary
      */
     'metadata'?: SlabRevenueMetadata;
+}
+/**
+ * 
+ * @export
+ * @interface SlabRevenueWithMetadata
+ */
+export interface SlabRevenueWithMetadata {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'order': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'usage': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'revenue': number;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'metadata'?: { [key: string]: string; };
+}
+/**
+ * 
+ * @export
+ * @interface SlabRevenueWithMetadataAllOf
+ */
+export interface SlabRevenueWithMetadataAllOf {
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRevenueWithMetadataAllOf
+     */
+    'metadata'?: { [key: string]: string; };
 }
 /**
  * 
