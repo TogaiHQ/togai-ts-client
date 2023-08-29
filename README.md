@@ -30,7 +30,7 @@ const configuration = new Configuration({
 const createCustomerRequest:CreateCustomerRequest = {
     name: "customer1",
     id: "1",
-    billingAddress: "address",
+    address: {line1: "house 221B", line2: "Baker Street", city: "London", state: "London", country: "GB"},
     primaryEmail: "email@togai.com"
 } 
 const customersApi = new CustomersApi(configuration);

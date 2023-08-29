@@ -42,6 +42,12 @@ export interface Account {
      */
     'name': string;
     /**
+     * Identifier of the customer
+     * @type {string}
+     * @memberof Account
+     */
+    'customerId': string;
+    /**
      * [ISO_4217](https://en.wikipedia.org/wiki/ISO_4217) code of the currency in which the account must be invoiced Defaults to Base currency. 
      * @type {string}
      * @memberof Account
@@ -65,6 +71,12 @@ export interface Account {
      * @memberof Account
      */
     'settings'?: Array<CreateEntitySetting>;
+    /**
+     * 
+     * @type {InvoiceGroupDetails}
+     * @memberof Account
+     */
+    'invoiceGroupDetails'?: InvoiceGroupDetails;
 }
 
 export const AccountStatusEnum = {
@@ -169,7 +181,7 @@ export interface AddCurrencyToPricePlanRequest {
      * @type {Array<UsageRate>}
      * @memberof AddCurrencyToPricePlanRequest
      */
-    'usageRates': Array<UsageRate>;
+    'usageRates'?: Array<UsageRate>;
     /**
      * Rates for fixed fee rate cards
      * @type {Array<FixedFeeRate>}
@@ -183,55 +195,29 @@ export interface AddCurrencyToPricePlanRequest {
      */
     'licenseRates'?: Array<LicenseRate>;
     /**
+     * Rates for billing entitlement rate cards
+     * @type {Array<BillingEntitlementRate>}
+     * @memberof AddCurrencyToPricePlanRequest
+     */
+    'billingEntitlementRates'?: Array<BillingEntitlementRate>;
+    /**
      * Rates for minimum commitment.
      * @type {number}
      * @memberof AddCurrencyToPricePlanRequest
      */
     'minimumCommitmentRate'?: number;
-}
-/**
- * 
- * @export
- * @interface AddFeatureCreditsRequest
- */
-export interface AddFeatureCreditsRequest {
     /**
-     * 
-     * @type {AddFeatureCreditsRequestRevenueDetails}
-     * @memberof AddFeatureCreditsRequest
+     * List of slab rates
+     * @type {Array<SlabRate>}
+     * @memberof AddCurrencyToPricePlanRequest
      */
-    'revenueDetails'?: AddFeatureCreditsRequestRevenueDetails;
+    'rateDetailsRate'?: Array<SlabRate>;
     /**
-     * 
-     * @type {Array<FeatureCreditRequest>}
-     * @memberof AddFeatureCreditsRequest
+     * Rates for credit grant rate card
+     * @type {Array<CreditGrantRates>}
+     * @memberof AddCurrencyToPricePlanRequest
      */
-    'creditRequests': Array<FeatureCreditRequest>;
-}
-/**
- * Revenue details for feature credits
- * @export
- * @interface AddFeatureCreditsRequestRevenueDetails
- */
-export interface AddFeatureCreditsRequestRevenueDetails {
-    /**
-     * Revenue for feature credits
-     * @type {number}
-     * @memberof AddFeatureCreditsRequestRevenueDetails
-     */
-    'revenue': number;
-    /**
-     * Currency conversion rate for feature credits
-     * @type {number}
-     * @memberof AddFeatureCreditsRequestRevenueDetails
-     */
-    'currencyConversionRate': number;
-    /**
-     * Revenue reference id for feature credits to add in revenue entries
-     * @type {string}
-     * @memberof AddFeatureCreditsRequestRevenueDetails
-     */
-    'revenueReferenceId': string;
+    'creditGrantRates'?: Array<CreditGrantRates>;
 }
 /**
  * 
@@ -337,19 +323,63 @@ export interface AddOnPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
- * LICENSE: Addon can be used in license rate cards FIXED_FEE: Addon can be used in fixed fee rate cards 
+ * LICENSE: Addon can be used in license rate cards FIXED_FEE: Addon can be used in fixed fee rate cards CREDIT_GRANT: Addon can be used in credit grant rate cards 
  * @export
  * @enum {string}
  */
 
 export const AddOnType = {
     License: 'LICENSE',
-    FixedFee: 'FIXED_FEE'
+    FixedFee: 'FIXED_FEE',
+    CreditGrant: 'CREDIT_GRANT'
 } as const;
 
 export type AddOnType = typeof AddOnType[keyof typeof AddOnType];
 
 
+/**
+ * billing address of the customer
+ * @export
+ * @interface Address
+ */
+export interface Address {
+    /**
+     * Address line 1 (eg. Street, PO Box, Company Name)
+     * @type {string}
+     * @memberof Address
+     */
+    'line1'?: string;
+    /**
+     * Address line 2 (eg. apartment, suite, unit or building)
+     * @type {string}
+     * @memberof Address
+     */
+    'line2'?: string;
+    /**
+     * ZIP or postal code
+     * @type {string}
+     * @memberof Address
+     */
+    'postalCode'?: string;
+    /**
+     * City, district, suburb, town or village
+     * @type {string}
+     * @memberof Address
+     */
+    'city'?: string;
+    /**
+     * State, county, province or region
+     * @type {string}
+     * @memberof Address
+     */
+    'state'?: string;
+    /**
+     * Two letter country code [ISO-3166-1 Alpha-2](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+     * @type {string}
+     * @memberof Address
+     */
+    'country'?: string;
+}
 /**
  * Metric to be recorded
  * @export
@@ -387,6 +417,140 @@ export interface BaseSuccessResponse {
      * @memberof BaseSuccessResponse
      */
     'success': boolean;
+}
+/**
+ * 
+ * @export
+ * @interface BillingEntitlementRate
+ */
+export interface BillingEntitlementRate {
+    /**
+     * 
+     * @type {string}
+     * @memberof BillingEntitlementRate
+     */
+    'id': string;
+    /**
+     * List of slab rates
+     * @type {Array<SlabRate>}
+     * @memberof BillingEntitlementRate
+     */
+    'slabRates': Array<SlabRate>;
+}
+/**
+ * 
+ * @export
+ * @interface BillingEntitlementRateCard
+ */
+export interface BillingEntitlementRateCard {
+    /**
+     * 
+     * @type {string}
+     * @memberof BillingEntitlementRateCard
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {Array<FeatureConfig>}
+     * @memberof BillingEntitlementRateCard
+     */
+    'featureConfigs': Array<FeatureConfig>;
+    /**
+     * A tag string to group rate cards
+     * @type {string}
+     * @memberof BillingEntitlementRateCard
+     */
+    'tag'?: string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof BillingEntitlementRateCard
+     */
+    'invoiceTiming': InvoiceTiming;
+    /**
+     * Name your rate card, this will be used in invoice
+     * @type {string}
+     * @memberof BillingEntitlementRateCard
+     */
+    'displayName'?: string;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof BillingEntitlementRateCard
+     */
+    'ratePlan': RatePlan;
+    /**
+     * 
+     * @type {Array<RateValue>}
+     * @memberof BillingEntitlementRateCard
+     */
+    'rateValues': Array<RateValue>;
+    /**
+     * 
+     * @type {RecurrenceConfig}
+     * @memberof BillingEntitlementRateCard
+     */
+    'recurrenceConfig'?: RecurrenceConfig;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface BillingEntitlementRateCardAllOf
+ */
+export interface BillingEntitlementRateCardAllOf {
+    /**
+     * A tag string to group rate cards
+     * @type {string}
+     * @memberof BillingEntitlementRateCardAllOf
+     */
+    'tag'?: string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof BillingEntitlementRateCardAllOf
+     */
+    'invoiceTiming': InvoiceTiming;
+    /**
+     * Name your rate card, this will be used in invoice
+     * @type {string}
+     * @memberof BillingEntitlementRateCardAllOf
+     */
+    'displayName'?: string;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof BillingEntitlementRateCardAllOf
+     */
+    'ratePlan': RatePlan;
+    /**
+     * 
+     * @type {Array<RateValue>}
+     * @memberof BillingEntitlementRateCardAllOf
+     */
+    'rateValues': Array<RateValue>;
+    /**
+     * 
+     * @type {RecurrenceConfig}
+     * @memberof BillingEntitlementRateCardAllOf
+     */
+    'recurrenceConfig'?: RecurrenceConfig;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface BillingEntitlementRevenueSummary
+ */
+export interface BillingEntitlementRevenueSummary {
+    /**
+     * 
+     * @type {number}
+     * @memberof BillingEntitlementRevenueSummary
+     */
+    'revenue': number;
 }
 /**
  * Request to get revenue details
@@ -488,32 +652,6 @@ export interface Computation {
     'order': number;
 }
 /**
- * 
- * @export
- * @interface ComputeRevenueSummaryRequest
- */
-export interface ComputeRevenueSummaryRequest {
-    /**
-     * 
-     * @type {Array<RevenueSummaryQuery>}
-     * @memberof ComputeRevenueSummaryRequest
-     */
-    'revenueSummaryQueries': Array<RevenueSummaryQuery>;
-}
-/**
- * 
- * @export
- * @interface ComputeRevenueSummaryResponse
- */
-export interface ComputeRevenueSummaryResponse {
-    /**
-     * 
-     * @type {Array<RevenueSummaryResponse>}
-     * @memberof ComputeRevenueSummaryResponse
-     */
-    'revenueSummaryResponses': Array<RevenueSummaryResponse>;
-}
-/**
  * Payload to create account
  * @export
  * @interface CreateAccountRequest
@@ -555,6 +693,12 @@ export interface CreateAccountRequest {
      * @memberof CreateAccountRequest
      */
     'customerId': string;
+    /**
+     * Net term for the invoices of the account
+     * @type {number}
+     * @memberof CreateAccountRequest
+     */
+    'netTermDays'?: number;
 }
 /**
  * Payload to create account
@@ -592,6 +736,12 @@ export interface CreateAccountRequestWithoutCustomerId {
      * @memberof CreateAccountRequestWithoutCustomerId
      */
     'settings'?: Array<CreateEntitySetting>;
+    /**
+     * Net term for the invoices of the account
+     * @type {number}
+     * @memberof CreateAccountRequestWithoutCustomerId
+     */
+    'netTermDays'?: number;
 }
 /**
  * Request to create an addon
@@ -662,6 +812,12 @@ export interface CreateCreditRequest {
      * @memberof CreateCreditRequest
      */
     'priority': number;
+    /**
+     * The entity through which the credit has been granted
+     * @type {string}
+     * @memberof CreateCreditRequest
+     */
+    'grantorId'?: string;
 }
 /**
  * Payload to create customer
@@ -688,11 +844,11 @@ export interface CreateCustomerRequest {
      */
     'primaryEmail': string;
     /**
-     * billing address of the customer
-     * @type {string}
+     * 
+     * @type {Address}
      * @memberof CreateCustomerRequest
      */
-    'billingAddress': string;
+    'address': Address;
     /**
      * 
      * @type {Array<CreateEntitySetting>}
@@ -731,11 +887,17 @@ export interface CreateCustomerResponse {
      */
     'primaryEmail': string;
     /**
-     * billing address of the customer
+     * 
      * @type {string}
      * @memberof CreateCustomerResponse
      */
-    'billingAddress': string;
+    'billingAddress'?: string;
+    /**
+     * 
+     * @type {Address}
+     * @memberof CreateCustomerResponse
+     */
+    'address'?: Address;
     /**
      * 
      * @type {Array<CreateEntitySetting>}
@@ -845,6 +1007,43 @@ export interface CreateFeatureRequest {
     'schemaAssociations': Array<EventSchemasForFeature>;
 }
 /**
+ * Create an invoice group
+ * @export
+ * @interface CreateInvoiceGroupRequest
+ */
+export interface CreateInvoiceGroupRequest {
+    /**
+     * 
+     * @type {boolean}
+     * @memberof CreateInvoiceGroupRequest
+     */
+    'dailyInvoiceConsolidation': boolean;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof CreateInvoiceGroupRequest
+     */
+    'accountIds': Array<string>;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateInvoiceGroupRequest
+     */
+    'gracePeriod': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateInvoiceGroupRequest
+     */
+    'netTermDays'?: number;
+    /**
+     * 
+     * @type {Address}
+     * @memberof CreateInvoiceGroupRequest
+     */
+    'address': Address;
+}
+/**
  * 
  * @export
  * @interface CreatePricePlanDetails
@@ -882,23 +1081,43 @@ export interface CreatePricePlanDetails {
     'licenseRateCards'?: Array<LicenseRateCard>;
     /**
      * 
+     * @type {Array<BillingEntitlementRateCard>}
+     * @memberof CreatePricePlanDetails
+     */
+    'billingEntitlementRateCards'?: Array<BillingEntitlementRateCard>;
+    /**
+     * 
      * @type {MinimumCommitment}
      * @memberof CreatePricePlanDetails
      */
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof CreatePricePlanDetails
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof CreatePricePlanDetails
      */
     'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {Array<CreditGrantRateCard>}
+     * @memberof CreatePricePlanDetails
+     */
+    'creditGrantRateCards'?: Array<CreditGrantRateCard>;
+    /**
+     * 
+     * @type {PricePlanType}
+     * @memberof CreatePricePlanDetails
+     */
+    'type'?: PricePlanType;
 }
+
+
 /**
  * 
  * @export
@@ -925,6 +1144,12 @@ export interface CreatePricePlanDetailsOverride {
     'usageRateCards'?: Array<UsageRateCard>;
     /**
      * 
+     * @type {Array<BillingEntitlementRateCard>}
+     * @memberof CreatePricePlanDetailsOverride
+     */
+    'billingEntitlementRateCards'?: Array<BillingEntitlementRateCard>;
+    /**
+     * 
      * @type {Array<FixedFeeRateCard>}
      * @memberof CreatePricePlanDetailsOverride
      */
@@ -943,17 +1168,70 @@ export interface CreatePricePlanDetailsOverride {
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof CreatePricePlanDetailsOverride
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof CreatePricePlanDetailsOverride
      */
     'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {Array<CreditGrantRateCard>}
+     * @memberof CreatePricePlanDetailsOverride
+     */
+    'creditGrantRateCards'?: Array<CreditGrantRateCard>;
 }
+/**
+ * Request to migrate all account associations of a price plan to another price plan
+ * @export
+ * @interface CreatePricePlanMigrationRequest
+ */
+export interface CreatePricePlanMigrationRequest {
+    /**
+     * Id of source price plan
+     * @type {string}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'sourceId': string;
+    /**
+     * Version of the source price plan
+     * @type {number}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'sourceVersion': number;
+    /**
+     * Id of target price plan
+     * @type {string}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'targetId': string;
+    /**
+     * Version of the target price plan
+     * @type {number}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'targetVersion': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'migrationMode': CreatePricePlanMigrationRequestMigrationModeEnum;
+}
+
+export const CreatePricePlanMigrationRequestMigrationModeEnum = {
+    Immediate: 'IMMEDIATE',
+    ImmediateIgnoreOverride: 'IMMEDIATE_IGNORE_OVERRIDE',
+    NextCycle: 'NEXT_CYCLE',
+    NextCycleIgnoreOverride: 'NEXT_CYCLE_IGNORE_OVERRIDE'
+} as const;
+
+export type CreatePricePlanMigrationRequestMigrationModeEnum = typeof CreatePricePlanMigrationRequestMigrationModeEnum[keyof typeof CreatePricePlanMigrationRequestMigrationModeEnum];
+
 /**
  * Request to create a price plan
  * @export
@@ -974,10 +1252,10 @@ export interface CreatePricePlanRequest {
     'description'?: string;
     /**
      * 
-     * @type {string}
+     * @type {PricePlanType}
      * @memberof CreatePricePlanRequest
      */
-    'type'?: CreatePricePlanRequestTypeEnum;
+    'type'?: PricePlanType;
     /**
      * 
      * @type {CreatePricePlanDetails}
@@ -986,12 +1264,114 @@ export interface CreatePricePlanRequest {
     'pricePlanDetails': CreatePricePlanDetails;
 }
 
-export const CreatePricePlanRequestTypeEnum = {
-    Billing: 'BILLING',
-    Entitlement: 'ENTITLEMENT'
+
+/**
+ * 
+ * @export
+ * @interface CreateProposalRequest
+ */
+export interface CreateProposalRequest {
+    /**
+     * Id of the price plan
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreateProposalRequest
+     */
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof CreateProposalRequest
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof CreateProposalRequest
+     */
+    'purchasePlanOverride'?: PurchasePlanOverride;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof CreateProposalRequest
+     */
+    'associationOverride'?: CreatePricePlanDetailsOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'expiryDate'?: string;
+    /**
+     * Specifies whether this purchase is for granting entitlements or for an association. If left null, ENTITLEMENT_GRANT is taken as default
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'type': CreateProposalRequestTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProposalRequest
+     */
+    'paymentMode': CreateProposalRequestPaymentModeEnum;
+}
+
+export const CreateProposalRequestTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
 } as const;
 
-export type CreatePricePlanRequestTypeEnum = typeof CreatePricePlanRequestTypeEnum[keyof typeof CreatePricePlanRequestTypeEnum];
+export type CreateProposalRequestTypeEnum = typeof CreateProposalRequestTypeEnum[keyof typeof CreateProposalRequestTypeEnum];
+export const CreateProposalRequestPaymentModeEnum = {
+    Prepaid: 'PREPAID',
+    Postpaid: 'POSTPAID'
+} as const;
+
+export type CreateProposalRequestPaymentModeEnum = typeof CreateProposalRequestPaymentModeEnum[keyof typeof CreateProposalRequestPaymentModeEnum];
+
+/**
+ * 
+ * @export
+ * @interface CreateProposalRequestAllOf
+ */
+export interface CreateProposalRequestAllOf {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateProposalRequestAllOf
+     */
+    'paymentMode': CreateProposalRequestAllOfPaymentModeEnum;
+}
+
+export const CreateProposalRequestAllOfPaymentModeEnum = {
+    Prepaid: 'PREPAID',
+    Postpaid: 'POSTPAID'
+} as const;
+
+export type CreateProposalRequestAllOfPaymentModeEnum = typeof CreateProposalRequestAllOfPaymentModeEnum[keyof typeof CreateProposalRequestAllOfPaymentModeEnum];
 
 /**
  * Create a purchase for an account
@@ -1010,7 +1390,13 @@ export interface CreatePurchaseRequest {
      * @type {number}
      * @memberof CreatePurchaseRequest
      */
-    'quantity': number;
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof CreatePurchaseRequest
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
     /**
      * 
      * @type {string}
@@ -1023,7 +1409,45 @@ export interface CreatePurchaseRequest {
      * @memberof CreatePurchaseRequest
      */
     'purchasePlanOverride'?: PurchasePlanOverride;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof CreatePurchaseRequest
+     */
+    'associationOverride'?: CreatePricePlanDetailsOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'expiryDate'?: string;
+    /**
+     * Specifies whether this purchase is for granting entitlements or for an association. If left null, ENTITLEMENT_GRANT is taken as default
+     * @type {string}
+     * @memberof CreatePurchaseRequest
+     */
+    'type'?: CreatePurchaseRequestTypeEnum;
 }
+
+export const CreatePurchaseRequestTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type CreatePurchaseRequestTypeEnum = typeof CreatePurchaseRequestTypeEnum[keyof typeof CreatePurchaseRequestTypeEnum];
+
 /**
  * Request to create usage meter
  * @export
@@ -1128,6 +1552,12 @@ export interface Credit {
      * @memberof Credit
      */
     'priority': number;
+    /**
+     * The entity through which the credit has been granted
+     * @type {string}
+     * @memberof Credit
+     */
+    'grantorId'?: string;
     /**
      * Identifier of credits
      * @type {string}
@@ -1338,6 +1768,12 @@ export interface CreditDetailsResponse {
      */
     'priority': number;
     /**
+     * The entity through which the credit has been granted
+     * @type {string}
+     * @memberof CreditDetailsResponse
+     */
+    'grantorId'?: string;
+    /**
      * Identifier of credits
      * @type {string}
      * @memberof CreditDetailsResponse
@@ -1415,6 +1851,136 @@ export interface CreditDetailsResponseAllOf {
      */
     'transactions': Array<CreditTransaction>;
 }
+/**
+ * Credit grant rate card
+ * @export
+ * @interface CreditGrantRateCard
+ */
+export interface CreditGrantRateCard {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreditGrantRateCard
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreditGrantRateCard
+     */
+    'displayName'?: string;
+    /**
+     * A tag string to group creditGrantRateCard
+     * @type {string}
+     * @memberof CreditGrantRateCard
+     */
+    'tag'?: string;
+    /**
+     * 
+     * @type {GrantDetails}
+     * @memberof CreditGrantRateCard
+     */
+    'grantDetails': GrantDetails;
+    /**
+     * 
+     * @type {CreditRateDetails}
+     * @memberof CreditGrantRateCard
+     */
+    'rateDetails': CreditRateDetails;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof CreditGrantRateCard
+     */
+    'invoiceTiming'?: InvoiceTiming;
+    /**
+     * 
+     * @type {CreditGrantType}
+     * @memberof CreditGrantRateCard
+     */
+    'type'?: CreditGrantType;
+    /**
+     * 
+     * @type {RecurrenceConfig}
+     * @memberof CreditGrantRateCard
+     */
+    'recurrenceConfig'?: RecurrenceConfig;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface CreditGrantRates
+ */
+export interface CreditGrantRates {
+    /**
+     * 
+     * @type {string}
+     * @memberof CreditGrantRates
+     */
+    'id': string;
+    /**
+     * 
+     * @type {Array<SlabDetail>}
+     * @memberof CreditGrantRates
+     */
+    'slabDetails': Array<SlabDetail>;
+    /**
+     * 
+     * @type {number}
+     * @memberof CreditGrantRates
+     */
+    'creditAmount': number;
+}
+/**
+ * 
+ * @export
+ * @interface CreditGrantRevenueSummary
+ */
+export interface CreditGrantRevenueSummary {
+    /**
+     * 
+     * @type {number}
+     * @memberof CreditGrantRevenueSummary
+     */
+    'revenue': number;
+}
+/**
+ * Credit grant applies either for a one-time occurrence or for each cycle.
+ * @export
+ * @enum {string}
+ */
+
+export const CreditGrantType = {
+    OneTime: 'ONE_TIME',
+    Recurring: 'RECURRING'
+} as const;
+
+export type CreditGrantType = typeof CreditGrantType[keyof typeof CreditGrantType];
+
+
+/**
+ * Amount to be credited
+ * @export
+ * @interface CreditRateDetails
+ */
+export interface CreditRateDetails {
+    /**
+     * 
+     * @type {PricingModel}
+     * @memberof CreditRateDetails
+     */
+    'pricingModel': PricingModel;
+    /**
+     * 
+     * @type {Array<CurrencySlabRateDetail>}
+     * @memberof CreditRateDetails
+     */
+    'currencySlabRateDetails': Array<CurrencySlabRateDetail>;
+}
+
+
 /**
  * 
  * @export
@@ -1521,6 +2087,31 @@ export interface CurrencyRateValue {
     'rate': number;
 }
 /**
+ * The association of a currency along with its slab detail
+ * @export
+ * @interface CurrencySlabRateDetail
+ */
+export interface CurrencySlabRateDetail {
+    /**
+     * 
+     * @type {string}
+     * @memberof CurrencySlabRateDetail
+     */
+    'currency': string;
+    /**
+     * The amount of credit that needs to be credited
+     * @type {number}
+     * @memberof CurrencySlabRateDetail
+     */
+    'creditAmount': number;
+    /**
+     * 
+     * @type {Array<SlabDetail>}
+     * @memberof CurrencySlabRateDetail
+     */
+    'slabDetails': Array<SlabDetail>;
+}
+/**
  * Structure of customer
  * @export
  * @interface Customer
@@ -1550,6 +2141,12 @@ export interface Customer {
      * @memberof Customer
      */
     'billingAddress': string;
+    /**
+     * 
+     * @type {Address}
+     * @memberof Customer
+     */
+    'address': Address;
     /**
      * Status of the customer
      * @type {string}
@@ -1763,17 +2360,11 @@ export interface EntitlementRateCard {
      */
     'featureId': string;
     /**
-     * Credit value of the feature
-     * @type {number}
+     * 
+     * @type {Array<FeatureConfig>}
      * @memberof EntitlementRateCard
      */
-    'featureCredits': number;
-    /**
-     * The validity of the credit value of the feature
-     * @type {number}
-     * @memberof EntitlementRateCard
-     */
-    'expiryDurationSeconds': number;
+    'featureConfigs': Array<FeatureConfig>;
 }
 /**
  * 
@@ -1888,6 +2479,12 @@ export interface EventPipelineInfo {
     'customer'?: EventPipelineInfoCustomer;
     /**
      * 
+     * @type {EventPipelineInfoFeatureDetails}
+     * @memberof EventPipelineInfo
+     */
+    'featureDetails'?: EventPipelineInfoFeatureDetails;
+    /**
+     * 
      * @type {EventPipelineInfoEnrichments}
      * @memberof EventPipelineInfo
      */
@@ -1974,6 +2571,25 @@ export interface EventPipelineInfoEventSchema {
      * @memberof EventPipelineInfoEventSchema
      */
     'version': number;
+}
+/**
+ * 
+ * @export
+ * @interface EventPipelineInfoFeatureDetails
+ */
+export interface EventPipelineInfoFeatureDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof EventPipelineInfoFeatureDetails
+     */
+    'featureId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof EventPipelineInfoFeatureDetails
+     */
+    'mappedAttribute': string;
 }
 /**
  * 
@@ -2406,6 +3022,21 @@ export interface EventWithStatusAndEventPipelineInfoAllOf {
     'EventPipelineInfo'?: EventPipelineInfo;
 }
 /**
+ * Expiry type of grant
+ * @export
+ * @enum {string}
+ */
+
+export const ExpiryType = {
+    PricingCycle: 'PRICING_CYCLE',
+    NoExpiry: 'NO_EXPIRY',
+    Custom: 'CUSTOM'
+} as const;
+
+export type ExpiryType = typeof ExpiryType[keyof typeof ExpiryType];
+
+
+/**
  * Represents a Feature
  * @export
  * @interface Feature
@@ -2443,158 +3074,29 @@ export interface Feature {
     'updatedAt'?: string;
 }
 /**
- * 
+ * Feature configuration object
  * @export
- * @interface FeatureCredit
+ * @interface FeatureConfig
  */
-export interface FeatureCredit {
+export interface FeatureConfig {
     /**
-     * Feature ID
+     * 
      * @type {string}
-     * @memberof FeatureCredit
+     * @memberof FeatureConfig
      */
-    'featureId': string;
+    'effectiveFrom'?: string;
     /**
-     * Customer ID
+     * 
      * @type {string}
-     * @memberof FeatureCredit
-     */
-    'customerId': string;
-    /**
-     * Account ID
-     * @type {string}
-     * @memberof FeatureCredit
-     */
-    'accountId': string;
-    /**
-     * The id of the entity that granted the units like purchase id, etc
-     * @type {string}
-     * @memberof FeatureCredit
-     */
-    'referenceId': string;
-    /**
-     * Quantity of feature credits
-     * @type {number}
-     * @memberof FeatureCredit
-     */
-    'units': number;
-    /**
-     * Effective from date
-     * @type {string}
-     * @memberof FeatureCredit
-     */
-    'effectiveFrom': string;
-    /**
-     * Effective until date
-     * @type {string}
-     * @memberof FeatureCredit
+     * @memberof FeatureConfig
      */
     'effectiveUntil': string;
     /**
-     * Description of feature credits
-     * @type {string}
-     * @memberof FeatureCredit
-     */
-    'description'?: string;
-    /**
      * 
-     * @type {string}
-     * @memberof FeatureCredit
-     */
-    'createdAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureCredit
-     */
-    'updatedAt': string;
-}
-/**
- * 
- * @export
- * @interface FeatureCreditAllOf
- */
-export interface FeatureCreditAllOf {
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureCreditAllOf
-     */
-    'createdAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof FeatureCreditAllOf
-     */
-    'updatedAt': string;
-}
-/**
- * 
- * @export
- * @interface FeatureCreditRequest
- */
-export interface FeatureCreditRequest {
-    /**
-     * Feature ID
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'featureId': string;
-    /**
-     * Customer ID
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'customerId': string;
-    /**
-     * Account ID
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'accountId': string;
-    /**
-     * The id of the entity that granted the units like purchase id, etc
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'referenceId': string;
-    /**
-     * Quantity of feature credits
      * @type {number}
-     * @memberof FeatureCreditRequest
+     * @memberof FeatureConfig
      */
-    'units': number;
-    /**
-     * Effective from date
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'effectiveFrom': string;
-    /**
-     * Effective until date
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'effectiveUntil': string;
-    /**
-     * Description of feature credits
-     * @type {string}
-     * @memberof FeatureCreditRequest
-     */
-    'description'?: string;
-}
-/**
- * 
- * @export
- * @interface FeatureCreditsResponse
- */
-export interface FeatureCreditsResponse {
-    /**
-     * 
-     * @type {Array<FeatureCredit>}
-     * @memberof FeatureCreditsResponse
-     */
-    'featureCredits': Array<FeatureCredit>;
+    'featureCreditLimit': number;
 }
 /**
  * details of feature associated with event schema with attribute name
@@ -2633,6 +3135,12 @@ export interface FeatureListResponse {
      * @memberof FeatureListResponse
      */
     'name': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof FeatureListResponse
+     */
+    'schemaCount': number;
     /**
      * 
      * @type {string}
@@ -2761,6 +3269,12 @@ export interface FixedFeeRateCard {
      */
     'displayName'?: string;
     /**
+     * A tag string to group fixedFeeRateCards
+     * @type {string}
+     * @memberof FixedFeeRateCard
+     */
+    'tag'?: string;
+    /**
      * 
      * @type {InvoiceTiming}
      * @memberof FixedFeeRateCard
@@ -2784,6 +3298,12 @@ export interface FixedFeeRateCard {
      * @memberof FixedFeeRateCard
      */
     'enableProration': boolean;
+    /**
+     * 
+     * @type {RecurrenceConfig}
+     * @memberof FixedFeeRateCard
+     */
+    'recurrenceConfig'?: RecurrenceConfig;
 }
 
 
@@ -2869,6 +3389,12 @@ export interface GetFeatureCreditsResponse {
      * @type {number}
      * @memberof GetFeatureCreditsResponse
      */
+    'granted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetFeatureCreditsResponse
+     */
     'balance': number;
 }
 /**
@@ -2928,6 +3454,449 @@ export interface GetMetricsResponse {
      */
     'results': Array<MetricQueryResponse>;
 }
+/**
+ * 
+ * @export
+ * @interface GetMigrationResponse
+ */
+export interface GetMigrationResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMigrationResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMigrationResponse
+     */
+    'type': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMigrationResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMigrationResponse
+     */
+    'status': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMigrationResponse
+     */
+    'sourceId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetMigrationResponse
+     */
+    'sourceVersion'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetMigrationResponse
+     */
+    'targetId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetMigrationResponse
+     */
+    'targetVersion'?: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetMigrationResponse
+     */
+    'totalMigrationEntries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetMigrationResponse
+     */
+    'pendingMigrationEntries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetMigrationResponse
+     */
+    'failedMigrationEntries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetMigrationResponse
+     */
+    'completedMigrationEntries': number;
+}
+/**
+ * 
+ * @export
+ * @interface GetProposalResponse
+ */
+export interface GetProposalResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetProposalResponse
+     */
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof GetProposalResponse
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetProposalResponse
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {PricePlanDetailsOverride}
+     * @memberof GetProposalResponse
+     */
+    'purchasePlanOverride'?: PricePlanDetailsOverride;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof GetProposalResponse
+     */
+    'associationOverride'?: CreatePricePlanDetailsOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'expiryDate'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetProposalResponse
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'invoiceId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof GetProposalResponse
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'type': GetProposalResponseTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'comment'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'paymentMode': GetProposalResponsePaymentModeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetProposalResponse
+     */
+    'proposalResponseDate'?: string;
+}
+
+export const GetProposalResponseTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type GetProposalResponseTypeEnum = typeof GetProposalResponseTypeEnum[keyof typeof GetProposalResponseTypeEnum];
+export const GetProposalResponsePaymentModeEnum = {
+    Prepaid: 'PREPAID',
+    Postpaid: 'POSTPAID'
+} as const;
+
+export type GetProposalResponsePaymentModeEnum = typeof GetProposalResponsePaymentModeEnum[keyof typeof GetProposalResponsePaymentModeEnum];
+
+/**
+ * 
+ * @export
+ * @interface GetPurchaseResponse
+ */
+export interface GetPurchaseResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponse
+     */
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof GetPurchaseResponse
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponse
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {PricePlanDetailsOverride}
+     * @memberof GetPurchaseResponse
+     */
+    'purchasePlanOverride'?: PricePlanDetailsOverride;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof GetPurchaseResponse
+     */
+    'associationOverride'?: CreatePricePlanDetailsOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'expiryDate'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponse
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'invoiceId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof GetPurchaseResponse
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'type': GetPurchaseResponseTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponse
+     */
+    'comment'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof GetPurchaseResponse
+     */
+    'purchasePlan'?: PurchasePlanOverride;
+    /**
+     * 
+     * @type {Array<PurchaseFeatureDetails>}
+     * @memberof GetPurchaseResponse
+     */
+    'features'?: Array<PurchaseFeatureDetails>;
+}
+
+export const GetPurchaseResponseTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type GetPurchaseResponseTypeEnum = typeof GetPurchaseResponseTypeEnum[keyof typeof GetPurchaseResponseTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface GetPurchaseResponseAllOf
+ */
+export interface GetPurchaseResponseAllOf {
+    /**
+     * 
+     * @type {number}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'purchasePlan'?: PurchasePlanOverride;
+    /**
+     * 
+     * @type {Array<PurchaseFeatureDetails>}
+     * @memberof GetPurchaseResponseAllOf
+     */
+    'features'?: Array<PurchaseFeatureDetails>;
+}
+/**
+ * Grant details of Credit Grant Rate Card
+ * @export
+ * @interface GrantDetails
+ */
+export interface GrantDetails {
+    /**
+     * 
+     * @type {number}
+     * @memberof GrantDetails
+     */
+    'priority': number;
+    /**
+     * 
+     * @type {ExpiryType}
+     * @memberof GrantDetails
+     */
+    'expiryType': ExpiryType;
+    /**
+     * 
+     * @type {string}
+     * @memberof GrantDetails
+     */
+    'expiryDuration'?: string;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof GrantDetails
+     */
+    'applicableEntityIds'?: Array<string>;
+}
+
+
 /**
  * Payload for ingesting batch events
  * @export
@@ -3026,221 +3995,12 @@ export const IngestionStatusStatusEnum = {
     IngestionCompletedNoMatchingMeters: 'INGESTION_COMPLETED_NO_MATCHING_METERS',
     IngestionCompletedEventMetered: 'INGESTION_COMPLETED_EVENT_METERED',
     IngestionCompletedEventNotMetered: 'INGESTION_COMPLETED_EVENT_NOT_METERED',
+    IngestionFailedPastGracePeriod: 'INGESTION_FAILED_PAST_GRACE_PERIOD',
+    IngestionFailedAccountNotFound: 'INGESTION_FAILED_ACCOUNT_NOT_FOUND',
     Unknown: 'UNKNOWN'
 } as const;
 
 export type IngestionStatusStatusEnum = typeof IngestionStatusStatusEnum[keyof typeof IngestionStatusStatusEnum];
-
-/**
- * 
- * @export
- * @interface InternalFixedFeeRateCard
- */
-export interface InternalFixedFeeRateCard {
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'currency': string;
-    /**
-     * 
-     * @type {number}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'rate': number;
-    /**
-     * 
-     * @type {InvoiceTiming}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'invoiceTiming': InvoiceTiming;
-    /**
-     * 
-     * @type {FixedFeeType}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'type'?: FixedFeeType;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'enableProration': boolean;
-    /**
-     * number of days into the pricing cycle after which the fixed fee must be applied.
-     * @type {number}
-     * @memberof InternalFixedFeeRateCard
-     */
-    'startPeriod': number;
-}
-
-
-/**
- * 
- * @export
- * @interface InternalLicenseRateCard
- */
-export interface InternalLicenseRateCard {
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalLicenseRateCard
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalLicenseRateCard
-     */
-    'displayName': string;
-    /**
-     * 
-     * @type {PricingModel}
-     * @memberof InternalLicenseRateCard
-     */
-    'pricingModel': PricingModel;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalLicenseRateCard
-     */
-    'currency': string;
-    /**
-     * 
-     * @type {Array<InternalSlab>}
-     * @memberof InternalLicenseRateCard
-     */
-    'internalSlabs': Array<InternalSlab>;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof InternalLicenseRateCard
-     */
-    'enableProration': boolean;
-}
-
-
-/**
- * 
- * @export
- * @interface InternalSlab
- */
-export interface InternalSlab {
-    /**
-     * 
-     * @type {number}
-     * @memberof InternalSlab
-     */
-    'order': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof InternalSlab
-     */
-    'startAfter': number;
-    /**
-     * 
-     * @type {PriceType}
-     * @memberof InternalSlab
-     */
-    'priceType': PriceType;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof InternalSlab
-     */
-    'slabConfig'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {number}
-     * @memberof InternalSlab
-     */
-    'rate': number;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof InternalSlab
-     */
-    'slabRateConfig'?: { [key: string]: string; };
-    /**
-     * 
-     * @type {number}
-     * @memberof InternalSlab
-     */
-    'endAt'?: number;
-}
-
-
-/**
- * 
- * @export
- * @interface InternalSlabAllOf
- */
-export interface InternalSlabAllOf {
-    /**
-     * 
-     * @type {number}
-     * @memberof InternalSlabAllOf
-     */
-    'endAt'?: number;
-}
-/**
- * 
- * @export
- * @interface InternalUsageRateCard
- */
-export interface InternalUsageRateCard {
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalUsageRateCard
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalUsageRateCard
-     */
-    'displayName': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalUsageRateCard
-     */
-    'usageMeterId': string;
-    /**
-     * 
-     * @type {PricingModel}
-     * @memberof InternalUsageRateCard
-     */
-    'pricingModel': PricingModel;
-    /**
-     * 
-     * @type {string}
-     * @memberof InternalUsageRateCard
-     */
-    'currency': string;
-    /**
-     * 
-     * @type {Array<InternalSlab>}
-     * @memberof InternalUsageRateCard
-     */
-    'internalSlabs': Array<InternalSlab>;
-}
-
 
 /**
  * Structure of invoice
@@ -3259,19 +4019,19 @@ export interface Invoice {
      * @type {string}
      * @memberof Invoice
      */
-    'customerId': string;
+    'customerId'?: string;
     /**
      * 
      * @type {string}
      * @memberof Invoice
      */
-    'accountId': string;
+    'ownerId'?: string;
     /**
      * 
      * @type {string}
      * @memberof Invoice
      */
-    'pricePlanId': string;
+    'pricePlanId'?: string;
     /**
      * 
      * @type {Array<InvoiceLineItem>}
@@ -3297,23 +4057,35 @@ export interface Invoice {
      */
     'status': InvoiceStatusEnum;
     /**
+     * Represents the class of entity( INVOICE/ORDER/BILLABLE)
+     * @type {string}
+     * @memberof Invoice
+     */
+    'invoiceClass': InvoiceInvoiceClassEnum;
+    /**
      * Start date of the invoice
      * @type {string}
      * @memberof Invoice
      */
-    'startDate': string;
+    'startDate'?: string;
     /**
      * End date of the invoice
      * @type {string}
      * @memberof Invoice
      */
-    'endDate': string;
+    'endDate'?: string;
     /**
      * Invoice date of the invoice
      * @type {string}
      * @memberof Invoice
      */
     'invoiceDate': string;
+    /**
+     * Due date of the invoice
+     * @type {string}
+     * @memberof Invoice
+     */
+    'dueDate'?: string;
     /**
      * 
      * @type {string}
@@ -3326,16 +4098,32 @@ export interface Invoice {
      * @memberof Invoice
      */
     'updatedAt': string;
+    /**
+     * 
+     * @type {{ [key: string]: any; }}
+     * @memberof Invoice
+     */
+    'metadata'?: { [key: string]: any; };
 }
 
 export const InvoiceStatusEnum = {
-    Ongoing: 'ONGOING',
-    GracePeriod: 'GRACE_PERIOD',
-    Generated: 'GENERATED',
-    Published: 'PUBLISHED'
+    Draft: 'DRAFT',
+    Due: 'DUE',
+    Paid: 'PAID',
+    Void: 'VOID',
+    UnCollectible: 'UN_COLLECTIBLE',
+    InitiateRefund: 'INITIATE_REFUND',
+    RefundCompleted: 'REFUND_COMPLETED'
 } as const;
 
 export type InvoiceStatusEnum = typeof InvoiceStatusEnum[keyof typeof InvoiceStatusEnum];
+export const InvoiceInvoiceClassEnum = {
+    Invoice: 'INVOICE',
+    Order: 'ORDER',
+    Billable: 'BILLABLE'
+} as const;
+
+export type InvoiceInvoiceClassEnum = typeof InvoiceInvoiceClassEnum[keyof typeof InvoiceInvoiceClassEnum];
 
 /**
  * 
@@ -3360,7 +4148,7 @@ export interface InvoiceDetails {
      * @type {string}
      * @memberof InvoiceDetails
      */
-    'pricePlanName': string;
+    'pricePlanName'?: string;
 }
 /**
  * 
@@ -3404,7 +4192,217 @@ export interface InvoiceDetailsCustomer {
      * @type {string}
      * @memberof InvoiceDetailsCustomer
      */
-    'billingAddress': string;
+    'billingAddress'?: string;
+    /**
+     * 
+     * @type {Address}
+     * @memberof InvoiceDetailsCustomer
+     */
+    'address'?: Address;
+}
+/**
+ * 
+ * @export
+ * @interface InvoiceGroupAccountsPaginatedResponse
+ */
+export interface InvoiceGroupAccountsPaginatedResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'dailyInvoiceConsolidation': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'gracePeriod': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'netTermDays'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'invoiceCurrency': string;
+    /**
+     * 
+     * @type {Address}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'billingAddress': Address;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'accountsCount': number;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'accounts': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupAccountsPaginatedResponse
+     */
+    'nextToken'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface InvoiceGroupAccountsPaginatedResponseAllOf
+ */
+export interface InvoiceGroupAccountsPaginatedResponseAllOf {
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof InvoiceGroupAccountsPaginatedResponseAllOf
+     */
+    'accounts': Array<string>;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupAccountsPaginatedResponseAllOf
+     */
+    'nextToken'?: string;
+}
+/**
+ * Invoice group details
+ * @export
+ * @interface InvoiceGroupDetails
+ */
+export interface InvoiceGroupDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupDetails
+     */
+    'id': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof InvoiceGroupDetails
+     */
+    'dailyInvoiceConsolidation': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroupDetails
+     */
+    'gracePeriod': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroupDetails
+     */
+    'netTermDays'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupDetails
+     */
+    'invoiceCurrency': string;
+    /**
+     * 
+     * @type {Address}
+     * @memberof InvoiceGroupDetails
+     */
+    'billingAddress': Address;
+}
+/**
+ * 
+ * @export
+ * @interface InvoiceGroupPaginatedResponse
+ */
+export interface InvoiceGroupPaginatedResponse {
+    /**
+     * 
+     * @type {Array<InvoiceGroups>}
+     * @memberof InvoiceGroupPaginatedResponse
+     */
+    'data'?: Array<InvoiceGroups>;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroupPaginatedResponse
+     */
+    'nextToken'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface InvoiceGroups
+ */
+export interface InvoiceGroups {
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroups
+     */
+    'id': string;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof InvoiceGroups
+     */
+    'dailyInvoiceConsolidation': boolean;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroups
+     */
+    'gracePeriod': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroups
+     */
+    'netTermDays'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceGroups
+     */
+    'invoiceCurrency': string;
+    /**
+     * 
+     * @type {Address}
+     * @memberof InvoiceGroups
+     */
+    'billingAddress': Address;
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroups
+     */
+    'accountsCount': number;
+}
+/**
+ * 
+ * @export
+ * @interface InvoiceGroupsAllOf
+ */
+export interface InvoiceGroupsAllOf {
+    /**
+     * 
+     * @type {number}
+     * @memberof InvoiceGroupsAllOf
+     */
+    'accountsCount': number;
 }
 /**
  * 
@@ -3447,13 +4445,13 @@ export interface InvoiceLineItem {
      * @type {string}
      * @memberof InvoiceLineItem
      */
-    'units'?: string;
+    'units': string;
     /**
      * 
      * @type {number}
      * @memberof InvoiceLineItem
      */
-    'value'?: number;
+    'value': number;
     /**
      * 
      * @type {{ [key: string]: any; }}
@@ -3467,6 +4465,30 @@ export interface InvoiceLineItem {
      */
     'lineItems': Array<InvoiceLineItem>;
 }
+/**
+ * Payload to update payment information of invoice
+ * @export
+ * @interface InvoicePaymentsRequest
+ */
+export interface InvoicePaymentsRequest {
+    /**
+     * Payment status of the invoice
+     * @type {string}
+     * @memberof InvoicePaymentsRequest
+     */
+    'status': InvoicePaymentsRequestStatusEnum;
+}
+
+export const InvoicePaymentsRequestStatusEnum = {
+    Paid: 'PAID',
+    Void: 'VOID',
+    UnCollectible: 'UN_COLLECTIBLE',
+    InitiateRefund: 'INITIATE_REFUND',
+    RefundCompleted: 'REFUND_COMPLETED'
+} as const;
+
+export type InvoicePaymentsRequestStatusEnum = typeof InvoicePaymentsRequestStatusEnum[keyof typeof InvoicePaymentsRequestStatusEnum];
+
 /**
  * If IN_ADVANCE, the fixed fee will be invoiced in the previous billing cycle. If IN_ARREARS, the fixed fee will be invoiced in the current billing cycle. 
  * @export
@@ -3593,25 +4615,6 @@ export interface LicenseEntry {
 /**
  * 
  * @export
- * @interface LicenseEntry1
- */
-export interface LicenseEntry1 {
-    /**
-     * 
-     * @type {number}
-     * @memberof LicenseEntry1
-     */
-    'quantity': number;
-    /**
-     * 
-     * @type {string}
-     * @memberof LicenseEntry1
-     */
-    'effectiveFrom': string;
-}
-/**
- * 
- * @export
  * @interface LicenseRate
  */
 export interface LicenseRate {
@@ -3647,11 +4650,29 @@ export interface LicenseRateCard {
      */
     'displayName'?: string;
     /**
+     * A tag string to group licenseRateCards
+     * @type {string}
+     * @memberof LicenseRateCard
+     */
+    'tag'?: string;
+    /**
+     * 
+     * @type {InvoiceTiming}
+     * @memberof LicenseRateCard
+     */
+    'invoiceTiming'?: InvoiceTiming;
+    /**
      * 
      * @type {boolean}
      * @memberof LicenseRateCard
      */
     'enableProration': boolean;
+    /**
+     * 
+     * @type {LicenseRateCardConfig}
+     * @memberof LicenseRateCard
+     */
+    'config'?: LicenseRateCardConfig;
     /**
      * 
      * @type {RatePlan}
@@ -3664,6 +4685,21 @@ export interface LicenseRateCard {
      * @memberof LicenseRateCard
      */
     'rateValues': Array<RateValue>;
+}
+
+
+/**
+ * 
+ * @export
+ * @interface LicenseRateCardConfig
+ */
+export interface LicenseRateCardConfig {
+    /**
+     * Max allowed quantity for a particular license in a price plan
+     * @type {number}
+     * @memberof LicenseRateCardConfig
+     */
+    'maxQuantity'?: number;
 }
 /**
  * 
@@ -4011,6 +5047,62 @@ export interface MetricQueryResponse {
 /**
  * 
  * @export
+ * @interface MigrationsPaginatedResponse
+ */
+export interface MigrationsPaginatedResponse {
+    /**
+     * 
+     * @type {Array<MigrationsWithoutStatusInfo>}
+     * @memberof MigrationsPaginatedResponse
+     */
+    'data'?: Array<MigrationsWithoutStatusInfo>;
+    /**
+     * 
+     * @type {string}
+     * @memberof MigrationsPaginatedResponse
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof MigrationsPaginatedResponse
+     */
+    'context'?: PaginationOptions;
+}
+/**
+ * 
+ * @export
+ * @interface MigrationsWithoutStatusInfo
+ */
+export interface MigrationsWithoutStatusInfo {
+    /**
+     * 
+     * @type {string}
+     * @memberof MigrationsWithoutStatusInfo
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MigrationsWithoutStatusInfo
+     */
+    'type': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MigrationsWithoutStatusInfo
+     */
+    'status': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof MigrationsWithoutStatusInfo
+     */
+    'updatedAt': string;
+}
+/**
+ * 
+ * @export
  * @interface MinimumCommitment
  */
 export interface MinimumCommitment {
@@ -4058,19 +5150,6 @@ export interface MiscellaneousChargesResponse {
      * @memberof MiscellaneousChargesResponse
      */
     'data': Array<MiscellaneousCharge>;
-}
-/**
- * 
- * @export
- * @interface OrganizationSetting
- */
-export interface OrganizationSetting {
-    /**
-     * Base currency of the organization
-     * @type {string}
-     * @memberof OrganizationSetting
-     */
-    'baseCurrency'?: string;
 }
 /**
  * 
@@ -4238,23 +5317,43 @@ export interface PricePlanDetails {
     'licenseRateCards'?: Array<LicenseRateCard>;
     /**
      * 
+     * @type {Array<BillingEntitlementRateCard>}
+     * @memberof PricePlanDetails
+     */
+    'billingEntitlementRateCards'?: Array<BillingEntitlementRateCard>;
+    /**
+     * 
      * @type {MinimumCommitment}
      * @memberof PricePlanDetails
      */
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof PricePlanDetails
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof PricePlanDetails
      */
     'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {Array<CreditGrantRateCard>}
+     * @memberof PricePlanDetails
+     */
+    'creditGrantRateCards'?: Array<CreditGrantRateCard>;
+    /**
+     * 
+     * @type {PricePlanType}
+     * @memberof PricePlanDetails
+     */
+    'type'?: PricePlanType;
 }
+
+
 /**
  * Configuration for getting the usage rate card
  * @export
@@ -4333,6 +5432,12 @@ export interface PricePlanDetailsOverride {
     'usageRateCards'?: Array<UsageRateCard>;
     /**
      * 
+     * @type {Array<BillingEntitlementRateCard>}
+     * @memberof PricePlanDetailsOverride
+     */
+    'billingEntitlementRateCards'?: Array<BillingEntitlementRateCard>;
+    /**
+     * 
      * @type {Array<FixedFeeRateCard>}
      * @memberof PricePlanDetailsOverride
      */
@@ -4351,16 +5456,22 @@ export interface PricePlanDetailsOverride {
     'minimumCommitment'?: MinimumCommitment;
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof PricePlanDetailsOverride
      */
-    'rateValues'?: Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof PricePlanDetailsOverride
      */
     'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {Array<CreditGrantRateCard>}
+     * @memberof PricePlanDetailsOverride
+     */
+    'creditGrantRateCards'?: Array<CreditGrantRateCard>;
 }
 /**
  * 
@@ -4484,7 +5595,8 @@ export interface PricePlanPaginatedResponse {
 
 export const PricePlanType = {
     Entitlement: 'ENTITLEMENT',
-    Billing: 'BILLING'
+    Billing: 'BILLING',
+    Purchase: 'PURCHASE'
 } as const;
 
 export type PricePlanType = typeof PricePlanType[keyof typeof PricePlanType];
@@ -4532,6 +5644,7 @@ export interface PricingCycleConfig {
 }
 
 export const PricingCycleConfigIntervalEnum = {
+    Weekly: 'WEEKLY',
     Monthly: 'MONTHLY',
     Quarterly: 'QUARTERLY',
     HalfYearly: 'HALF_YEARLY',
@@ -4541,13 +5654,13 @@ export const PricingCycleConfigIntervalEnum = {
 export type PricingCycleConfigIntervalEnum = typeof PricingCycleConfigIntervalEnum[keyof typeof PricingCycleConfigIntervalEnum];
 
 /**
- * Represents the start of pricing cycle in terms of  - dayOffset - number of days from beginning of month and  - monthOffset - number of months from beginning of interval (quarter, half-year or year) Note: If a day with offset doesn\'t exist for a month, closest previous day is considered Examples: MONTHLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every month   - {dayOffset: 12, monthOffset: NIL} - 12th of every month   - {dayOffset: 28, monthOffset: NIL} - 28th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: 30, monthOffset: NIL} - 30th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: LAST, monthOffset: NIL} - Last day of every month. i.e, 31st of Jan, 28th of Feb, ... QUARTERLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan, 15th Apr, 15th Jul and 15th Oct   - {dayOffset: 15, monthOffset: 2} - 15th Feb, 15th May, 15th Aug and 15th Nov   - {dayOffset: 15, monthOffset: LAST} - 15th Mar, 15th Jun, 15th Sep and 15th Dec   - {dayOffset: LAST, monthOffset: FIRST} - 31st Jan, 30th Apr, 30th Jul and 31th Oct HALF_YEARLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan and 15th Jul   - {dayOffset: 15, monthOffset: 4} - 15th Apr and 15th Oct   - {dayOffset: 15, monthOffset: LAST} - 15th Jun and 15th Dec ANNUALLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan   - {dayOffset: 15, monthOffset: 1} - 15th Jan   - {dayOffset: LAST, monthOffset: 2} - 29th Feb on Leap year, 28th otherwise    - {dayOffset: 15, monthOffset: 8} - 15th Aug   - {dayOffset: 15, monthOffset: LAST} - 15th Dec 
+ * Represents the start of pricing cycle in terms of  - dayOffset - number of days from beginning of week / month and  - monthOffset - number of months from beginning of interval (quarter, half-year or year) Note: If a day with offset doesn\'t exist for a month, closest previous day is considered Examples: WEEKLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every week (Monday)   - {dayOffset: 3, monthOffset: NIL} - 3rd day of every week (Wednesday)   - {dayOffset: LAST, monthOffset: NIL} - Last day of every week (Sunday) MONTHLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every month   - {dayOffset: 12, monthOffset: NIL} - 12th of every month   - {dayOffset: 28, monthOffset: NIL} - 28th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: 30, monthOffset: NIL} - 30th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: LAST, monthOffset: NIL} - Last day of every month. i.e, 31st of Jan, 28th of Feb, ... QUARTERLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan, 15th Apr, 15th Jul and 15th Oct   - {dayOffset: 15, monthOffset: 2} - 15th Feb, 15th May, 15th Aug and 15th Nov   - {dayOffset: 15, monthOffset: LAST} - 15th Mar, 15th Jun, 15th Sep and 15th Dec   - {dayOffset: LAST, monthOffset: FIRST} - 31st Jan, 30th Apr, 30th Jul and 31th Oct HALF_YEARLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan and 15th Jul   - {dayOffset: 15, monthOffset: 4} - 15th Apr and 15th Oct   - {dayOffset: 15, monthOffset: LAST} - 15th Jun and 15th Dec ANNUALLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan   - {dayOffset: 15, monthOffset: 1} - 15th Jan   - {dayOffset: LAST, monthOffset: 2} - 29th Feb on Leap year, 28th otherwise    - {dayOffset: 15, monthOffset: 8} - 15th Aug   - {dayOffset: 15, monthOffset: LAST} - 15th Dec 
  * @export
  * @interface PricingCycleConfigStartOffset
  */
 export interface PricingCycleConfigStartOffset {
     /**
-     * min: \"1\" and max: \"31\" as strings. Spl. string allowed: LAST 
+     * If interval is WEEKLY, min: \"1\" and max: \"7\" as strings. Spl. string allowed: LAST Otherwise, min: \"1\" and max: \"31\" as strings. Spl. string allowed: LAST 
      * @type {string}
      * @memberof PricingCycleConfigStartOffset
      */
@@ -4692,6 +5805,292 @@ export interface PricingScheduleWithPricePlanIdAllOf {
     'pricePlanId': string;
 }
 /**
+ * 
+ * @export
+ * @interface Proposal
+ */
+export interface Proposal {
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Proposal
+     */
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof Proposal
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Proposal
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {PricePlanDetailsOverride}
+     * @memberof Proposal
+     */
+    'purchasePlanOverride'?: PricePlanDetailsOverride;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof Proposal
+     */
+    'associationOverride'?: CreatePricePlanDetailsOverride;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'expiryDate'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Proposal
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'invoiceId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof Proposal
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'type': ProposalTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'comment'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'paymentMode': ProposalPaymentModeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Proposal
+     */
+    'proposalResponseDate'?: string;
+}
+
+export const ProposalTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type ProposalTypeEnum = typeof ProposalTypeEnum[keyof typeof ProposalTypeEnum];
+export const ProposalPaymentModeEnum = {
+    Prepaid: 'PREPAID',
+    Postpaid: 'POSTPAID'
+} as const;
+
+export type ProposalPaymentModeEnum = typeof ProposalPaymentModeEnum[keyof typeof ProposalPaymentModeEnum];
+
+/**
+ * 
+ * @export
+ * @interface ProposalAllOf
+ */
+export interface ProposalAllOf {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalAllOf
+     */
+    'paymentMode': ProposalAllOfPaymentModeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalAllOf
+     */
+    'proposalResponseDate'?: string;
+}
+
+export const ProposalAllOfPaymentModeEnum = {
+    Prepaid: 'PREPAID',
+    Postpaid: 'POSTPAID'
+} as const;
+
+export type ProposalAllOfPaymentModeEnum = typeof ProposalAllOfPaymentModeEnum[keyof typeof ProposalAllOfPaymentModeEnum];
+
+/**
+ * Represents a Proposal for List Response
+ * @export
+ * @interface ProposalsListResponse
+ */
+export interface ProposalsListResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'pricePlanId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'pricePlanName': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ProposalsListResponse
+     */
+    'pricePlanVersion': number;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof ProposalsListResponse
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'expiryDate'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'paymentMode': ProposalsListResponsePaymentModeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsListResponse
+     */
+    'type': ProposalsListResponseTypeEnum;
+}
+
+export const ProposalsListResponsePaymentModeEnum = {
+    Prepaid: 'PREPAID',
+    Postpaid: 'POSTPAID'
+} as const;
+
+export type ProposalsListResponsePaymentModeEnum = typeof ProposalsListResponsePaymentModeEnum[keyof typeof ProposalsListResponsePaymentModeEnum];
+export const ProposalsListResponseTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type ProposalsListResponseTypeEnum = typeof ProposalsListResponseTypeEnum[keyof typeof ProposalsListResponseTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface ProposalsPaginatedResponse
+ */
+export interface ProposalsPaginatedResponse {
+    /**
+     * 
+     * @type {Array<ProposalsListResponse>}
+     * @memberof ProposalsPaginatedResponse
+     */
+    'data'?: Array<ProposalsListResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof ProposalsPaginatedResponse
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof ProposalsPaginatedResponse
+     */
+    'context'?: PaginationOptions;
+}
+/**
  * Configuration for getting the proration, if not provided no proration will be applied
  * @export
  * @interface ProrationConfig
@@ -4803,7 +6202,13 @@ export interface Purchase {
      * @type {number}
      * @memberof Purchase
      */
-    'quantity': number;
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof Purchase
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
     /**
      * 
      * @type {string}
@@ -4818,10 +6223,16 @@ export interface Purchase {
     'pricePlanVersion': number;
     /**
      * 
-     * @type {PurchasePlanOverride}
+     * @type {PricePlanDetailsOverride}
      * @memberof Purchase
      */
-    'purchasePlanOverrides'?: PurchasePlanOverride;
+    'purchasePlanOverride'?: PricePlanDetailsOverride;
+    /**
+     * 
+     * @type {CreatePricePlanDetailsOverride}
+     * @memberof Purchase
+     */
+    'associationOverride'?: CreatePricePlanDetailsOverride;
     /**
      * 
      * @type {string}
@@ -4834,6 +6245,117 @@ export interface Purchase {
      * @memberof Purchase
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'expiryDate'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof Purchase
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'invoiceId'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {PurchaseStatus}
+     * @memberof Purchase
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'type': PurchaseTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof Purchase
+     */
+    'comment'?: string;
+}
+
+export const PurchaseTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type PurchaseTypeEnum = typeof PurchaseTypeEnum[keyof typeof PurchaseTypeEnum];
+
+/**
+ * 
+ * @export
+ * @interface PurchaseFeatureDetails
+ */
+export interface PurchaseFeatureDetails {
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'name': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseFeatureDetails
+     */
+    'creditsGranted': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseFeatureDetails
+     */
+    'creditsAvailable': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'effectiveFrom': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseFeatureDetails
+     */
+    'effectiveUntil': string;
 }
 /**
  * Represents a Purchase for List Response
@@ -4855,10 +6377,22 @@ export interface PurchaseListResponse {
     'pricePlanId': string;
     /**
      * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'pricePlanName': string;
+    /**
+     * 
      * @type {number}
      * @memberof PurchaseListResponse
      */
-    'quantity': number;
+    'quantity'?: number;
+    /**
+     * 
+     * @type {{ [key: string]: number; }}
+     * @memberof PurchaseListResponse
+     */
+    'rateCardQuantities'?: { [key: string]: number; };
     /**
      * 
      * @type {number}
@@ -4867,10 +6401,34 @@ export interface PurchaseListResponse {
     'pricePlanVersion': number;
     /**
      * 
+     * @type {PurchaseStatus}
+     * @memberof PurchaseListResponse
+     */
+    'status': PurchaseStatus;
+    /**
+     * 
      * @type {string}
      * @memberof PurchaseListResponse
      */
     'idempotencyKey'?: string;
+    /**
+     * 
+     * @type {PurchasePlanOverride}
+     * @memberof PurchaseListResponse
+     */
+    'purchasePlan': PurchasePlanOverride;
+    /**
+     * 
+     * @type {number}
+     * @memberof PurchaseListResponse
+     */
+    'price'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'invoiceCurrency'?: string;
     /**
      * 
      * @type {string}
@@ -4883,7 +6441,21 @@ export interface PurchaseListResponse {
      * @memberof PurchaseListResponse
      */
     'updatedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PurchaseListResponse
+     */
+    'type': PurchaseListResponseTypeEnum;
 }
+
+export const PurchaseListResponseTypeEnum = {
+    EntitlementGrant: 'ENTITLEMENT_GRANT',
+    Association: 'ASSOCIATION'
+} as const;
+
+export type PurchaseListResponseTypeEnum = typeof PurchaseListResponseTypeEnum[keyof typeof PurchaseListResponseTypeEnum];
+
 /**
  * 
  * @export
@@ -4917,16 +6489,66 @@ export interface PurchasePaginatedListData {
 export interface PurchasePlanOverride {
     /**
      * 
-     * @type {Array<CurrencyRateValue>}
+     * @type {RateDetails}
      * @memberof PurchasePlanOverride
      */
-    'rateValues': Array<CurrencyRateValue>;
+    'rateDetails'?: RateDetails;
     /**
      * 
      * @type {Array<EntitlementRateCard>}
      * @memberof PurchasePlanOverride
      */
-    'entitlementRateCards': Array<EntitlementRateCard>;
+    'entitlementRateCards'?: Array<EntitlementRateCard>;
+    /**
+     * 
+     * @type {Array<BillingEntitlementRateCard>}
+     * @memberof PurchasePlanOverride
+     */
+    'billingEntitlementRateCards'?: Array<BillingEntitlementRateCard>;
+    /**
+     * 
+     * @type {Array<CreditGrantRateCard>}
+     * @memberof PurchasePlanOverride
+     */
+    'creditGrantRateCards'?: Array<CreditGrantRateCard>;
+}
+/**
+ * Status of the purchase
+ * @export
+ * @enum {string}
+ */
+
+export const PurchaseStatus = {
+    Success: 'SUCCESS',
+    Failure: 'FAILURE',
+    Pending: 'PENDING',
+    ProposalActive: 'PROPOSAL_ACTIVE',
+    ProposalApproved: 'PROPOSAL_APPROVED',
+    ProposalDeclined: 'PROPOSAL_DECLINED',
+    ProposalExpired: 'PROPOSAL_EXPIRED'
+} as const;
+
+export type PurchaseStatus = typeof PurchaseStatus[keyof typeof PurchaseStatus];
+
+
+/**
+ * rate details for a price plan
+ * @export
+ * @interface RateDetails
+ */
+export interface RateDetails {
+    /**
+     * 
+     * @type {Array<RateValue>}
+     * @memberof RateDetails
+     */
+    'rateValues': Array<RateValue>;
+    /**
+     * 
+     * @type {RatePlan}
+     * @memberof RateDetails
+     */
+    'ratePlan': RatePlan;
 }
 /**
  * Contains all rate related configurations
@@ -4969,6 +6591,25 @@ export interface RateValue {
     'slabRates': Array<SlabRate>;
 }
 /**
+ * 
+ * @export
+ * @interface RecurrenceConfig
+ */
+export interface RecurrenceConfig {
+    /**
+     * Represents the number of pricing cycles after which the rate card will be charged
+     * @type {number}
+     * @memberof RecurrenceConfig
+     */
+    'interval'?: number;
+    /**
+     * Represents the offset for pricing cycles after which the rate card will be charged
+     * @type {number}
+     * @memberof RecurrenceConfig
+     */
+    'offset'?: number;
+}
+/**
  * Payload to remove aliases from account
  * @export
  * @interface RemoveAccountAliasesRequest
@@ -5007,6 +6648,18 @@ export interface RevenueInfo {
     'licenseRateCard'?: LicenseRateCard;
     /**
      * 
+     * @type {BillingEntitlementRateCard}
+     * @memberof RevenueInfo
+     */
+    'billingEntitlementRateCard'?: BillingEntitlementRateCard;
+    /**
+     * 
+     * @type {CreditGrantRateCard}
+     * @memberof RevenueInfo
+     */
+    'creditGrantRateCard'?: CreditGrantRateCard;
+    /**
+     * 
      * @type {{ [key: string]: number; }}
      * @memberof RevenueInfo
      */
@@ -5025,288 +6678,22 @@ export interface RevenueInfo {
     'licenseRevenueSummary'?: LicenseRevenueSummary;
     /**
      * 
+     * @type {BillingEntitlementRevenueSummary}
+     * @memberof RevenueInfo
+     */
+    'billingEntitlementRevenueSummary'?: BillingEntitlementRevenueSummary;
+    /**
+     * 
+     * @type {CreditGrantRevenueSummary}
+     * @memberof RevenueInfo
+     */
+    'creditGrantRevenueSummary'?: CreditGrantRevenueSummary;
+    /**
+     * 
      * @type {Array<SlabRevenueSummary>}
      * @memberof RevenueInfo
      */
     'slabRevenueSummaries'?: Array<SlabRevenueSummary>;
-}
-/**
- * 
- * @export
- * @interface RevenueSummaryQuery
- */
-export interface RevenueSummaryQuery {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQuery
-     */
-    'id': string;
-    /**
-     * 
-     * @type {InternalFixedFeeRateCard}
-     * @memberof RevenueSummaryQuery
-     */
-    'fixedFeeRateCard'?: InternalFixedFeeRateCard;
-    /**
-     * 
-     * @type {InternalUsageRateCard}
-     * @memberof RevenueSummaryQuery
-     */
-    'usageRateCard'?: InternalUsageRateCard;
-    /**
-     * 
-     * @type {InternalLicenseRateCard}
-     * @memberof RevenueSummaryQuery
-     */
-    'licenseRateCard'?: InternalLicenseRateCard;
-    /**
-     * 
-     * @type {RevenueSummaryQueryProrationConfig}
-     * @memberof RevenueSummaryQuery
-     */
-    'prorationConfig'?: RevenueSummaryQueryProrationConfig;
-    /**
-     * 
-     * @type {RevenueSummaryQueryUsages}
-     * @memberof RevenueSummaryQuery
-     */
-    'usages': RevenueSummaryQueryUsages;
-    /**
-     * 
-     * @type {RevenueSummaryQueryLicenseEntries}
-     * @memberof RevenueSummaryQuery
-     */
-    'licenseEntries'?: RevenueSummaryQueryLicenseEntries;
-}
-/**
- * 
- * @export
- * @interface RevenueSummaryQueryLicenseEntries
- */
-export interface RevenueSummaryQueryLicenseEntries {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryLicenseEntries
-     */
-    'mode': RevenueSummaryQueryLicenseEntriesModeEnum;
-    /**
-     * 
-     * @type {RevenueSummaryQueryLicenseEntriesLookUpConfig}
-     * @memberof RevenueSummaryQueryLicenseEntries
-     */
-    'lookUpConfig'?: RevenueSummaryQueryLicenseEntriesLookUpConfig;
-    /**
-     * 
-     * @type {RevenueSummaryQueryLicenseEntriesCustomConfig}
-     * @memberof RevenueSummaryQueryLicenseEntries
-     */
-    'customConfig'?: RevenueSummaryQueryLicenseEntriesCustomConfig;
-}
-
-export const RevenueSummaryQueryLicenseEntriesModeEnum = {
-    Lookup: 'LOOKUP',
-    Custom: 'CUSTOM'
-} as const;
-
-export type RevenueSummaryQueryLicenseEntriesModeEnum = typeof RevenueSummaryQueryLicenseEntriesModeEnum[keyof typeof RevenueSummaryQueryLicenseEntriesModeEnum];
-
-/**
- * License entries for the billing cycle. This will be considered if mode is CUSTOM
- * @export
- * @interface RevenueSummaryQueryLicenseEntriesCustomConfig
- */
-export interface RevenueSummaryQueryLicenseEntriesCustomConfig {
-    /**
-     * 
-     * @type {Array<LicenseEntry1>}
-     * @memberof RevenueSummaryQueryLicenseEntriesCustomConfig
-     */
-    'customLicenseEntries': Array<LicenseEntry1>;
-}
-/**
- * Holder for data required to lookup license entries. This will be considered if mode is LOOKUP
- * @export
- * @interface RevenueSummaryQueryLicenseEntriesLookUpConfig
- */
-export interface RevenueSummaryQueryLicenseEntriesLookUpConfig {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
-     */
-    'start': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
-     */
-    'end': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
-     */
-    'licenseId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryLicenseEntriesLookUpConfig
-     */
-    'accountId': string;
-}
-/**
- * Config for prorated entities. If not provided, revenue will be calculated for the entire billing cycle. 
- * @export
- * @interface RevenueSummaryQueryProrationConfig
- */
-export interface RevenueSummaryQueryProrationConfig {
-    /**
-     * Start date of the billing cycle. This is the date when the billing cycle starts for the customer. 
-     * @type {string}
-     * @memberof RevenueSummaryQueryProrationConfig
-     */
-    'startDate': string;
-    /**
-     * Current date till which revenue is to be prorated. 
-     * @type {string}
-     * @memberof RevenueSummaryQueryProrationConfig
-     */
-    'currentDate': string;
-    /**
-     * End date of the billing cycle. This is the date when the billing cycle ends for the customer. 
-     * @type {string}
-     * @memberof RevenueSummaryQueryProrationConfig
-     */
-    'endDate': string;
-}
-/**
- * 
- * @export
- * @interface RevenueSummaryQueryUsages
- */
-export interface RevenueSummaryQueryUsages {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryUsages
-     */
-    'mode': RevenueSummaryQueryUsagesModeEnum;
-    /**
-     * 
-     * @type {RevenueSummaryQueryUsagesCustomConfig}
-     * @memberof RevenueSummaryQueryUsages
-     */
-    'customConfig'?: RevenueSummaryQueryUsagesCustomConfig;
-    /**
-     * 
-     * @type {RevenueSummaryQueryUsagesLookupConfig}
-     * @memberof RevenueSummaryQueryUsages
-     */
-    'lookupConfig'?: RevenueSummaryQueryUsagesLookupConfig;
-}
-
-export const RevenueSummaryQueryUsagesModeEnum = {
-    Lookup: 'LOOKUP',
-    Custom: 'CUSTOM'
-} as const;
-
-export type RevenueSummaryQueryUsagesModeEnum = typeof RevenueSummaryQueryUsagesModeEnum[keyof typeof RevenueSummaryQueryUsagesModeEnum];
-
-/**
- * Usages map with usageMeterId as key and usage units as value. This will be considered if mode is CUSTOM
- * @export
- * @interface RevenueSummaryQueryUsagesCustomConfig
- */
-export interface RevenueSummaryQueryUsagesCustomConfig {
-    /**
-     * 
-     * @type {{ [key: string]: number; }}
-     * @memberof RevenueSummaryQueryUsagesCustomConfig
-     */
-    'usageMap': { [key: string]: number; };
-}
-/**
- * Holder for data required to lookup usages. This will be considered if mode is LOOKUP
- * @export
- * @interface RevenueSummaryQueryUsagesLookupConfig
- */
-export interface RevenueSummaryQueryUsagesLookupConfig {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryUsagesLookupConfig
-     */
-    'start': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryUsagesLookupConfig
-     */
-    'end': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryQueryUsagesLookupConfig
-     */
-    'accountId': string;
-}
-/**
- * 
- * @export
- * @interface RevenueSummaryResponse
- */
-export interface RevenueSummaryResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryResponse
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof RevenueSummaryResponse
-     */
-    'currency': string;
-    /**
-     * 
-     * @type {{ [key: string]: number; }}
-     * @memberof RevenueSummaryResponse
-     */
-    'usages': { [key: string]: number; };
-    /**
-     * 
-     * @type {RevenueSummaryResponseRevenueSummary}
-     * @memberof RevenueSummaryResponse
-     */
-    'revenueSummary': RevenueSummaryResponseRevenueSummary;
-}
-/**
- * 
- * @export
- * @interface RevenueSummaryResponseRevenueSummary
- */
-export interface RevenueSummaryResponseRevenueSummary {
-    /**
-     * 
-     * @type {Array<SlabRevenue>}
-     * @memberof RevenueSummaryResponseRevenueSummary
-     */
-    'slabRevenues'?: Array<SlabRevenue>;
-    /**
-     * 
-     * @type {number}
-     * @memberof RevenueSummaryResponseRevenueSummary
-     */
-    'fixedFeeRevenue'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof RevenueSummaryResponseRevenueSummary
-     */
-    'licenseRevenue'?: number;
 }
 /**
  * Represents a setting
@@ -5401,50 +6788,6 @@ export interface SettingPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
- * Payload to signup
- * @export
- * @interface SignupRequest
- */
-export interface SignupRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof SignupRequest
-     */
-    'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof SignupRequest
-     */
-    'description'?: string;
-    /**
-     * 
-     * @type {UserDetails}
-     * @memberof SignupRequest
-     */
-    'userDetails': UserDetails;
-}
-/**
- * Signup response
- * @export
- * @interface SignupResponse
- */
-export interface SignupResponse {
-    /**
-     * Organization Identifier
-     * @type {string}
-     * @memberof SignupResponse
-     */
-    'organizationId': string;
-    /**
-     * Token which can be used for authentication
-     * @type {string}
-     * @memberof SignupResponse
-     */
-    'jwtToken': string;
-}
-/**
  * Represents a pricing priceType (rates + slabs) for usage price plan
  * @export
  * @interface Slab
@@ -5478,6 +6821,45 @@ export interface Slab {
 
 
 /**
+ * The details of a slab
+ * @export
+ * @interface SlabDetail
+ */
+export interface SlabDetail {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabDetail
+     */
+    'startAfter': number;
+    /**
+     * 
+     * @type {PriceType}
+     * @memberof SlabDetail
+     */
+    'priceType': PriceType;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabDetail
+     */
+    'slabConfig'?: { [key: string]: string; };
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabDetail
+     */
+    'rate': number;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabDetail
+     */
+    'slabRateConfig'?: { [key: string]: string; };
+}
+
+
+/**
  * Represents a rate for a slab
  * @export
  * @interface SlabRate
@@ -5501,37 +6883,6 @@ export interface SlabRate {
      * @memberof SlabRate
      */
     'slabRateConfig'?: { [key: string]: string; };
-}
-/**
- * 
- * @export
- * @interface SlabRevenue
- */
-export interface SlabRevenue {
-    /**
-     * 
-     * @type {number}
-     * @memberof SlabRevenue
-     */
-    'order': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SlabRevenue
-     */
-    'usage': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof SlabRevenue
-     */
-    'revenue': number;
-    /**
-     * 
-     * @type {{ [key: string]: string; }}
-     * @memberof SlabRevenue
-     */
-    'metadata'?: { [key: string]: string; };
 }
 /**
  * 
@@ -5590,52 +6941,6 @@ export interface SlabRevenueSummary {
     'metadata'?: SlabRevenueMetadata;
 }
 /**
- * 
- * @export
- * @interface StatusResponse
- */
-export interface StatusResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
-    'greeting'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
-    'date'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponse
-     */
-    'url'?: string;
-    /**
-     * 
-     * @type {StatusResponseHeaders}
-     * @memberof StatusResponse
-     */
-    'headers'?: StatusResponseHeaders;
-}
-/**
- * 
- * @export
- * @interface StatusResponseHeaders
- */
-export interface StatusResponseHeaders {
-    [key: string]: any;
-
-    /**
-     * 
-     * @type {string}
-     * @memberof StatusResponseHeaders
-     */
-    'Content-Type'?: string;
-}
-/**
  * Payload to update account
  * @export
  * @interface UpdateAccountRequest
@@ -5680,11 +6985,11 @@ export interface UpdateCustomerRequest {
      */
     'primaryEmail'?: string;
     /**
-     * billing address of the customer
-     * @type {string}
+     * 
+     * @type {Address}
      * @memberof UpdateCustomerRequest
      */
-    'billingAddress'?: string;
+    'address'?: Address;
 }
 /**
  * Request to update event schema
@@ -5737,17 +7042,17 @@ export interface UpdateFeatureRequest {
     'schemaAssociations': Array<EventSchemasForFeature>;
 }
 /**
- * 
+ * Add accounts to an invoice group
  * @export
- * @interface UpdateOrganizationSettingRequest
+ * @interface UpdateInvoiceGroupAccounts
  */
-export interface UpdateOrganizationSettingRequest {
+export interface UpdateInvoiceGroupAccounts {
     /**
-     * Base currency of the organization
-     * @type {string}
-     * @memberof UpdateOrganizationSettingRequest
+     * 
+     * @type {Array<string>}
+     * @memberof UpdateInvoiceGroupAccounts
      */
-    'baseCurrency': string;
+    'accountIds': Array<string>;
 }
 /**
  * Request to update a price plan
@@ -5867,6 +7172,27 @@ export interface UpdatePricingScheduleResponse {
      */
     'pricingSchedules': Array<PlanOverride>;
 }
+/**
+ * Approve or decline a proposal of a billing plan for an account
+ * @export
+ * @interface UpdateProposalStatus
+ */
+export interface UpdateProposalStatus {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateProposalStatus
+     */
+    'status': UpdateProposalStatusStatusEnum;
+}
+
+export const UpdateProposalStatusStatusEnum = {
+    Approve: 'APPROVE',
+    Decline: 'DECLINE'
+} as const;
+
+export type UpdateProposalStatusStatusEnum = typeof UpdateProposalStatusStatusEnum[keyof typeof UpdateProposalStatusStatusEnum];
+
 /**
  * Update Settings
  * @export
@@ -6186,6 +7512,12 @@ export interface UsageRateCard {
      */
     'displayName': string;
     /**
+     * A tag string to group usageRateCards
+     * @type {string}
+     * @memberof UsageRateCard
+     */
+    'tag'?: string;
+    /**
      * 
      * @type {string}
      * @memberof UsageRateCard
@@ -6203,43 +7535,6 @@ export interface UsageRateCard {
      * @memberof UsageRateCard
      */
     'rateValues': Array<RateValue>;
-}
-/**
- * Root user details for the organization
- * @export
- * @interface UserDetails
- */
-export interface UserDetails {
-    /**
-     * 
-     * @type {string}
-     * @memberof UserDetails
-     */
-    'preferredUsername'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserDetails
-     */
-    'name': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserDetails
-     */
-    'password': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserDetails
-     */
-    'email': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof UserDetails
-     */
-    'phone'?: string;
 }
 
 /**
@@ -6333,6 +7628,50 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * This API let’s you to create a proposal of a billing/entitlement plan for an account
+         * @summary Propose a purchase of a plan
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreateProposalRequest} createProposalRequest Payload to initiate a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProposal: async (accountId: string, createProposalRequest: CreateProposalRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('createProposal', 'accountId', accountId)
+            // verify required parameter 'createProposalRequest' is not null or undefined
+            assertParamExists('createProposal', 'createProposalRequest', createProposalRequest)
+            const localVarPath = `/accounts/{account_id}/purchase_proposals`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createProposalRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} accountId account_id corresponding to an account
@@ -6374,10 +7713,11 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} accountId account_id corresponding to an account
+         * @param {boolean} [includeGroupDetails] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAccount: async (accountId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAccount: async (accountId: string, includeGroupDetails?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'accountId' is not null or undefined
             assertParamExists('getAccount', 'accountId', accountId)
             const localVarPath = `/accounts/{account_id}`
@@ -6396,6 +7736,10 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (includeGroupDetails !== undefined) {
+                localVarQueryParameter['includeGroupDetails'] = includeGroupDetails;
+            }
 
 
     
@@ -6511,6 +7855,44 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Get proposal information
+         * @summary Get proposal information
+         * @param {string} purchaseProposalId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProposal: async (purchaseProposalId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'purchaseProposalId' is not null or undefined
+            assertParamExists('getProposal', 'purchaseProposalId', purchaseProposalId)
+            const localVarPath = `/purchase_proposals/{purchase_proposal_id}`
+                .replace(`{${"purchase_proposal_id"}}`, encodeURIComponent(String(purchaseProposalId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Get purchase information of an account for a specific plan using account_id and price_plan_id
          * @summary Get a specific purchase of an account
          * @param {string} purchaseId 
@@ -6522,6 +7904,88 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             assertParamExists('getPurchase', 'purchaseId', purchaseId)
             const localVarPath = `/purchases/{purchase_id}`
                 .replace(`{${"purchase_id"}}`, encodeURIComponent(String(purchaseId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to initiate a purchase for an account
+         * @summary Initiate a purchase
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateOneTimeEntitlementPlan: async (accountId: string, createPurchaseRequest: CreatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('initiateOneTimeEntitlementPlan', 'accountId', accountId)
+            // verify required parameter 'createPurchaseRequest' is not null or undefined
+            assertParamExists('initiateOneTimeEntitlementPlan', 'createPurchaseRequest', createPurchaseRequest)
+            const localVarPath = `/accounts/{account_id}/purchases`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createPurchaseRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List all proposals of an account
+         * @summary List all proposals of an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAccountProposals: async (accountId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('listAccountProposals', 'accountId', accountId)
+            const localVarPath = `/accounts/{account_id}/purchase_proposals`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -6580,50 +8044,6 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * This API let’s you to purchase a one time entitlement plan
-         * @summary Purchase an Entitlement Plan
-         * @param {string} accountId account_id corresponding to an account
-         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        purchaseOneTimeEntitlementPlan: async (accountId: string, createPurchaseRequest: CreatePurchaseRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'accountId' is not null or undefined
-            assertParamExists('purchaseOneTimeEntitlementPlan', 'accountId', accountId)
-            // verify required parameter 'createPurchaseRequest' is not null or undefined
-            assertParamExists('purchaseOneTimeEntitlementPlan', 'createPurchaseRequest', createPurchaseRequest)
-            const localVarPath = `/accounts/{account_id}/purchases`
-                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createPurchaseRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -6806,6 +8226,50 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * This API let’s you to approve or decline a proposal of a billing plan for an account
+         * @summary Approve or decline a purchase of a billing plan
+         * @param {string} purchaseProposalId 
+         * @param {UpdateProposalStatus} updateProposalStatus Payload to approve or decline a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateProposalStatus: async (purchaseProposalId: string, updateProposalStatus: UpdateProposalStatus, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'purchaseProposalId' is not null or undefined
+            assertParamExists('updateProposalStatus', 'purchaseProposalId', purchaseProposalId)
+            // verify required parameter 'updateProposalStatus' is not null or undefined
+            assertParamExists('updateProposalStatus', 'updateProposalStatus', updateProposalStatus)
+            const localVarPath = `/purchase_proposals/{purchase_proposal_id}/update_status`
+                .replace(`{${"purchase_proposal_id"}}`, encodeURIComponent(String(purchaseProposalId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateProposalStatus, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -6840,6 +8304,18 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * This API let’s you to create a proposal of a billing/entitlement plan for an account
+         * @summary Propose a purchase of a plan
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreateProposalRequest} createProposalRequest Payload to initiate a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createProposal(accountId: string, createProposalRequest: CreateProposalRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Proposal>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createProposal(accountId, createProposalRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} accountId account_id corresponding to an account
@@ -6854,11 +8330,12 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} accountId account_id corresponding to an account
+         * @param {boolean} [includeGroupDetails] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAccount(accountId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Account>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAccount(accountId, options);
+        async getAccount(accountId: string, includeGroupDetails?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Account>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAccount(accountId, includeGroupDetails, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6889,14 +8366,48 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Get proposal information
+         * @summary Get proposal information
+         * @param {string} purchaseProposalId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getProposal(purchaseProposalId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetProposalResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getProposal(purchaseProposalId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Get purchase information of an account for a specific plan using account_id and price_plan_id
          * @summary Get a specific purchase of an account
          * @param {string} purchaseId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+        async getPurchase(purchaseId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetPurchaseResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getPurchase(purchaseId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to initiate a purchase for an account
+         * @summary Initiate a purchase
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async initiateOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.initiateOneTimeEntitlementPlan(accountId, createPurchaseRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * List all proposals of an account
+         * @summary List all proposals of an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listAccountProposals(accountId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ProposalsPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listAccountProposals(accountId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6908,18 +8419,6 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          */
         async listAccountPurchases(accountId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PurchasePaginatedListData>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listAccountPurchases(accountId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * This API let’s you to purchase a one time entitlement plan
-         * @summary Purchase an Entitlement Plan
-         * @param {string} accountId account_id corresponding to an account
-         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Purchase>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -6970,6 +8469,18 @@ export const AccountsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.updatePricingScheduleBatch(accountId, editPricingScheduleRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * This API let’s you to approve or decline a proposal of a billing plan for an account
+         * @summary Approve or decline a purchase of a billing plan
+         * @param {string} purchaseProposalId 
+         * @param {UpdateProposalStatus} updateProposalStatus Payload to approve or decline a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateProposalStatus(purchaseProposalId: string, updateProposalStatus: UpdateProposalStatus, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Proposal>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateProposalStatus(purchaseProposalId, updateProposalStatus, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -7002,6 +8513,17 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.createAccount(createAccountRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * This API let’s you to create a proposal of a billing/entitlement plan for an account
+         * @summary Propose a purchase of a plan
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreateProposalRequest} createProposalRequest Payload to initiate a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createProposal(accountId: string, createProposalRequest: CreateProposalRequest, options?: any): AxiosPromise<Proposal> {
+            return localVarFp.createProposal(accountId, createProposalRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This API let’s you to delete a customer using customer_id and account_id.
          * @summary Delete an account
          * @param {string} accountId account_id corresponding to an account
@@ -7015,11 +8537,12 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * Get account information using customer_id and account_id.
          * @summary Get an account
          * @param {string} accountId account_id corresponding to an account
+         * @param {boolean} [includeGroupDetails] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAccount(accountId: string, options?: any): AxiosPromise<Account> {
-            return localVarFp.getAccount(accountId, options).then((request) => request(axios, basePath));
+        getAccount(accountId: string, includeGroupDetails?: boolean, options?: any): AxiosPromise<Account> {
+            return localVarFp.getAccount(accountId, includeGroupDetails, options).then((request) => request(axios, basePath));
         },
         /**
          * Returns a list of accounts of a customer with pagination and sort.
@@ -7047,14 +8570,45 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get proposal information
+         * @summary Get proposal information
+         * @param {string} purchaseProposalId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getProposal(purchaseProposalId: string, options?: any): AxiosPromise<GetProposalResponse> {
+            return localVarFp.getProposal(purchaseProposalId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Get purchase information of an account for a specific plan using account_id and price_plan_id
          * @summary Get a specific purchase of an account
          * @param {string} purchaseId 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPurchase(purchaseId: string, options?: any): AxiosPromise<Purchase> {
+        getPurchase(purchaseId: string, options?: any): AxiosPromise<GetPurchaseResponse> {
             return localVarFp.getPurchase(purchaseId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to initiate a purchase for an account
+         * @summary Initiate a purchase
+         * @param {string} accountId account_id corresponding to an account
+         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        initiateOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
+            return localVarFp.initiateOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List all proposals of an account
+         * @summary List all proposals of an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listAccountProposals(accountId: string, options?: any): AxiosPromise<ProposalsPaginatedResponse> {
+            return localVarFp.listAccountProposals(accountId, options).then((request) => request(axios, basePath));
         },
         /**
          * Get Purchase information for an account using account_id and price_plan_id
@@ -7065,17 +8619,6 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          */
         listAccountPurchases(accountId: string, options?: any): AxiosPromise<PurchasePaginatedListData> {
             return localVarFp.listAccountPurchases(accountId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * This API let’s you to purchase a one time entitlement plan
-         * @summary Purchase an Entitlement Plan
-         * @param {string} accountId account_id corresponding to an account
-         * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: any): AxiosPromise<Purchase> {
-            return localVarFp.purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Remove existing aliases tagged to an account using this API
@@ -7121,6 +8664,17 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
         updatePricingScheduleBatch(accountId: string, editPricingScheduleRequest: EditPricingScheduleRequest, options?: any): AxiosPromise<UpdatePricingScheduleResponse> {
             return localVarFp.updatePricingScheduleBatch(accountId, editPricingScheduleRequest, options).then((request) => request(axios, basePath));
         },
+        /**
+         * This API let’s you to approve or decline a proposal of a billing plan for an account
+         * @summary Approve or decline a purchase of a billing plan
+         * @param {string} purchaseProposalId 
+         * @param {UpdateProposalStatus} updateProposalStatus Payload to approve or decline a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateProposalStatus(purchaseProposalId: string, updateProposalStatus: UpdateProposalStatus, options?: any): AxiosPromise<Proposal> {
+            return localVarFp.updateProposalStatus(purchaseProposalId, updateProposalStatus, options).then((request) => request(axios, basePath));
+        },
     };
 };
 
@@ -7157,6 +8711,19 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
+     * This API let’s you to create a proposal of a billing/entitlement plan for an account
+     * @summary Propose a purchase of a plan
+     * @param {string} accountId account_id corresponding to an account
+     * @param {CreateProposalRequest} createProposalRequest Payload to initiate a proposal
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public createProposal(accountId: string, createProposalRequest: CreateProposalRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).createProposal(accountId, createProposalRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * This API let’s you to delete a customer using customer_id and account_id.
      * @summary Delete an account
      * @param {string} accountId account_id corresponding to an account
@@ -7172,12 +8739,13 @@ export class AccountsApi extends BaseAPI {
      * Get account information using customer_id and account_id.
      * @summary Get an account
      * @param {string} accountId account_id corresponding to an account
+     * @param {boolean} [includeGroupDetails] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
      */
-    public getAccount(accountId: string, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).getAccount(accountId, options).then((request) => request(this.axios, this.basePath));
+    public getAccount(accountId: string, includeGroupDetails?: boolean, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).getAccount(accountId, includeGroupDetails, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7210,6 +8778,18 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
+     * Get proposal information
+     * @summary Get proposal information
+     * @param {string} purchaseProposalId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public getProposal(purchaseProposalId: string, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).getProposal(purchaseProposalId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get purchase information of an account for a specific plan using account_id and price_plan_id
      * @summary Get a specific purchase of an account
      * @param {string} purchaseId 
@@ -7222,6 +8802,31 @@ export class AccountsApi extends BaseAPI {
     }
 
     /**
+     * This API let’s you to initiate a purchase for an account
+     * @summary Initiate a purchase
+     * @param {string} accountId account_id corresponding to an account
+     * @param {CreatePurchaseRequest} createPurchaseRequest Payload to initiate a purchase
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public initiateOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).initiateOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List all proposals of an account
+     * @summary List all proposals of an account
+     * @param {string} accountId account_id corresponding to an account
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public listAccountProposals(accountId: string, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).listAccountProposals(accountId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Get Purchase information for an account using account_id and price_plan_id
      * @summary Get all purchases for an account
      * @param {string} accountId account_id corresponding to an account
@@ -7231,19 +8836,6 @@ export class AccountsApi extends BaseAPI {
      */
     public listAccountPurchases(accountId: string, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).listAccountPurchases(accountId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * This API let’s you to purchase a one time entitlement plan
-     * @summary Purchase an Entitlement Plan
-     * @param {string} accountId account_id corresponding to an account
-     * @param {CreatePurchaseRequest} createPurchaseRequest Payload to make a purchase
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof AccountsApi
-     */
-    public purchaseOneTimeEntitlementPlan(accountId: string, createPurchaseRequest: CreatePurchaseRequest, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).purchaseOneTimeEntitlementPlan(accountId, createPurchaseRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -7296,6 +8888,19 @@ export class AccountsApi extends BaseAPI {
      */
     public updatePricingScheduleBatch(accountId: string, editPricingScheduleRequest: EditPricingScheduleRequest, options?: AxiosRequestConfig) {
         return AccountsApiFp(this.configuration).updatePricingScheduleBatch(accountId, editPricingScheduleRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to approve or decline a proposal of a billing plan for an account
+     * @summary Approve or decline a purchase of a billing plan
+     * @param {string} purchaseProposalId 
+     * @param {UpdateProposalStatus} updateProposalStatus Payload to approve or decline a proposal
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof AccountsApi
+     */
+    public updateProposalStatus(purchaseProposalId: string, updateProposalStatus: UpdateProposalStatus, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).updateProposalStatus(purchaseProposalId, updateProposalStatus, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -10129,6 +11734,412 @@ export class FeatureApi extends BaseAPI {
 
 
 /**
+ * InvoiceGroupsApi - axios parameter creator
+ * @export
+ */
+export const InvoiceGroupsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * This API let’s you to add accounts to an invoice group
+         * @summary Add accounts to an invoice group
+         * @param {string} invoiceGroupId 
+         * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addInvoiceGroupAccounts: async (invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invoiceGroupId' is not null or undefined
+            assertParamExists('addInvoiceGroupAccounts', 'invoiceGroupId', invoiceGroupId)
+            // verify required parameter 'updateInvoiceGroupAccounts' is not null or undefined
+            assertParamExists('addInvoiceGroupAccounts', 'updateInvoiceGroupAccounts', updateInvoiceGroupAccounts)
+            const localVarPath = `/invoice_groups/{invoice_group_id}/add_accounts`
+                .replace(`{${"invoice_group_id"}}`, encodeURIComponent(String(invoiceGroupId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateInvoiceGroupAccounts, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to create an invoice group
+         * @summary Create an invoice group
+         * @param {CreateInvoiceGroupRequest} createInvoiceGroupRequest Payload to approve or decline a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createInvoiceGroup: async (createInvoiceGroupRequest: CreateInvoiceGroupRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createInvoiceGroupRequest' is not null or undefined
+            assertParamExists('createInvoiceGroup', 'createInvoiceGroupRequest', createInvoiceGroupRequest)
+            const localVarPath = `/invoice_groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createInvoiceGroupRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to get information of an invoice group
+         * @summary Get information of an invoice group
+         * @param {string} invoiceGroupId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getInvoiceGroup: async (invoiceGroupId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invoiceGroupId' is not null or undefined
+            assertParamExists('getInvoiceGroup', 'invoiceGroupId', invoiceGroupId)
+            const localVarPath = `/invoice_groups/{invoice_group_id}`
+                .replace(`{${"invoice_group_id"}}`, encodeURIComponent(String(invoiceGroupId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to list invoice groups
+         * @summary List Invoice Groups
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listInvoiceGroups: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/invoice_groups`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * This API let’s you to remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+         * @summary Remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+         * @param {string} invoiceGroupId 
+         * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeInvoiceGroupAccounts: async (invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invoiceGroupId' is not null or undefined
+            assertParamExists('removeInvoiceGroupAccounts', 'invoiceGroupId', invoiceGroupId)
+            // verify required parameter 'updateInvoiceGroupAccounts' is not null or undefined
+            assertParamExists('removeInvoiceGroupAccounts', 'updateInvoiceGroupAccounts', updateInvoiceGroupAccounts)
+            const localVarPath = `/invoice_groups/{invoice_group_id}/remove_accounts`
+                .replace(`{${"invoice_group_id"}}`, encodeURIComponent(String(invoiceGroupId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateInvoiceGroupAccounts, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * InvoiceGroupsApi - functional programming interface
+ * @export
+ */
+export const InvoiceGroupsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = InvoiceGroupsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * This API let’s you to add accounts to an invoice group
+         * @summary Add accounts to an invoice group
+         * @param {string} invoiceGroupId 
+         * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async addInvoiceGroupAccounts(invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvoiceGroups>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.addInvoiceGroupAccounts(invoiceGroupId, updateInvoiceGroupAccounts, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to create an invoice group
+         * @summary Create an invoice group
+         * @param {CreateInvoiceGroupRequest} createInvoiceGroupRequest Payload to approve or decline a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createInvoiceGroup(createInvoiceGroupRequest: CreateInvoiceGroupRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvoiceGroups>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createInvoiceGroup(createInvoiceGroupRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to get information of an invoice group
+         * @summary Get information of an invoice group
+         * @param {string} invoiceGroupId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getInvoiceGroup(invoiceGroupId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvoiceGroupAccountsPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getInvoiceGroup(invoiceGroupId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to list invoice groups
+         * @summary List Invoice Groups
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listInvoiceGroups(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<InvoiceGroupPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listInvoiceGroups(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * This API let’s you to remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+         * @summary Remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+         * @param {string} invoiceGroupId 
+         * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async removeInvoiceGroupAccounts(invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.removeInvoiceGroupAccounts(invoiceGroupId, updateInvoiceGroupAccounts, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * InvoiceGroupsApi - factory interface
+ * @export
+ */
+export const InvoiceGroupsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = InvoiceGroupsApiFp(configuration)
+    return {
+        /**
+         * This API let’s you to add accounts to an invoice group
+         * @summary Add accounts to an invoice group
+         * @param {string} invoiceGroupId 
+         * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        addInvoiceGroupAccounts(invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options?: any): AxiosPromise<InvoiceGroups> {
+            return localVarFp.addInvoiceGroupAccounts(invoiceGroupId, updateInvoiceGroupAccounts, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to create an invoice group
+         * @summary Create an invoice group
+         * @param {CreateInvoiceGroupRequest} createInvoiceGroupRequest Payload to approve or decline a proposal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createInvoiceGroup(createInvoiceGroupRequest: CreateInvoiceGroupRequest, options?: any): AxiosPromise<InvoiceGroups> {
+            return localVarFp.createInvoiceGroup(createInvoiceGroupRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to get information of an invoice group
+         * @summary Get information of an invoice group
+         * @param {string} invoiceGroupId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getInvoiceGroup(invoiceGroupId: string, options?: any): AxiosPromise<InvoiceGroupAccountsPaginatedResponse> {
+            return localVarFp.getInvoiceGroup(invoiceGroupId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to list invoice groups
+         * @summary List Invoice Groups
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listInvoiceGroups(options?: any): AxiosPromise<InvoiceGroupPaginatedResponse> {
+            return localVarFp.listInvoiceGroups(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+         * @summary Remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+         * @param {string} invoiceGroupId 
+         * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        removeInvoiceGroupAccounts(invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.removeInvoiceGroupAccounts(invoiceGroupId, updateInvoiceGroupAccounts, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * InvoiceGroupsApi - object-oriented interface
+ * @export
+ * @class InvoiceGroupsApi
+ * @extends {BaseAPI}
+ */
+export class InvoiceGroupsApi extends BaseAPI {
+    /**
+     * This API let’s you to add accounts to an invoice group
+     * @summary Add accounts to an invoice group
+     * @param {string} invoiceGroupId 
+     * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceGroupsApi
+     */
+    public addInvoiceGroupAccounts(invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options?: AxiosRequestConfig) {
+        return InvoiceGroupsApiFp(this.configuration).addInvoiceGroupAccounts(invoiceGroupId, updateInvoiceGroupAccounts, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to create an invoice group
+     * @summary Create an invoice group
+     * @param {CreateInvoiceGroupRequest} createInvoiceGroupRequest Payload to approve or decline a proposal
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceGroupsApi
+     */
+    public createInvoiceGroup(createInvoiceGroupRequest: CreateInvoiceGroupRequest, options?: AxiosRequestConfig) {
+        return InvoiceGroupsApiFp(this.configuration).createInvoiceGroup(createInvoiceGroupRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to get information of an invoice group
+     * @summary Get information of an invoice group
+     * @param {string} invoiceGroupId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceGroupsApi
+     */
+    public getInvoiceGroup(invoiceGroupId: string, options?: AxiosRequestConfig) {
+        return InvoiceGroupsApiFp(this.configuration).getInvoiceGroup(invoiceGroupId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to list invoice groups
+     * @summary List Invoice Groups
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceGroupsApi
+     */
+    public listInvoiceGroups(options?: AxiosRequestConfig) {
+        return InvoiceGroupsApiFp(this.configuration).listInvoiceGroups(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+     * @summary Remove accounts from an invoice group. Removing all accounts will also delete the invoice group
+     * @param {string} invoiceGroupId 
+     * @param {UpdateInvoiceGroupAccounts} updateInvoiceGroupAccounts Payload to add or remove accounts to/from an invoice group
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoiceGroupsApi
+     */
+    public removeInvoiceGroupAccounts(invoiceGroupId: string, updateInvoiceGroupAccounts: UpdateInvoiceGroupAccounts, options?: AxiosRequestConfig) {
+        return InvoiceGroupsApiFp(this.configuration).removeInvoiceGroupAccounts(invoiceGroupId, updateInvoiceGroupAccounts, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
  * InvoicesApi - axios parameter creator
  * @export
  */
@@ -10166,6 +12177,50 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
             setSearchParams(localVarUrlObj, localVarQueryParameter);
             let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
             localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Update payment status in Invoice
+         * @summary Update payment status in Invoice
+         * @param {string} invoiceId 
+         * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invoicePayments: async (invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'invoiceId' is not null or undefined
+            assertParamExists('invoicePayments', 'invoiceId', invoiceId)
+            // verify required parameter 'invoicePaymentsRequest' is not null or undefined
+            assertParamExists('invoicePayments', 'invoicePaymentsRequest', invoicePaymentsRequest)
+            const localVarPath = `/invoices/{invoice_id}/payments`
+                .replace(`{${"invoice_id"}}`, encodeURIComponent(String(invoiceId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(invoicePaymentsRequest, localVarRequestOptions, configuration)
 
             return {
                 url: toPathString(localVarUrlObj),
@@ -10347,6 +12402,18 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Update payment status in Invoice
+         * @summary Update payment status in Invoice
+         * @param {string} invoiceId 
+         * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async invoicePayments(invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Invoice>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.invoicePayments(invoiceId, invoicePaymentsRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
@@ -10408,6 +12475,17 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.getInvoice(invoiceId, options).then((request) => request(axios, basePath));
         },
         /**
+         * Update payment status in Invoice
+         * @summary Update payment status in Invoice
+         * @param {string} invoiceId 
+         * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        invoicePayments(invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options?: any): AxiosPromise<Invoice> {
+            return localVarFp.invoicePayments(invoiceId, invoicePaymentsRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * List invoices
          * @summary List invoices
          * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
@@ -10465,6 +12543,19 @@ export class InvoicesApi extends BaseAPI {
      */
     public getInvoice(invoiceId: string, options?: AxiosRequestConfig) {
         return InvoicesApiFp(this.configuration).getInvoice(invoiceId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update payment status in Invoice
+     * @summary Update payment status in Invoice
+     * @param {string} invoiceId 
+     * @param {InvoicePaymentsRequest} invoicePaymentsRequest Payload to update payments of invoice
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoicesApi
+     */
+    public invoicePayments(invoiceId: string, invoicePaymentsRequest: InvoicePaymentsRequest, options?: AxiosRequestConfig) {
+        return InvoicesApiFp(this.configuration).invoicePayments(invoiceId, invoicePaymentsRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -10791,6 +12882,268 @@ export class MetricsApi extends BaseAPI {
      */
     public getMetrics(getMetricsRequest?: GetMetricsRequest, options?: AxiosRequestConfig) {
         return MetricsApiFp(this.configuration).getMetrics(getMetricsRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * MigrationsApi - axios parameter creator
+ * @export
+ */
+export const MigrationsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Get the status of a migration
+         * @summary Get the status of a migration
+         * @param {string} migrationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMigrationStatus: async (migrationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'migrationId' is not null or undefined
+            assertParamExists('getMigrationStatus', 'migrationId', migrationId)
+            const localVarPath = `/migrations/{migration_id}`
+                .replace(`{${"migration_id"}}`, encodeURIComponent(String(migrationId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns a list of migrations with pagination and sort.
+         * @summary List migrations
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMigrations: async (nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/migrations`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (nextToken !== undefined) {
+                localVarQueryParameter['nextToken'] = nextToken;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Migrates accounts which are associated to one price plan to another price plan
+         * @summary Migrates accounts which are associated to one price plan to another price plan
+         * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to update organization setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        migratePricePlan: async (createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createPricePlanMigrationRequest' is not null or undefined
+            assertParamExists('migratePricePlan', 'createPricePlanMigrationRequest', createPricePlanMigrationRequest)
+            const localVarPath = `/migrations/price_plan`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createPricePlanMigrationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * MigrationsApi - functional programming interface
+ * @export
+ */
+export const MigrationsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = MigrationsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Get the status of a migration
+         * @summary Get the status of a migration
+         * @param {string} migrationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMigrationStatus(migrationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMigrationResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMigrationStatus(migrationId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Returns a list of migrations with pagination and sort.
+         * @summary List migrations
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getMigrations(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MigrationsPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getMigrations(nextToken, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Migrates accounts which are associated to one price plan to another price plan
+         * @summary Migrates accounts which are associated to one price plan to another price plan
+         * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to update organization setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async migratePricePlan(createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.migratePricePlan(createPricePlanMigrationRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * MigrationsApi - factory interface
+ * @export
+ */
+export const MigrationsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = MigrationsApiFp(configuration)
+    return {
+        /**
+         * Get the status of a migration
+         * @summary Get the status of a migration
+         * @param {string} migrationId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMigrationStatus(migrationId: string, options?: any): AxiosPromise<GetMigrationResponse> {
+            return localVarFp.getMigrationStatus(migrationId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns a list of migrations with pagination and sort.
+         * @summary List migrations
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getMigrations(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<MigrationsPaginatedResponse> {
+            return localVarFp.getMigrations(nextToken, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Migrates accounts which are associated to one price plan to another price plan
+         * @summary Migrates accounts which are associated to one price plan to another price plan
+         * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to update organization setting
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        migratePricePlan(createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.migratePricePlan(createPricePlanMigrationRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * MigrationsApi - object-oriented interface
+ * @export
+ * @class MigrationsApi
+ * @extends {BaseAPI}
+ */
+export class MigrationsApi extends BaseAPI {
+    /**
+     * Get the status of a migration
+     * @summary Get the status of a migration
+     * @param {string} migrationId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MigrationsApi
+     */
+    public getMigrationStatus(migrationId: string, options?: AxiosRequestConfig) {
+        return MigrationsApiFp(this.configuration).getMigrationStatus(migrationId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns a list of migrations with pagination and sort.
+     * @summary List migrations
+     * @param {string} [nextToken] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MigrationsApi
+     */
+    public getMigrations(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
+        return MigrationsApiFp(this.configuration).getMigrations(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Migrates accounts which are associated to one price plan to another price plan
+     * @summary Migrates accounts which are associated to one price plan to another price plan
+     * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to update organization setting
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof MigrationsApi
+     */
+    public migratePricePlan(createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options?: AxiosRequestConfig) {
+        return MigrationsApiFp(this.configuration).migratePricePlan(createPricePlanMigrationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -11581,6 +13934,8 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * List settings
          * @summary Lists settings
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
          * @param {string} [entityType] 
          * @param {string} [entityId] 
          * @param {string} [settingId] 
@@ -11588,7 +13943,7 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listSetting: async (entityType?: string, entityId?: string, settingId?: string, namespace?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listSetting: async (nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/settings`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -11604,6 +13959,14 @@ export const SettingsApiAxiosParamCreator = function (configuration?: Configurat
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (nextToken !== undefined) {
+                localVarQueryParameter['nextToken'] = nextToken;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
 
             if (entityType !== undefined) {
                 localVarQueryParameter['entity_type'] = entityType;
@@ -11711,6 +14074,8 @@ export const SettingsApiFp = function(configuration?: Configuration) {
         /**
          * List settings
          * @summary Lists settings
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
          * @param {string} [entityType] 
          * @param {string} [entityId] 
          * @param {string} [settingId] 
@@ -11718,8 +14083,8 @@ export const SettingsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listSetting(entityType, entityId, settingId, namespace, options);
+        async listSetting(nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<SettingPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listSetting(nextToken, pageSize, entityType, entityId, settingId, namespace, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -11767,6 +14132,8 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
         /**
          * List settings
          * @summary Lists settings
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
          * @param {string} [entityType] 
          * @param {string} [entityId] 
          * @param {string} [settingId] 
@@ -11774,8 +14141,8 @@ export const SettingsApiFactory = function (configuration?: Configuration, baseP
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
-            return localVarFp.listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(axios, basePath));
+        listSetting(nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: any): AxiosPromise<SettingPaginatedResponse> {
+            return localVarFp.listSetting(nextToken, pageSize, entityType, entityId, settingId, namespace, options).then((request) => request(axios, basePath));
         },
         /**
          * Update a setting
@@ -11825,6 +14192,8 @@ export class SettingsApi extends BaseAPI {
     /**
      * List settings
      * @summary Lists settings
+     * @param {string} [nextToken] 
+     * @param {number} [pageSize] 
      * @param {string} [entityType] 
      * @param {string} [entityId] 
      * @param {string} [settingId] 
@@ -11833,8 +14202,8 @@ export class SettingsApi extends BaseAPI {
      * @throws {RequiredError}
      * @memberof SettingsApi
      */
-    public listSetting(entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig) {
-        return SettingsApiFp(this.configuration).listSetting(entityType, entityId, settingId, namespace, options).then((request) => request(this.axios, this.basePath));
+    public listSetting(nextToken?: string, pageSize?: number, entityType?: string, entityId?: string, settingId?: string, namespace?: string, options?: AxiosRequestConfig) {
+        return SettingsApiFp(this.configuration).listSetting(nextToken, pageSize, entityType, entityId, settingId, namespace, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
