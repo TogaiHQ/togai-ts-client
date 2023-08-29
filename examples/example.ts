@@ -163,7 +163,7 @@ async function sample() {
     const createCustomerRequest: CreateCustomerRequest = {
         name: "customer1" + "-" + randomSeed,
         id: "1" + "-" + randomSeed,
-        billingAddress: "address",
+        address: {line1: "house 221B", line2: "Baker Street", city: "London", state: "London", country: "GB"},
         primaryEmail: "email@togai.com"
     }
     const customersApi = new CustomersApi(configuration);
