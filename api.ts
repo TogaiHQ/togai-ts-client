@@ -1130,7 +1130,7 @@ export interface CreateCustomInvoiceRequest {
      */
     'lineItems': Array<CustomInvoiceLineItem>;
     /**
-     * This property defines the behaviour of status updates of invoices in scenarios like: * Invoice created for future or past  Enabling this property to true auto updates the status of custom invoice to DUE or PAID accordingly  But disabling the property of left null does not auto update the custom status 
+     * This property defines the behaviour of status transition of the invoice. If true, invoice auto transitions from `DRAFT` to `DUE` or `PAID` at the end of pricing cycle. If false, the invoice’s state doesn’t automatically advance without an explicit action. Default: false 
      * @type {boolean}
      * @memberof CreateCustomInvoiceRequest
      */
@@ -1516,75 +1516,50 @@ export interface CreateInvoiceGroupRequest {
     'address': Address;
 }
 /**
- * Request to migrate all account associations of a price plan to another price plan
+ * Request to create job request
  * @export
- * @interface CreateMigrationRequest
+ * @interface CreateJobRequest
  */
-export interface CreateMigrationRequest {
+export interface CreateJobRequest {
     /**
      * 
      * @type {string}
-     * @memberof CreateMigrationRequest
+     * @memberof CreateJobRequest
      */
-    'migrationType': CreateMigrationRequestMigrationTypeEnum;
+    'jobType': CreateJobRequestJobTypeEnum;
     /**
-     * Id of source price plan
-     * @type {string}
-     * @memberof CreateMigrationRequest
-     */
-    'sourceId'?: string;
-    /**
-     * Version of the source price plan
-     * @type {number}
-     * @memberof CreateMigrationRequest
-     */
-    'sourceVersion'?: number;
-    /**
-     * Id of target price plan
-     * @type {string}
-     * @memberof CreateMigrationRequest
-     */
-    'targetId'?: string;
-    /**
-     * Version of the target price plan
-     * @type {number}
-     * @memberof CreateMigrationRequest
-     */
-    'targetVersion'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateMigrationRequest
-     */
-    'migrationMode'?: CreateMigrationRequestMigrationModeEnum;
-    /**
-     * If this flag is true, current pricing cycle of the account on the date of association will continue rather  than the configurations of the newly associated price plan. Pricing cycle overrides specified  using  `pricePlanDetailsOverride` will take precedence over the pricing cycle configurations of  the new price plan that the account needs to migrate to. PricingCycleInterval of the existing plan and  the new plan must be same for this to work. We\'ll return a `400 BadRequest` otherwise. Examples:   - Ongoing plan (1st Oct to 30th Oct) - {dayOffset: 1, monthOffset: NIL}     New association (15th Oct to 15th Nov) of different price plan with retainStartOffsets option true      will use the same pricing cycle configuration {dayOffset: 1, monthOffset: NIL} rather than using the     pricing cycle configuration of the new price plan that the account needs to migrate to.   - Ongoing plan (1st Oct to 30th Oct) - {dayOffset: 1, monthOffset: NIL}     New association (1st Nov to 30th Nov) of different price plan with retainStartOffsets option true will     throw a `400 BadRequest` as no existing price plan configuration found on date of association 
+     * This field specifies whether to process job or to wait till the job is confirmed. Default value: false 
      * @type {boolean}
-     * @memberof CreateMigrationRequest
+     * @memberof CreateJobRequest
      */
-    'retainStartOffsets'?: boolean;
+    'requireConfirmation'?: boolean;
     /**
      * 
-     * @type {EventFilters}
-     * @memberof CreateMigrationRequest
+     * @type {PricePlanMigrationConfig}
+     * @memberof CreateJobRequest
      */
-    'eventFilters'?: EventFilters;
+    'pricePlanMigrationConfig'?: PricePlanMigrationConfig;
+    /**
+     * 
+     * @type {EventCorrectionConfig}
+     * @memberof CreateJobRequest
+     */
+    'eventCorrectionConfig'?: EventCorrectionConfig;
+    /**
+     * 
+     * @type {InvoicesBillRunConfig}
+     * @memberof CreateJobRequest
+     */
+    'invoicesBillRunConfig'?: InvoicesBillRunConfig;
 }
 
-export const CreateMigrationRequestMigrationTypeEnum = {
+export const CreateJobRequestJobTypeEnum = {
     PricePlan: 'PRICE_PLAN',
-    EventCorrections: 'EVENT_CORRECTIONS'
+    EventCorrections: 'EVENT_CORRECTIONS',
+    BillRun: 'BILL_RUN'
 } as const;
 
-export type CreateMigrationRequestMigrationTypeEnum = typeof CreateMigrationRequestMigrationTypeEnum[keyof typeof CreateMigrationRequestMigrationTypeEnum];
-export const CreateMigrationRequestMigrationModeEnum = {
-    Immediate: 'IMMEDIATE',
-    ImmediateIgnoreOverride: 'IMMEDIATE_IGNORE_OVERRIDE',
-    NextCycle: 'NEXT_CYCLE',
-    NextCycleIgnoreOverride: 'NEXT_CYCLE_IGNORE_OVERRIDE'
-} as const;
-
-export type CreateMigrationRequestMigrationModeEnum = typeof CreateMigrationRequestMigrationModeEnum[keyof typeof CreateMigrationRequestMigrationModeEnum];
+export type CreateJobRequestJobTypeEnum = typeof CreateJobRequestJobTypeEnum[keyof typeof CreateJobRequestJobTypeEnum];
 
 /**
  * payload to create payment
@@ -3301,6 +3276,46 @@ export interface EventAttributeSchema {
     'defaultUnit'?: string;
 }
 /**
+ * Event filters along with actions for correcting events
+ * @export
+ * @interface EventCorrectionConfig
+ */
+export interface EventCorrectionConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof EventCorrectionConfig
+     */
+    'action': EventCorrectionConfigActionEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof EventCorrectionConfig
+     */
+    'paginationContext'?: string;
+    /**
+     * 
+     * @type {Event}
+     * @memberof EventCorrectionConfig
+     */
+    'event'?: Event;
+    /**
+     * 
+     * @type {string}
+     * @memberof EventCorrectionConfig
+     */
+    'accountId': string;
+}
+
+export const EventCorrectionConfigActionEnum = {
+    Undo: 'UNDO',
+    Redo: 'REDO',
+    RedoEvent: 'REDO_EVENT'
+} as const;
+
+export type EventCorrectionConfigActionEnum = typeof EventCorrectionConfigActionEnum[keyof typeof EventCorrectionConfigActionEnum];
+
+/**
  * 
  * @export
  * @interface EventCorrectionInfo
@@ -3405,46 +3420,6 @@ export interface EventCorrectionRequest {
      */
     'event'?: Event;
 }
-/**
- * Event filters along with actions for correcting events
- * @export
- * @interface EventFilters
- */
-export interface EventFilters {
-    /**
-     * 
-     * @type {string}
-     * @memberof EventFilters
-     */
-    'action': EventFiltersActionEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof EventFilters
-     */
-    'paginationContext'?: string;
-    /**
-     * 
-     * @type {Event}
-     * @memberof EventFilters
-     */
-    'event'?: Event;
-    /**
-     * 
-     * @type {string}
-     * @memberof EventFilters
-     */
-    'accountId': string;
-}
-
-export const EventFiltersActionEnum = {
-    Undo: 'UNDO',
-    Redo: 'REDO',
-    RedoEvent: 'REDO_EVENT'
-} as const;
-
-export type EventFiltersActionEnum = typeof EventFiltersActionEnum[keyof typeof EventFiltersActionEnum];
-
 /**
  * Information related to ingestion of an event
  * @export
@@ -4726,6 +4701,73 @@ export interface GetFeatureCreditsResponse {
     'usedOverage': number;
 }
 /**
+ * 
+ * @export
+ * @interface GetJobResponse
+ */
+export interface GetJobResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof GetJobResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetJobResponse
+     */
+    'type': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetJobResponse
+     */
+    'confirmedAt'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetJobResponse
+     */
+    'updatedAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof GetJobResponse
+     */
+    'status': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetJobResponse
+     */
+    'totalJobEntries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetJobResponse
+     */
+    'pendingJobEntries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetJobResponse
+     */
+    'failedJobEntries': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof GetJobResponse
+     */
+    'completedJobEntries': number;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof GetJobResponse
+     */
+    'metadata'?: { [key: string]: string; };
+}
+/**
  * Get license updates response
  * @export
  * @interface GetLicenseUpdatesResponse
@@ -4781,85 +4823,6 @@ export interface GetMetricsResponse {
      * @memberof GetMetricsResponse
      */
     'results': Array<MetricQueryResponse>;
-}
-/**
- * 
- * @export
- * @interface GetMigrationResponse
- */
-export interface GetMigrationResponse {
-    /**
-     * 
-     * @type {string}
-     * @memberof GetMigrationResponse
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetMigrationResponse
-     */
-    'type': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetMigrationResponse
-     */
-    'updatedAt': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetMigrationResponse
-     */
-    'status': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetMigrationResponse
-     */
-    'sourceId'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetMigrationResponse
-     */
-    'sourceVersion'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetMigrationResponse
-     */
-    'targetId'?: string;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetMigrationResponse
-     */
-    'targetVersion'?: number;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetMigrationResponse
-     */
-    'totalMigrationEntries': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetMigrationResponse
-     */
-    'pendingMigrationEntries': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetMigrationResponse
-     */
-    'failedMigrationEntries': number;
-    /**
-     * 
-     * @type {number}
-     * @memberof GetMigrationResponse
-     */
-    'completedMigrationEntries': number;
 }
 /**
  * 
@@ -5983,7 +5946,7 @@ export interface InvoiceLineItem {
      */
     'description': string;
     /**
-     * Type of the line item - GRAND_TOTAL_AMOUNT: Sum of all total amount of individual invoices in a grouped(composite) invoice - TOTAL_AMOUNT: Total revenue of the invoice - NET_AMOUNT: Net revenue of the invoice ( Gross revenue - Discounts ) - GROSS_AMOUNT: Gross revenue of the invoice  - PRICE_PLAN_AMOUNT: SUB_TOTAL_AMOUNT + true up amount - SUB_TOTAL_AMOUNT: Sum of all rate card revenues - TRUE_UP_AMOUNT: Minimum commitment - SUB_TOTAL_AMOUNT (Always positive) - TOTAL_USAGE: List of all the usage meter usages - USAGE_METER_USAGE: Usage of an usage meter - USAGE_RATE_CARD_AMOUNT: Revenue generated from usage rate card - USAGE_RATE_CARD_SLAB_AMOUNT: Revenue generated from usage rate card slab - FIXED_FEE_RATE_CARD_AMOUNT: Revenue generated from fixed fee rate card - CREDIT_GRANT_RATE_CARD_AMOUNT: : Revenue generated from credit grant rate card - BILLING_ENTITLEMENT_RATE_CARD_AMOUNT: Revenue generated from billing entitlement rate card - ENTITLEMENT_OVERAGE_RATE_CARD_AMOUNT: : Revenue generated from entitlement overage rate card - ENTITLEMENT_OVERAGE_RATE_CARD_SLAB_AMOUNT: Revenue generated from entitlement overage rate card slab - LICENSE_RATE_CARD_AMOUNT: Revenue generated from license rate card - TOTAL_CREDITS: Sum of all credit amounts - SUB_CREDITS: Granted credit value - TOTAL_ADVANCED_FEES: Sum of all advanced fee revenue - ADVANCED_FIXED_FEE: Revenue generated from advanced fixed fee rate card - ADVANCED_LICENSE_RATE_CARD_AMOUNT: Revenue generated from advanced license rate card - ADVANCED_BILLING_ENTITLEMENT_RATE_CARD_AMOUNT: Revenue generated from advanced billing entitlement rate card - ADVANCED_CREDIT_GRANT_RATE_CARD_AMOUNT: Revenue generated from advanced credit grant rate card - TOTAL_MISCELLANEOUS_CHARGES: Net revenue of all MISCELLANEOUS_CHARGE - MISCELLANEOUS_CHARGE: Custom amount added to a DRAFT invoice - TOTAL_PURCHASE_AMOUNT: Net revenue all rate cards in a purchase plan - CUSTOM_AMOUNT: Custom amount added a DRAFT invoice - CUSTOM_TAG: User defined tags given to each rate card - TOTAL_PRICING_RULE_ADDITION_AMOUNT: Sum of all line items added by applying pricing rules - PRICING_RULE_ADDITION_AMOUNT: Amount added to invoice as a result of applying a pricing rule - PRICING_RULE_REVENUE_UPDATE_AMOUNT: Difference in revenue(value) obtained as a result of applying a pricing rule - PRICING_RULE_USAGE_UPDATE_AMOUNT: Difference in usage(quantity) obtained as a result of applying a pricing rule 
+     * Type of the line item - GRAND_TOTAL_AMOUNT: Sum of all total amount of individual invoices in a grouped(composite) invoice - TOTAL_AMOUNT: Total revenue of the invoice - NET_AMOUNT: Net revenue of the invoice ( Gross revenue - Discounts ) - GROSS_AMOUNT: Gross revenue of the invoice  - PRICE_PLAN_AMOUNT: SUB_TOTAL_AMOUNT + true up amount - SUB_TOTAL_AMOUNT: Sum of all rate card revenues - TRUE_UP_AMOUNT: Minimum commitment - SUB_TOTAL_AMOUNT (Always positive) - TOTAL_USAGE: List of all the usage meter usages - USAGE_METER_USAGE: Usage of an usage meter - USAGE_RATE_CARD_AMOUNT: Revenue generated from usage rate card - USAGE_RATE_CARD_SLAB_AMOUNT: Revenue generated from usage rate card slab - FIXED_FEE_RATE_CARD_AMOUNT: Revenue generated from fixed fee rate card - CREDIT_GRANT_RATE_CARD_AMOUNT: : Revenue generated from credit grant rate card - BILLING_ENTITLEMENT_RATE_CARD_AMOUNT: Revenue generated from billing entitlement rate card - ENTITLEMENT_OVERAGE_RATE_CARD_AMOUNT: : Revenue generated from entitlement overage rate card - ENTITLEMENT_OVERAGE_RATE_CARD_SLAB_AMOUNT: Revenue generated from entitlement overage rate card slab - LICENSE_RATE_CARD_AMOUNT: Revenue generated from license rate card - TOTAL_CREDITS: Sum of all credit amounts - SUB_CREDITS: Granted credit value - TOTAL_ADVANCED_FEES: Sum of all advanced fee revenue - ADVANCED_FIXED_FEE: Revenue generated from advanced fixed fee rate card - ADVANCED_LICENSE_RATE_CARD_AMOUNT: Revenue generated from advanced license rate card - ADVANCED_BILLING_ENTITLEMENT_RATE_CARD_AMOUNT: Revenue generated from advanced billing entitlement rate card - ADVANCED_CREDIT_GRANT_RATE_CARD_AMOUNT: Revenue generated from advanced credit grant rate card - TOTAL_MISCELLANEOUS_CHARGES: Net revenue of all MISCELLANEOUS_CHARGE - MISCELLANEOUS_CHARGE: Custom amount added to a DRAFT invoice - TOTAL_PURCHASE_AMOUNT: Net revenue all rate cards in a purchase plan - CUSTOM_AMOUNT: Custom amount added a DRAFT invoice - CUSTOM_TAG: User defined tags given to each rate card - TOTAL_PRICING_RULE_ADDITION_AMOUNT: Sum of all line items added by applying pricing rules - PRICING_RULE_ADDITION_AMOUNT: Amount added to invoice as a result of applying a pricing rule - PRICING_RULE_REVENUE_UPDATE_AMOUNT: Difference in revenue(value) obtained as a result of applying a pricing rule - PRICING_RULE_USAGE_UPDATE_AMOUNT: Difference in usage(quantity) obtained as a result of applying a pricing rule - RATE_CONFIG_ADJUSTMENT_AMOUNT: Difference in revenue obtained as a result of applying rate config[\'minimumRate\', \'maximumRate\'] at rate card level 
      * @type {string}
      * @memberof InvoiceLineItem
      */
@@ -6242,19 +6205,161 @@ export const InvoiceSummaryInvoiceTypeEnum = {
 export type InvoiceSummaryInvoiceTypeEnum = typeof InvoiceSummaryInvoiceTypeEnum[keyof typeof InvoiceSummaryInvoiceTypeEnum];
 
 /**
- * If IN_ADVANCE, the fixed fee will be invoiced in the previous billing cycle. If IN_ARREARS, the fixed fee will be invoiced in the current billing cycle. 
+ * If IN_ADVANCE, the rate card will be invoiced in the previous billing cycle. If IN_ARREARS, the rate card will be invoiced in the current billing cycle. If PREPAID, credits/entitlements will be granted only after invoice is paid 
  * @export
  * @enum {string}
  */
 
 export const InvoiceTiming = {
     IN_ADVANCE: 'IN_ADVANCE',
-    IN_ARREARS: 'IN_ARREARS'
+    IN_ARREARS: 'IN_ARREARS',
+    PREPAID: 'PREPAID'
 } as const;
 
 export type InvoiceTiming = typeof InvoiceTiming[keyof typeof InvoiceTiming];
 
 
+/**
+ * Filters for invoices bill run request
+ * @export
+ * @interface InvoicesBillRunConfig
+ */
+export interface InvoicesBillRunConfig {
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoicesBillRunConfig
+     */
+    'paginationContext'?: string;
+}
+/**
+ * 
+ * @export
+ * @interface JobEntriesPaginatedResponse
+ */
+export interface JobEntriesPaginatedResponse {
+    /**
+     * 
+     * @type {Array<JobEntriesResponse>}
+     * @memberof JobEntriesPaginatedResponse
+     */
+    'data'?: Array<JobEntriesResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobEntriesPaginatedResponse
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof JobEntriesPaginatedResponse
+     */
+    'context'?: PaginationOptions;
+}
+/**
+ * 
+ * @export
+ * @interface JobEntriesResponse
+ */
+export interface JobEntriesResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof JobEntriesResponse
+     */
+    'entityId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobEntriesResponse
+     */
+    'jobId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobEntriesResponse
+     */
+    'status': JobEntriesResponseStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobEntriesResponse
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof JobEntriesResponse
+     */
+    'metadata'?: { [key: string]: string; };
+}
+
+export const JobEntriesResponseStatusEnum = {
+    Pending: 'PENDING',
+    InProgress: 'IN_PROGRESS',
+    Completed: 'COMPLETED',
+    Failed: 'FAILED'
+} as const;
+
+export type JobEntriesResponseStatusEnum = typeof JobEntriesResponseStatusEnum[keyof typeof JobEntriesResponseStatusEnum];
+
+/**
+ * 
+ * @export
+ * @interface JobsPaginatedResponse
+ */
+export interface JobsPaginatedResponse {
+    /**
+     * 
+     * @type {Array<JobsWithoutStatusInfoResponse>}
+     * @memberof JobsPaginatedResponse
+     */
+    'data'?: Array<JobsWithoutStatusInfoResponse>;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobsPaginatedResponse
+     */
+    'nextToken'?: string;
+    /**
+     * 
+     * @type {PaginationOptions}
+     * @memberof JobsPaginatedResponse
+     */
+    'context'?: PaginationOptions;
+}
+/**
+ * 
+ * @export
+ * @interface JobsWithoutStatusInfoResponse
+ */
+export interface JobsWithoutStatusInfoResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof JobsWithoutStatusInfoResponse
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobsWithoutStatusInfoResponse
+     */
+    'type': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobsWithoutStatusInfoResponse
+     */
+    'status': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof JobsWithoutStatusInfoResponse
+     */
+    'updatedAt': string;
+}
 /**
  * Configuration for getting the license entries
  * @export
@@ -6891,62 +6996,6 @@ export interface MetricQueryResponse {
 }
 
 
-/**
- * 
- * @export
- * @interface MigrationsPaginatedResponse
- */
-export interface MigrationsPaginatedResponse {
-    /**
-     * 
-     * @type {Array<MigrationsWithoutStatusInfo>}
-     * @memberof MigrationsPaginatedResponse
-     */
-    'data'?: Array<MigrationsWithoutStatusInfo>;
-    /**
-     * 
-     * @type {string}
-     * @memberof MigrationsPaginatedResponse
-     */
-    'nextToken'?: string;
-    /**
-     * 
-     * @type {PaginationOptions}
-     * @memberof MigrationsPaginatedResponse
-     */
-    'context'?: PaginationOptions;
-}
-/**
- * 
- * @export
- * @interface MigrationsWithoutStatusInfo
- */
-export interface MigrationsWithoutStatusInfo {
-    /**
-     * 
-     * @type {string}
-     * @memberof MigrationsWithoutStatusInfo
-     */
-    'id': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MigrationsWithoutStatusInfo
-     */
-    'type': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MigrationsWithoutStatusInfo
-     */
-    'status': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof MigrationsWithoutStatusInfo
-     */
-    'updatedAt': string;
-}
 /**
  * 
  * @export
@@ -7590,6 +7639,59 @@ export const PricePlanListDataStatusEnum = {
 } as const;
 
 export type PricePlanListDataStatusEnum = typeof PricePlanListDataStatusEnum[keyof typeof PricePlanListDataStatusEnum];
+
+/**
+ * Migrate all account associations of a price plan to another price plan
+ * @export
+ * @interface PricePlanMigrationConfig
+ */
+export interface PricePlanMigrationConfig {
+    /**
+     * Id of source price plan
+     * @type {string}
+     * @memberof PricePlanMigrationConfig
+     */
+    'sourceId': string;
+    /**
+     * Version of the source price plan
+     * @type {number}
+     * @memberof PricePlanMigrationConfig
+     */
+    'sourceVersion': number;
+    /**
+     * Id of target price plan
+     * @type {string}
+     * @memberof PricePlanMigrationConfig
+     */
+    'targetId': string;
+    /**
+     * Version of the target price plan
+     * @type {number}
+     * @memberof PricePlanMigrationConfig
+     */
+    'targetVersion': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricePlanMigrationConfig
+     */
+    'migrationMode': PricePlanMigrationConfigMigrationModeEnum;
+    /**
+     * If this flag is true, current pricing cycle of the account on the date of association will continue rather  than the configurations of the newly associated price plan. Pricing cycle overrides specified  using  `pricePlanDetailsOverride` will take precedence over the pricing cycle configurations of  the new price plan that the account needs to migrate to. PricingCycleInterval of the existing plan and  the new plan must be same for this to work. We\'ll return a `400 BadRequest` otherwise. Examples:   - Ongoing plan (1st Oct to 30th Oct) - {dayOffset: 1, monthOffset: NIL}     New association (15th Oct to 15th Nov) of different price plan with retainStartOffsets option true      will use the same pricing cycle configuration {dayOffset: 1, monthOffset: NIL} rather than using the     pricing cycle configuration of the new price plan that the account needs to migrate to.   - Ongoing plan (1st Oct to 30th Oct) - {dayOffset: 1, monthOffset: NIL}     New association (1st Nov to 30th Nov) of different price plan with retainStartOffsets option true will     throw a `400 BadRequest` as no existing price plan configuration found on date of association 
+     * @type {boolean}
+     * @memberof PricePlanMigrationConfig
+     */
+    'retainStartOffsets'?: boolean;
+}
+
+export const PricePlanMigrationConfigMigrationModeEnum = {
+    Immediate: 'IMMEDIATE',
+    ImmediateIgnoreOverride: 'IMMEDIATE_IGNORE_OVERRIDE',
+    NextCycle: 'NEXT_CYCLE',
+    NextCycleIgnoreOverride: 'NEXT_CYCLE_IGNORE_OVERRIDE'
+} as const;
+
+export type PricePlanMigrationConfigMigrationModeEnum = typeof PricePlanMigrationConfigMigrationModeEnum[keyof typeof PricePlanMigrationConfigMigrationModeEnum];
 
 /**
  * 
@@ -8801,7 +8903,7 @@ export type PurchaseStatus = typeof PurchaseStatus[keyof typeof PurchaseStatus];
 
 
 /**
- * Specifies whether this purchase is for granting entitlements or for an association or for wallet topup. If left null, ENTITLEMENT_GRANT is taken as default
+ * Specifies whether this purchase is for granting entitlements or for an association or for wallet topup or prepaid purchase. If left null, ENTITLEMENT_GRANT is taken as default
  * @export
  * @enum {string}
  */
@@ -8809,7 +8911,8 @@ export type PurchaseStatus = typeof PurchaseStatus[keyof typeof PurchaseStatus];
 export const PurchaseType = {
     EntitlementGrant: 'ENTITLEMENT_GRANT',
     Association: 'ASSOCIATION',
-    WalletTopup: 'WALLET_TOPUP'
+    WalletTopup: 'WALLET_TOPUP',
+    Prepaid: 'PREPAID'
 } as const;
 
 export type PurchaseType = typeof PurchaseType[keyof typeof PurchaseType];
@@ -9499,6 +9602,12 @@ export interface UpdateInvoiceRequest {
      * @memberof UpdateInvoiceRequest
      */
     'lineItems'?: Array<CustomInvoiceLineItem>;
+    /**
+     * This property defines the behaviour of status updates of invoices like: Enabling this property to true auto updates the status of invoice to DUE or PAID accordingly But disabling this property of left null does not auto update the custom status 
+     * @type {boolean}
+     * @memberof UpdateInvoiceRequest
+     */
+    'autoAdvance'?: boolean;
 }
 
 export const UpdateInvoiceRequestStatusEnum = {
@@ -14440,14 +14549,15 @@ export class EventIngestionApi extends BaseAPI {
 export const EventManagementApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
         /**
-         * #### This API lets you to revert the changes caused by events.  - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account. 
+         * #### This API lets you to correct events. Available in both synchronous and asynchronous mode - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account.  ### Possible Actions: - UNDO: Undo all usages, revenue and entitlements associated with an event - REDO: Performs UNDO and re-ingests the same event - REDO_EVENT: Performs UNDO and re-ingests the correction payload of the event 
          * @summary Correct an ingested event
          * @param {'UNDO' | 'REDO' | 'REDO_EVENT'} action Action to perform in event correction
+         * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
          * @param {EventCorrectionRequest} [eventCorrectionRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        eventCorrection: async (action: 'UNDO' | 'REDO' | 'REDO_EVENT', eventCorrectionRequest?: EventCorrectionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        eventCorrection: async (action: 'UNDO' | 'REDO' | 'REDO_EVENT', requireConfirmation?: boolean, eventCorrectionRequest?: EventCorrectionRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'action' is not null or undefined
             assertParamExists('eventCorrection', 'action', action)
             const localVarPath = `/events/correction`;
@@ -14468,6 +14578,10 @@ export const EventManagementApiAxiosParamCreator = function (configuration?: Con
 
             if (action !== undefined) {
                 localVarQueryParameter['action'] = action;
+            }
+
+            if (requireConfirmation !== undefined) {
+                localVarQueryParameter['require_confirmation'] = requireConfirmation;
             }
 
 
@@ -14592,15 +14706,16 @@ export const EventManagementApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = EventManagementApiAxiosParamCreator(configuration)
     return {
         /**
-         * #### This API lets you to revert the changes caused by events.  - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account. 
+         * #### This API lets you to correct events. Available in both synchronous and asynchronous mode - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account.  ### Possible Actions: - UNDO: Undo all usages, revenue and entitlements associated with an event - REDO: Performs UNDO and re-ingests the same event - REDO_EVENT: Performs UNDO and re-ingests the correction payload of the event 
          * @summary Correct an ingested event
          * @param {'UNDO' | 'REDO' | 'REDO_EVENT'} action Action to perform in event correction
+         * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
          * @param {EventCorrectionRequest} [eventCorrectionRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async eventCorrection(action: 'UNDO' | 'REDO' | 'REDO_EVENT', eventCorrectionRequest?: EventCorrectionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EventsCorrectionResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.eventCorrection(action, eventCorrectionRequest, options);
+        async eventCorrection(action: 'UNDO' | 'REDO' | 'REDO_EVENT', requireConfirmation?: boolean, eventCorrectionRequest?: EventCorrectionRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<EventsCorrectionResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.eventCorrection(action, requireConfirmation, eventCorrectionRequest, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -14640,15 +14755,16 @@ export const EventManagementApiFactory = function (configuration?: Configuration
     const localVarFp = EventManagementApiFp(configuration)
     return {
         /**
-         * #### This API lets you to revert the changes caused by events.  - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account. 
+         * #### This API lets you to correct events. Available in both synchronous and asynchronous mode - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account.  ### Possible Actions: - UNDO: Undo all usages, revenue and entitlements associated with an event - REDO: Performs UNDO and re-ingests the same event - REDO_EVENT: Performs UNDO and re-ingests the correction payload of the event 
          * @summary Correct an ingested event
          * @param {'UNDO' | 'REDO' | 'REDO_EVENT'} action Action to perform in event correction
+         * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
          * @param {EventCorrectionRequest} [eventCorrectionRequest] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        eventCorrection(action: 'UNDO' | 'REDO' | 'REDO_EVENT', eventCorrectionRequest?: EventCorrectionRequest, options?: any): AxiosPromise<EventsCorrectionResponse> {
-            return localVarFp.eventCorrection(action, eventCorrectionRequest, options).then((request) => request(axios, basePath));
+        eventCorrection(action: 'UNDO' | 'REDO' | 'REDO_EVENT', requireConfirmation?: boolean, eventCorrectionRequest?: EventCorrectionRequest, options?: any): AxiosPromise<EventsCorrectionResponse> {
+            return localVarFp.eventCorrection(action, requireConfirmation, eventCorrectionRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * This API let’s you to fetch a list of events with multiple query parameters
@@ -14685,16 +14801,17 @@ export const EventManagementApiFactory = function (configuration?: Configuration
  */
 export class EventManagementApi extends BaseAPI {
     /**
-     * #### This API lets you to revert the changes caused by events.  - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account. 
+     * #### This API lets you to correct events. Available in both synchronous and asynchronous mode - **Usages**: Reduction of all usages associated with this event - **Revenue**: Reduction of all revenues associated with this event - **Entitlements**: Entitlements(Feature Credits) consumed by this event are granted back to the account.  ### Possible Actions: - UNDO: Undo all usages, revenue and entitlements associated with an event - REDO: Performs UNDO and re-ingests the same event - REDO_EVENT: Performs UNDO and re-ingests the correction payload of the event 
      * @summary Correct an ingested event
      * @param {'UNDO' | 'REDO' | 'REDO_EVENT'} action Action to perform in event correction
+     * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
      * @param {EventCorrectionRequest} [eventCorrectionRequest] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof EventManagementApi
      */
-    public eventCorrection(action: 'UNDO' | 'REDO' | 'REDO_EVENT', eventCorrectionRequest?: EventCorrectionRequest, options?: AxiosRequestConfig) {
-        return EventManagementApiFp(this.configuration).eventCorrection(action, eventCorrectionRequest, options).then((request) => request(this.axios, this.basePath));
+    public eventCorrection(action: 'UNDO' | 'REDO' | 'REDO_EVENT', requireConfirmation?: boolean, eventCorrectionRequest?: EventCorrectionRequest, options?: AxiosRequestConfig) {
+        return EventManagementApiFp(this.configuration).eventCorrection(action, requireConfirmation, eventCorrectionRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -16342,6 +16459,45 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * Create a bill run migration request
+         * @summary Create a bill run migration request
+         * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createInvoiceBillRun: async (requireConfirmation?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/invoices/bill_runs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (requireConfirmation !== undefined) {
+                localVarQueryParameter['require_confirmation'] = requireConfirmation;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Delete a custom invoice in DRAFT state.
          * @summary Delete a custom invoice in DRAFT state
          * @param {string} invoiceId 
@@ -16476,6 +16632,75 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
          */
         listInvoices: async (nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/invoices`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (nextToken !== undefined) {
+                localVarQueryParameter['nextToken'] = nextToken;
+            }
+
+            if (status !== undefined) {
+                localVarQueryParameter['status'] = status;
+            }
+
+            if (ownerId !== undefined) {
+                localVarQueryParameter['owner_id'] = ownerId;
+            }
+
+            if (customerId !== undefined) {
+                localVarQueryParameter['customer_id'] = customerId;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+            if (startTime !== undefined) {
+                localVarQueryParameter['start_time'] = startTime;
+            }
+
+            if (endTime !== undefined) {
+                localVarQueryParameter['end_time'] = endTime;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List invoices eligible for bill run
+         * @summary List invoices eligible for bill run
+         * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [ownerId] Filter option to filter based on owner id.
+         * @param {string} [customerId] Filter option to filter based on customer id.
+         * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
+         * @param {number} [startTime] Start time filter in epoch milli seconds
+         * @param {number} [endTime] End time filter in epoch milli seconds
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listInvoicesForBillRun: async (nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/invoices/bill_runs`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
             let baseOptions;
@@ -16716,6 +16941,17 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Create a bill run migration request
+         * @summary Create a bill run migration request
+         * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createInvoiceBillRun(requireConfirmation?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createInvoiceBillRun(requireConfirmation, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Delete a custom invoice in DRAFT state.
          * @summary Delete a custom invoice in DRAFT state
          * @param {string} invoiceId 
@@ -16764,6 +17000,23 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
          */
         async listInvoices(nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListInvoicesResponse>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listInvoices(nextToken, status, ownerId, customerId, pageSize, startTime, endTime, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * List invoices eligible for bill run
+         * @summary List invoices eligible for bill run
+         * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [ownerId] Filter option to filter based on owner id.
+         * @param {string} [customerId] Filter option to filter based on customer id.
+         * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
+         * @param {number} [startTime] Start time filter in epoch milli seconds
+         * @param {number} [endTime] End time filter in epoch milli seconds
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async listInvoicesForBillRun(nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ListInvoicesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listInvoicesForBillRun(nextToken, status, ownerId, customerId, pageSize, startTime, endTime, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -16834,6 +17087,16 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.createCustomInvoice(createCustomInvoiceRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Create a bill run migration request
+         * @summary Create a bill run migration request
+         * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createInvoiceBillRun(requireConfirmation?: boolean, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.createInvoiceBillRun(requireConfirmation, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Delete a custom invoice in DRAFT state.
          * @summary Delete a custom invoice in DRAFT state
          * @param {string} invoiceId 
@@ -16879,6 +17142,22 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
          */
         listInvoices(nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: any): AxiosPromise<ListInvoicesResponse> {
             return localVarFp.listInvoices(nextToken, status, ownerId, customerId, pageSize, startTime, endTime, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List invoices eligible for bill run
+         * @summary List invoices eligible for bill run
+         * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
+         * @param {string} [status] Filter option to filter by status.
+         * @param {string} [ownerId] Filter option to filter based on owner id.
+         * @param {string} [customerId] Filter option to filter based on customer id.
+         * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
+         * @param {number} [startTime] Start time filter in epoch milli seconds
+         * @param {number} [endTime] End time filter in epoch milli seconds
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        listInvoicesForBillRun(nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: any): AxiosPromise<ListInvoicesResponse> {
+            return localVarFp.listInvoicesForBillRun(nextToken, status, ownerId, customerId, pageSize, startTime, endTime, options).then((request) => request(axios, basePath));
         },
         /**
          * List pricing rule logs
@@ -16946,6 +17225,18 @@ export class InvoicesApi extends BaseAPI {
     }
 
     /**
+     * Create a bill run migration request
+     * @summary Create a bill run migration request
+     * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoicesApi
+     */
+    public createInvoiceBillRun(requireConfirmation?: boolean, options?: AxiosRequestConfig) {
+        return InvoicesApiFp(this.configuration).createInvoiceBillRun(requireConfirmation, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * Delete a custom invoice in DRAFT state.
      * @summary Delete a custom invoice in DRAFT state
      * @param {string} invoiceId 
@@ -17001,6 +17292,24 @@ export class InvoicesApi extends BaseAPI {
     }
 
     /**
+     * List invoices eligible for bill run
+     * @summary List invoices eligible for bill run
+     * @param {string} [nextToken] Pagination token used as a marker to get records from next page.
+     * @param {string} [status] Filter option to filter by status.
+     * @param {string} [ownerId] Filter option to filter based on owner id.
+     * @param {string} [customerId] Filter option to filter based on customer id.
+     * @param {number} [pageSize] Maximum page size expected by client to return the record list.    NOTE: Max page size cannot be more than 50. Also 50 is the default page size if no value is provided.
+     * @param {number} [startTime] Start time filter in epoch milli seconds
+     * @param {number} [endTime] End time filter in epoch milli seconds
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof InvoicesApi
+     */
+    public listInvoicesForBillRun(nextToken?: string, status?: string, ownerId?: string, customerId?: string, pageSize?: number, startTime?: number, endTime?: number, options?: AxiosRequestConfig) {
+        return InvoicesApiFp(this.configuration).listInvoicesForBillRun(nextToken, status, ownerId, customerId, pageSize, startTime, endTime, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * List pricing rule logs
      * @summary List pricing rule logs
      * @param {string} invoiceId 
@@ -17049,6 +17358,410 @@ export class InvoicesApi extends BaseAPI {
      */
     public updateInvoice(invoiceId: string, updateInvoiceRequest?: UpdateInvoiceRequest, options?: AxiosRequestConfig) {
         return InvoicesApiFp(this.configuration).updateInvoice(invoiceId, updateInvoiceRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * JobsApi - axios parameter creator
+ * @export
+ */
+export const JobsApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Confirm a job
+         * @summary Confirm a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmJob: async (jobId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'jobId' is not null or undefined
+            assertParamExists('confirmJob', 'jobId', jobId)
+            const localVarPath = `/jobs/{job_id}/confirm`
+                .replace(`{${"job_id"}}`, encodeURIComponent(String(jobId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Jobs in Togai are bulk requests that are carried out in an async flow
+         * @summary Create a job
+         * @param {CreateJobRequest} createJobRequest Payload to create job request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createJob: async (createJobRequest: CreateJobRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createJobRequest' is not null or undefined
+            assertParamExists('createJob', 'createJobRequest', createJobRequest)
+            const localVarPath = `/jobs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createJobRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * List individual job entries and current state of processing
+         * @summary List job entries
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJobEntries: async (jobId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'jobId' is not null or undefined
+            assertParamExists('getJobEntries', 'jobId', jobId)
+            const localVarPath = `/jobs/{job_id}/entries`
+                .replace(`{${"job_id"}}`, encodeURIComponent(String(jobId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Get the status of a job
+         * @summary Get the status of a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJobStatus: async (jobId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'jobId' is not null or undefined
+            assertParamExists('getJobStatus', 'jobId', jobId)
+            const localVarPath = `/jobs/{job_id}`
+                .replace(`{${"job_id"}}`, encodeURIComponent(String(jobId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * Returns a list of jobs with pagination and sort.
+         * @summary List jobs
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJobs: async (nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/jobs`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (nextToken !== undefined) {
+                localVarQueryParameter['nextToken'] = nextToken;
+            }
+
+            if (pageSize !== undefined) {
+                localVarQueryParameter['pageSize'] = pageSize;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * JobsApi - functional programming interface
+ * @export
+ */
+export const JobsApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = JobsApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Confirm a job
+         * @summary Confirm a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async confirmJob(jobId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetJobResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.confirmJob(jobId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Jobs in Togai are bulk requests that are carried out in an async flow
+         * @summary Create a job
+         * @param {CreateJobRequest} createJobRequest Payload to create job request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async createJob(createJobRequest: CreateJobRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.createJob(createJobRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * List individual job entries and current state of processing
+         * @summary List job entries
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getJobEntries(jobId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobEntriesPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getJobEntries(jobId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Get the status of a job
+         * @summary Get the status of a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getJobStatus(jobId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetJobResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getJobStatus(jobId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
+         * Returns a list of jobs with pagination and sort.
+         * @summary List jobs
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getJobs(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<JobsPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getJobs(nextToken, pageSize, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * JobsApi - factory interface
+ * @export
+ */
+export const JobsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = JobsApiFp(configuration)
+    return {
+        /**
+         * Confirm a job
+         * @summary Confirm a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        confirmJob(jobId: string, options?: any): AxiosPromise<GetJobResponse> {
+            return localVarFp.confirmJob(jobId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Jobs in Togai are bulk requests that are carried out in an async flow
+         * @summary Create a job
+         * @param {CreateJobRequest} createJobRequest Payload to create job request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        createJob(createJobRequest: CreateJobRequest, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.createJob(createJobRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * List individual job entries and current state of processing
+         * @summary List job entries
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJobEntries(jobId: string, options?: any): AxiosPromise<JobEntriesPaginatedResponse> {
+            return localVarFp.getJobEntries(jobId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Get the status of a job
+         * @summary Get the status of a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJobStatus(jobId: string, options?: any): AxiosPromise<GetJobResponse> {
+            return localVarFp.getJobStatus(jobId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Returns a list of jobs with pagination and sort.
+         * @summary List jobs
+         * @param {string} [nextToken] 
+         * @param {number} [pageSize] 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getJobs(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<JobsPaginatedResponse> {
+            return localVarFp.getJobs(nextToken, pageSize, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * JobsApi - object-oriented interface
+ * @export
+ * @class JobsApi
+ * @extends {BaseAPI}
+ */
+export class JobsApi extends BaseAPI {
+    /**
+     * Confirm a job
+     * @summary Confirm a job
+     * @param {string} jobId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public confirmJob(jobId: string, options?: AxiosRequestConfig) {
+        return JobsApiFp(this.configuration).confirmJob(jobId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Jobs in Togai are bulk requests that are carried out in an async flow
+     * @summary Create a job
+     * @param {CreateJobRequest} createJobRequest Payload to create job request
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public createJob(createJobRequest: CreateJobRequest, options?: AxiosRequestConfig) {
+        return JobsApiFp(this.configuration).createJob(createJobRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * List individual job entries and current state of processing
+     * @summary List job entries
+     * @param {string} jobId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getJobEntries(jobId: string, options?: AxiosRequestConfig) {
+        return JobsApiFp(this.configuration).getJobEntries(jobId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Get the status of a job
+     * @summary Get the status of a job
+     * @param {string} jobId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getJobStatus(jobId: string, options?: AxiosRequestConfig) {
+        return JobsApiFp(this.configuration).getJobStatus(jobId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Returns a list of jobs with pagination and sort.
+     * @summary List jobs
+     * @param {string} [nextToken] 
+     * @param {number} [pageSize] 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public getJobs(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
+        return JobsApiFp(this.configuration).getJobs(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
@@ -17452,268 +18165,6 @@ export class MetricsApi extends BaseAPI {
      */
     public getMetrics(getMetricsRequest?: GetMetricsRequest, options?: AxiosRequestConfig) {
         return MetricsApiFp(this.configuration).getMetrics(getMetricsRequest, options).then((request) => request(this.axios, this.basePath));
-    }
-}
-
-
-/**
- * MigrationsApi - axios parameter creator
- * @export
- */
-export const MigrationsApiAxiosParamCreator = function (configuration?: Configuration) {
-    return {
-        /**
-         * Get the status of a migration
-         * @summary Get the status of a migration
-         * @param {string} migrationId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getMigrationStatus: async (migrationId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'migrationId' is not null or undefined
-            assertParamExists('getMigrationStatus', 'migrationId', migrationId)
-            const localVarPath = `/migrations/{migration_id}`
-                .replace(`{${"migration_id"}}`, encodeURIComponent(String(migrationId)));
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Returns a list of migrations with pagination and sort.
-         * @summary List migrations
-         * @param {string} [nextToken] 
-         * @param {number} [pageSize] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getMigrations: async (nextToken?: string, pageSize?: number, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            const localVarPath = `/migrations`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-            if (nextToken !== undefined) {
-                localVarQueryParameter['nextToken'] = nextToken;
-            }
-
-            if (pageSize !== undefined) {
-                localVarQueryParameter['pageSize'] = pageSize;
-            }
-
-
-    
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
-         * Migrates accounts which are associated to one price plan to another price plan
-         * @summary Migrates accounts which are associated to one price plan to another price plan
-         * @param {CreateMigrationRequest} createMigrationRequest Payload to update organization setting
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        migratePricePlan: async (createMigrationRequest: CreateMigrationRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createMigrationRequest' is not null or undefined
-            assertParamExists('migratePricePlan', 'createMigrationRequest', createMigrationRequest)
-            const localVarPath = `/migrations/price_plan`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createMigrationRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-    }
-};
-
-/**
- * MigrationsApi - functional programming interface
- * @export
- */
-export const MigrationsApiFp = function(configuration?: Configuration) {
-    const localVarAxiosParamCreator = MigrationsApiAxiosParamCreator(configuration)
-    return {
-        /**
-         * Get the status of a migration
-         * @summary Get the status of a migration
-         * @param {string} migrationId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getMigrationStatus(migrationId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetMigrationResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMigrationStatus(migrationId, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Returns a list of migrations with pagination and sort.
-         * @summary List migrations
-         * @param {string} [nextToken] 
-         * @param {number} [pageSize] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async getMigrations(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<MigrationsPaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getMigrations(nextToken, pageSize, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
-         * Migrates accounts which are associated to one price plan to another price plan
-         * @summary Migrates accounts which are associated to one price plan to another price plan
-         * @param {CreateMigrationRequest} createMigrationRequest Payload to update organization setting
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async migratePricePlan(createMigrationRequest: CreateMigrationRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.migratePricePlan(createMigrationRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-    }
-};
-
-/**
- * MigrationsApi - factory interface
- * @export
- */
-export const MigrationsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
-    const localVarFp = MigrationsApiFp(configuration)
-    return {
-        /**
-         * Get the status of a migration
-         * @summary Get the status of a migration
-         * @param {string} migrationId 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getMigrationStatus(migrationId: string, options?: any): AxiosPromise<GetMigrationResponse> {
-            return localVarFp.getMigrationStatus(migrationId, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Returns a list of migrations with pagination and sort.
-         * @summary List migrations
-         * @param {string} [nextToken] 
-         * @param {number} [pageSize] 
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        getMigrations(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<MigrationsPaginatedResponse> {
-            return localVarFp.getMigrations(nextToken, pageSize, options).then((request) => request(axios, basePath));
-        },
-        /**
-         * Migrates accounts which are associated to one price plan to another price plan
-         * @summary Migrates accounts which are associated to one price plan to another price plan
-         * @param {CreateMigrationRequest} createMigrationRequest Payload to update organization setting
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        migratePricePlan(createMigrationRequest: CreateMigrationRequest, options?: any): AxiosPromise<BaseSuccessResponse> {
-            return localVarFp.migratePricePlan(createMigrationRequest, options).then((request) => request(axios, basePath));
-        },
-    };
-};
-
-/**
- * MigrationsApi - object-oriented interface
- * @export
- * @class MigrationsApi
- * @extends {BaseAPI}
- */
-export class MigrationsApi extends BaseAPI {
-    /**
-     * Get the status of a migration
-     * @summary Get the status of a migration
-     * @param {string} migrationId 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof MigrationsApi
-     */
-    public getMigrationStatus(migrationId: string, options?: AxiosRequestConfig) {
-        return MigrationsApiFp(this.configuration).getMigrationStatus(migrationId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Returns a list of migrations with pagination and sort.
-     * @summary List migrations
-     * @param {string} [nextToken] 
-     * @param {number} [pageSize] 
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof MigrationsApi
-     */
-    public getMigrations(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
-        return MigrationsApiFp(this.configuration).getMigrations(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Migrates accounts which are associated to one price plan to another price plan
-     * @summary Migrates accounts which are associated to one price plan to another price plan
-     * @param {CreateMigrationRequest} createMigrationRequest Payload to update organization setting
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof MigrationsApi
-     */
-    public migratePricePlan(createMigrationRequest: CreateMigrationRequest, options?: AxiosRequestConfig) {
-        return MigrationsApiFp(this.configuration).migratePricePlan(createMigrationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
