@@ -432,7 +432,7 @@ export interface AddOnPaginatedResponse {
     'context'?: PaginationOptions;
 }
 /**
- * LICENSE: Addon can be used in license rate cards FIXED_FEE: Addon can be used in fixed fee rate cards CREDIT_GRANT: Addon can be used in credit grant rate cards 
+ * LICENSE: Addon can be used in license rate cards FIXED_FEE: Addon can be used in fixed fee rate cards CREDIT_GRANT: Addon can be used in credit grant rate cards NAMED_LICENSE: Addon can be used in license rate cards 
  * @export
  * @enum {string}
  */
@@ -440,7 +440,8 @@ export interface AddOnPaginatedResponse {
 export const AddOnType = {
     License: 'LICENSE',
     FixedFee: 'FIXED_FEE',
-    CreditGrant: 'CREDIT_GRANT'
+    CreditGrant: 'CREDIT_GRANT',
+    NamedLicense: 'NAMED_LICENSE'
 } as const;
 
 export type AddOnType = typeof AddOnType[keyof typeof AddOnType];
@@ -715,6 +716,12 @@ export interface CalculateRevenueRequest {
      * @memberof CalculateRevenueRequest
      */
     'licenseEntriesConfig': LicenseEntriesConfig;
+    /**
+     * 
+     * @type {NamedLicenseEntriesConfig}
+     * @memberof CalculateRevenueRequest
+     */
+    'namedLicenseEntriesConfig'?: NamedLicenseEntriesConfig;
     /**
      * 
      * @type {ProrationConfig}
@@ -5290,6 +5297,7 @@ export const IngestionStatusStatusEnum = {
     IngestionFailedAccountNotFound: 'INGESTION_FAILED_ACCOUNT_NOT_FOUND',
     IngestionFailedDuplicateEvent: 'INGESTION_FAILED_DUPLICATE_EVENT',
     IngestionFailedNoEventId: 'INGESTION_FAILED_NO_EVENT_ID',
+    IngestionFailedInvalidNamedLicenseEvent: 'INGESTION_FAILED_INVALID_NAMED_LICENSE_EVENT',
     Reverted: 'REVERTED',
     Unknown: 'UNKNOWN'
 } as const;
@@ -7064,6 +7072,121 @@ export interface MiscellaneousChargesResponse {
      * @memberof MiscellaneousChargesResponse
      */
     'data': Array<MiscellaneousCharge>;
+}
+/**
+ * Configuration for getting the named license entries
+ * @export
+ * @interface NamedLicenseEntriesConfig
+ */
+export interface NamedLicenseEntriesConfig {
+    /**
+     * Mode to get the named license entries for the license rate cards - CUSTOM: Use the named license entries provided in the request - LOOKUP_RANGE: Use the named license entries of a given account for the specified range - LOOKUP_CYCLE: Use the named license entries of a given account for the specified cycle 
+     * @type {string}
+     * @memberof NamedLicenseEntriesConfig
+     */
+    'mode': NamedLicenseEntriesConfigModeEnum;
+    /**
+     * List of named license entries, this will be considered if mode is CUSTOM
+     * @type {Array<NamedLicenseEntry>}
+     * @memberof NamedLicenseEntriesConfig
+     */
+    'custom'?: Array<NamedLicenseEntry>;
+    /**
+     * 
+     * @type {NamedLicenseEntriesConfigLookupRange}
+     * @memberof NamedLicenseEntriesConfig
+     */
+    'lookupRange'?: NamedLicenseEntriesConfigLookupRange;
+    /**
+     * 
+     * @type {NamedLicenseEntriesConfigLookupCycle}
+     * @memberof NamedLicenseEntriesConfig
+     */
+    'lookupCycle'?: NamedLicenseEntriesConfigLookupCycle;
+}
+
+export const NamedLicenseEntriesConfigModeEnum = {
+    Custom: 'CUSTOM',
+    LookupRange: 'LOOKUP_RANGE',
+    LookupCycle: 'LOOKUP_CYCLE'
+} as const;
+
+export type NamedLicenseEntriesConfigModeEnum = typeof NamedLicenseEntriesConfigModeEnum[keyof typeof NamedLicenseEntriesConfigModeEnum];
+
+/**
+ * Cycle of named license entries to be looked up, this will be considered if mode is LOOKUP_CYCLE
+ * @export
+ * @interface NamedLicenseEntriesConfigLookupCycle
+ */
+export interface NamedLicenseEntriesConfigLookupCycle {
+    /**
+     * Effective date of the cycle, will be used to get the named license entries of the cycle
+     * @type {string}
+     * @memberof NamedLicenseEntriesConfigLookupCycle
+     */
+    'cycleEffectiveOn'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntriesConfigLookupCycle
+     */
+    'accountId': string;
+}
+/**
+ * Range of named license entries to be looked up, this will be considered if mode is LOOKUP_RANGE
+ * @export
+ * @interface NamedLicenseEntriesConfigLookupRange
+ */
+export interface NamedLicenseEntriesConfigLookupRange {
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntriesConfigLookupRange
+     */
+    'start': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntriesConfigLookupRange
+     */
+    'end': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntriesConfigLookupRange
+     */
+    'accountId': string;
+}
+/**
+ * 
+ * @export
+ * @interface NamedLicenseEntry
+ */
+export interface NamedLicenseEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntry
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof NamedLicenseEntry
+     */
+    'name': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntry
+     */
+    'effectiveFrom': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseEntry
+     */
+    'effectiveUntil'?: string;
 }
 /**
  * 
