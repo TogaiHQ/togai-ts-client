@@ -6540,6 +6540,12 @@ export interface LicenseRateCard {
      */
     'id': string;
     /**
+     * 
+     * @type {AddOnType}
+     * @memberof LicenseRateCard
+     */
+    'type': AddOnType;
+    /**
      * Name of the attached AddOn
      * @type {string}
      * @memberof LicenseRateCard
