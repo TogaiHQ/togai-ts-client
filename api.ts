@@ -73,6 +73,12 @@ export interface Account {
     'aliases'?: Array<AccountAliases>;
     /**
      * 
+     * @type {number}
+     * @memberof Account
+     */
+    'netTermDays'?: number;
+    /**
+     * 
      * @type {Address}
      * @memberof Account
      */
@@ -4724,13 +4730,13 @@ export interface GetJobResponse {
      * @type {string}
      * @memberof GetJobResponse
      */
-    'type': string;
+    'type': GetJobResponseTypeEnum;
     /**
      * 
      * @type {string}
      * @memberof GetJobResponse
      */
-    'confirmedAt'?: string;
+    'settledAt'?: string;
     /**
      * 
      * @type {string}
@@ -4742,7 +4748,7 @@ export interface GetJobResponse {
      * @type {string}
      * @memberof GetJobResponse
      */
-    'status': string;
+    'status': GetJobResponseStatusEnum;
     /**
      * 
      * @type {number}
@@ -4774,6 +4780,26 @@ export interface GetJobResponse {
      */
     'metadata'?: { [key: string]: string; };
 }
+
+export const GetJobResponseTypeEnum = {
+    PricePlan: 'PRICE_PLAN',
+    EventCorrections: 'EVENT_CORRECTIONS',
+    BillRun: 'BILL_RUN'
+} as const;
+
+export type GetJobResponseTypeEnum = typeof GetJobResponseTypeEnum[keyof typeof GetJobResponseTypeEnum];
+export const GetJobResponseStatusEnum = {
+    Scheduled: 'SCHEDULED',
+    Pending: 'PENDING',
+    Initialized: 'INITIALIZED',
+    WaitingForConfirmation: 'WAITING_FOR_CONFIRMATION',
+    InProgress: 'IN_PROGRESS',
+    Completed: 'COMPLETED',
+    Failed: 'FAILED'
+} as const;
+
+export type GetJobResponseStatusEnum = typeof GetJobResponseStatusEnum[keyof typeof GetJobResponseStatusEnum];
+
 /**
  * Get license updates response
  * @export
@@ -9530,6 +9556,12 @@ export interface UpdateAccountRequest {
      * @memberof UpdateAccountRequest
      */
     'invoiceCurrency'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateAccountRequest
+     */
+    'netTermDays'?: number;
     /**
      * Primary email of the account
      * @type {string}
@@ -16588,8 +16620,8 @@ export const InvoicesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
-         * Create a bill run migration request
-         * @summary Create a bill run migration request
+         * Create a bill run job request
+         * @summary Create a bill run job request
          * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -17070,8 +17102,8 @@ export const InvoicesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Create a bill run migration request
-         * @summary Create a bill run migration request
+         * Create a bill run job request
+         * @summary Create a bill run job request
          * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -17216,8 +17248,8 @@ export const InvoicesApiFactory = function (configuration?: Configuration, baseP
             return localVarFp.createCustomInvoice(createCustomInvoiceRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * Create a bill run migration request
-         * @summary Create a bill run migration request
+         * Create a bill run job request
+         * @summary Create a bill run job request
          * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
@@ -17354,8 +17386,8 @@ export class InvoicesApi extends BaseAPI {
     }
 
     /**
-     * Create a bill run migration request
-     * @summary Create a bill run migration request
+     * Create a bill run job request
+     * @summary Create a bill run job request
      * @param {boolean} [requireConfirmation] Specifies whether to start a migration only after a confirmation
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
@@ -17695,6 +17727,44 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * Reject a job
+         * @summary Reject a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rejectJob: async (jobId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'jobId' is not null or undefined
+            assertParamExists('rejectJob', 'jobId', jobId)
+            const localVarPath = `/jobs/{job_id}/reject`
+                .replace(`{${"job_id"}}`, encodeURIComponent(String(jobId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -17761,6 +17831,17 @@ export const JobsApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getJobs(nextToken, pageSize, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
+        /**
+         * Reject a job
+         * @summary Reject a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async rejectJob(jobId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<GetJobResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.rejectJob(jobId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
     }
 };
 
@@ -17821,6 +17902,16 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
          */
         getJobs(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<JobsPaginatedResponse> {
             return localVarFp.getJobs(nextToken, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Reject a job
+         * @summary Reject a job
+         * @param {string} jobId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        rejectJob(jobId: string, options?: any): AxiosPromise<GetJobResponse> {
+            return localVarFp.rejectJob(jobId, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -17891,6 +17982,18 @@ export class JobsApi extends BaseAPI {
      */
     public getJobs(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
         return JobsApiFp(this.configuration).getJobs(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Reject a job
+     * @summary Reject a job
+     * @param {string} jobId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof JobsApi
+     */
+    public rejectJob(jobId: string, options?: AxiosRequestConfig) {
+        return JobsApiFp(this.configuration).rejectJob(jobId, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
