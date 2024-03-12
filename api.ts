@@ -1529,52 +1529,6 @@ export interface CreateInvoiceGroupRequest {
     'address': Address;
 }
 /**
- * Request to create job request
- * @export
- * @interface CreateJobRequest
- */
-export interface CreateJobRequest {
-    /**
-     * 
-     * @type {string}
-     * @memberof CreateJobRequest
-     */
-    'jobType': CreateJobRequestJobTypeEnum;
-    /**
-     * This field specifies whether to process job or to wait till the job is confirmed. Default value: false 
-     * @type {boolean}
-     * @memberof CreateJobRequest
-     */
-    'requireConfirmation'?: boolean;
-    /**
-     * 
-     * @type {PricePlanMigrationConfig}
-     * @memberof CreateJobRequest
-     */
-    'pricePlanMigrationConfig'?: PricePlanMigrationConfig;
-    /**
-     * 
-     * @type {EventCorrectionConfig}
-     * @memberof CreateJobRequest
-     */
-    'eventCorrectionConfig'?: EventCorrectionConfig;
-    /**
-     * 
-     * @type {InvoicesBillRunConfig}
-     * @memberof CreateJobRequest
-     */
-    'invoicesBillRunConfig'?: InvoicesBillRunConfig;
-}
-
-export const CreateJobRequestJobTypeEnum = {
-    PricePlan: 'PRICE_PLAN',
-    EventCorrections: 'EVENT_CORRECTIONS',
-    BillRun: 'BILL_RUN'
-} as const;
-
-export type CreateJobRequestJobTypeEnum = typeof CreateJobRequestJobTypeEnum[keyof typeof CreateJobRequestJobTypeEnum];
-
-/**
  * payload to create payment
  * @export
  * @interface CreatePaymentRequest
@@ -1750,6 +1704,78 @@ export interface CreatePricePlanDetailsOverride {
      * @memberof CreatePricePlanDetailsOverride
      */
     'creditGrantRateCards'?: Array<CreditGrantRateCard>;
+}
+/**
+ * Request to create price plan migration request
+ * @export
+ * @interface CreatePricePlanMigrationRequest
+ */
+export interface CreatePricePlanMigrationRequest {
+    /**
+     * Id of source price plan
+     * @type {string}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'sourceId': string;
+    /**
+     * Version of the source price plan
+     * @type {number}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'sourceVersion': number;
+    /**
+     * Id of target price plan
+     * @type {string}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'targetId': string;
+    /**
+     * Version of the target price plan
+     * @type {number}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'targetVersion': number;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'migrationMode': CreatePricePlanMigrationRequestMigrationModeEnum;
+    /**
+     * If this flag is true, current pricing cycle of the account on the date of association will continue rather  than the configurations of the newly associated price plan. Pricing cycle overrides specified  using  `pricePlanDetailsOverride` will take precedence over the pricing cycle configurations of  the new price plan that the account needs to migrate to. PricingCycleInterval of the existing plan and  the new plan must be same for this to work. We\'ll return a `400 BadRequest` otherwise. Examples:   - Ongoing plan (1st Oct to 30th Oct) - {dayOffset: 1, monthOffset: NIL}     New association (15th Oct to 15th Nov) of different price plan with retainStartOffsets option true      will use the same pricing cycle configuration {dayOffset: 1, monthOffset: NIL} rather than using the     pricing cycle configuration of the new price plan that the account needs to migrate to.   - Ongoing plan (1st Oct to 30th Oct) - {dayOffset: 1, monthOffset: NIL}     New association (1st Nov to 30th Nov) of different price plan with retainStartOffsets option true will     throw a `400 BadRequest` as no existing price plan configuration found on date of association 
+     * @type {boolean}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'retainStartOffsets'?: boolean;
+    /**
+     * This field specifies whether to process job or to wait till the job is confirmed. Default value: false 
+     * @type {boolean}
+     * @memberof CreatePricePlanMigrationRequest
+     */
+    'requireConfirmation'?: boolean;
+}
+
+export const CreatePricePlanMigrationRequestMigrationModeEnum = {
+    Immediate: 'IMMEDIATE',
+    ImmediateIgnoreOverride: 'IMMEDIATE_IGNORE_OVERRIDE',
+    NextCycle: 'NEXT_CYCLE',
+    NextCycleIgnoreOverride: 'NEXT_CYCLE_IGNORE_OVERRIDE'
+} as const;
+
+export type CreatePricePlanMigrationRequestMigrationModeEnum = typeof CreatePricePlanMigrationRequestMigrationModeEnum[keyof typeof CreatePricePlanMigrationRequestMigrationModeEnum];
+
+/**
+ * 
+ * @export
+ * @interface CreatePricePlanMigrationRequestAllOf
+ */
+export interface CreatePricePlanMigrationRequestAllOf {
+    /**
+     * This field specifies whether to process job or to wait till the job is confirmed. Default value: false 
+     * @type {boolean}
+     * @memberof CreatePricePlanMigrationRequestAllOf
+     */
+    'requireConfirmation'?: boolean;
 }
 /**
  * Request to create a price plan
@@ -3289,46 +3315,6 @@ export interface EventAttributeSchema {
     'defaultUnit'?: string;
 }
 /**
- * Event filters along with actions for correcting events
- * @export
- * @interface EventCorrectionConfig
- */
-export interface EventCorrectionConfig {
-    /**
-     * 
-     * @type {string}
-     * @memberof EventCorrectionConfig
-     */
-    'action': EventCorrectionConfigActionEnum;
-    /**
-     * 
-     * @type {string}
-     * @memberof EventCorrectionConfig
-     */
-    'paginationContext'?: string;
-    /**
-     * 
-     * @type {Event}
-     * @memberof EventCorrectionConfig
-     */
-    'event'?: Event;
-    /**
-     * 
-     * @type {string}
-     * @memberof EventCorrectionConfig
-     */
-    'accountId': string;
-}
-
-export const EventCorrectionConfigActionEnum = {
-    Undo: 'UNDO',
-    Redo: 'REDO',
-    RedoEvent: 'REDO_EVENT'
-} as const;
-
-export type EventCorrectionConfigActionEnum = typeof EventCorrectionConfigActionEnum[keyof typeof EventCorrectionConfigActionEnum];
-
-/**
  * 
  * @export
  * @interface EventCorrectionInfo
@@ -4795,7 +4781,8 @@ export const GetJobResponseStatusEnum = {
     WaitingForConfirmation: 'WAITING_FOR_CONFIRMATION',
     InProgress: 'IN_PROGRESS',
     Completed: 'COMPLETED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
+    Cancelled: 'CANCELLED'
 } as const;
 
 export type GetJobResponseStatusEnum = typeof GetJobResponseStatusEnum[keyof typeof GetJobResponseStatusEnum];
@@ -6254,19 +6241,6 @@ export type InvoiceTiming = typeof InvoiceTiming[keyof typeof InvoiceTiming];
 
 
 /**
- * Filters for invoices bill run request
- * @export
- * @interface InvoicesBillRunConfig
- */
-export interface InvoicesBillRunConfig {
-    /**
-     * 
-     * @type {string}
-     * @memberof InvoicesBillRunConfig
-     */
-    'paginationContext'?: string;
-}
-/**
  * 
  * @export
  * @interface JobEntriesPaginatedResponse
@@ -6333,7 +6307,8 @@ export const JobEntriesResponseStatusEnum = {
     Pending: 'PENDING',
     InProgress: 'IN_PROGRESS',
     Completed: 'COMPLETED',
-    Failed: 'FAILED'
+    Failed: 'FAILED',
+    Cancelled: 'CANCELLED'
 } as const;
 
 export type JobEntriesResponseStatusEnum = typeof JobEntriesResponseStatusEnum[keyof typeof JobEntriesResponseStatusEnum];
@@ -7219,6 +7194,80 @@ export interface NamedLicenseEntry {
      * @memberof NamedLicenseEntry
      */
     'effectiveUntil'?: string;
+}
+/**
+ * Named License update response
+ * @export
+ * @interface NamedLicenseUpdate
+ */
+export interface NamedLicenseUpdate {
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'licenseId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'accountId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'name': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'effectiveUntil'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'createdAt': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdate
+     */
+    'updatedAt': string;
+}
+/**
+ * Named License updates paginated response
+ * @export
+ * @interface NamedLicenseUpdatesPaginatedResponse
+ */
+export interface NamedLicenseUpdatesPaginatedResponse {
+    /**
+     * 
+     * @type {Array<NamedLicenseUpdate>}
+     * @memberof NamedLicenseUpdatesPaginatedResponse
+     */
+    'data': Array<NamedLicenseUpdate>;
+    /**
+     * 
+     * @type {string}
+     * @memberof NamedLicenseUpdatesPaginatedResponse
+     */
+    'nextToken'?: string;
 }
 /**
  * 
@@ -17568,46 +17617,6 @@ export const JobsApiAxiosParamCreator = function (configuration?: Configuration)
             };
         },
         /**
-         * Jobs in Togai are bulk requests that are carried out in an async flow
-         * @summary Create a job
-         * @param {CreateJobRequest} createJobRequest Payload to create job request
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createJob: async (createJobRequest: CreateJobRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'createJobRequest' is not null or undefined
-            assertParamExists('createJob', 'createJobRequest', createJobRequest)
-            const localVarPath = `/jobs`;
-            // use dummy base URL string because the URL constructor only accepts absolute URLs.
-            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
-            let baseOptions;
-            if (configuration) {
-                baseOptions = configuration.baseOptions;
-            }
-
-            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
-            const localVarHeaderParameter = {} as any;
-            const localVarQueryParameter = {} as any;
-
-            // authentication bearerAuth required
-            // http bearer authentication required
-            await setBearerAuthToObject(localVarHeaderParameter, configuration)
-
-
-    
-            localVarHeaderParameter['Content-Type'] = 'application/json';
-
-            setSearchParams(localVarUrlObj, localVarQueryParameter);
-            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
-            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
-            localVarRequestOptions.data = serializeDataIfNeeded(createJobRequest, localVarRequestOptions, configuration)
-
-            return {
-                url: toPathString(localVarUrlObj),
-                options: localVarRequestOptions,
-            };
-        },
-        /**
          * List individual job entries and current state of processing
          * @summary List job entries
          * @param {string} jobId 
@@ -17787,17 +17796,6 @@ export const JobsApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * Jobs in Togai are bulk requests that are carried out in an async flow
-         * @summary Create a job
-         * @param {CreateJobRequest} createJobRequest Payload to create job request
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        async createJob(createJobRequest: CreateJobRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.createJob(createJobRequest, options);
-            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
-        },
-        /**
          * List individual job entries and current state of processing
          * @summary List job entries
          * @param {string} jobId 
@@ -17863,16 +17861,6 @@ export const JobsApiFactory = function (configuration?: Configuration, basePath?
             return localVarFp.confirmJob(jobId, options).then((request) => request(axios, basePath));
         },
         /**
-         * Jobs in Togai are bulk requests that are carried out in an async flow
-         * @summary Create a job
-         * @param {CreateJobRequest} createJobRequest Payload to create job request
-         * @param {*} [options] Override http request option.
-         * @throws {RequiredError}
-         */
-        createJob(createJobRequest: CreateJobRequest, options?: any): AxiosPromise<BaseSuccessResponse> {
-            return localVarFp.createJob(createJobRequest, options).then((request) => request(axios, basePath));
-        },
-        /**
          * List individual job entries and current state of processing
          * @summary List job entries
          * @param {string} jobId 
@@ -17933,18 +17921,6 @@ export class JobsApi extends BaseAPI {
      */
     public confirmJob(jobId: string, options?: AxiosRequestConfig) {
         return JobsApiFp(this.configuration).confirmJob(jobId, options).then((request) => request(this.axios, this.basePath));
-    }
-
-    /**
-     * Jobs in Togai are bulk requests that are carried out in an async flow
-     * @summary Create a job
-     * @param {CreateJobRequest} createJobRequest Payload to create job request
-     * @param {*} [options] Override http request option.
-     * @throws {RequiredError}
-     * @memberof JobsApi
-     */
-    public createJob(createJobRequest: CreateJobRequest, options?: AxiosRequestConfig) {
-        return JobsApiFp(this.configuration).createJob(createJobRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -18104,6 +18080,40 @@ export const LicensesApiAxiosParamCreator = function (configuration?: Configurat
             };
         },
         /**
+         * This API let’s you to fetch a list of named licenses updates with multiple query parameters
+         * @summary Get a list of named licenses updates
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNamedLicenseUpdates: async (options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/named_license_updates`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This API let’s you to update metadata of a license entry
          * @summary Update a license entry details
          * @param {string} [licenseId] License Id to filter
@@ -18183,6 +18193,16 @@ export const LicensesApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * This API let’s you to fetch a list of named licenses updates with multiple query parameters
+         * @summary Get a list of named licenses updates
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getNamedLicenseUpdates(options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<NamedLicenseUpdatesPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getNamedLicenseUpdates(options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * This API let’s you to update metadata of a license entry
          * @summary Update a license entry details
          * @param {string} [licenseId] License Id to filter
@@ -18227,6 +18247,15 @@ export const LicensesApiFactory = function (configuration?: Configuration, baseP
          */
         getLicenseUpdates(nextToken?: string, accountId?: string, pageSize?: number, licenseId?: string, effectiveFrom?: string, options?: any): AxiosPromise<GetLicenseUpdatesResponse> {
             return localVarFp.getLicenseUpdates(nextToken, accountId, pageSize, licenseId, effectiveFrom, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * This API let’s you to fetch a list of named licenses updates with multiple query parameters
+         * @summary Get a list of named licenses updates
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getNamedLicenseUpdates(options?: any): AxiosPromise<NamedLicenseUpdatesPaginatedResponse> {
+            return localVarFp.getNamedLicenseUpdates(options).then((request) => request(axios, basePath));
         },
         /**
          * This API let’s you to update metadata of a license entry
@@ -18275,6 +18304,17 @@ export class LicensesApi extends BaseAPI {
      */
     public getLicenseUpdates(nextToken?: string, accountId?: string, pageSize?: number, licenseId?: string, effectiveFrom?: string, options?: AxiosRequestConfig) {
         return LicensesApiFp(this.configuration).getLicenseUpdates(nextToken, accountId, pageSize, licenseId, effectiveFrom, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * This API let’s you to fetch a list of named licenses updates with multiple query parameters
+     * @summary Get a list of named licenses updates
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof LicensesApi
+     */
+    public getNamedLicenseUpdates(options?: AxiosRequestConfig) {
+        return LicensesApiFp(this.configuration).getNamedLicenseUpdates(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -19007,6 +19047,46 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
+         * Migrates accounts across price plans. This is an asynchronous process functioning on top of Togai\'s Jobs  framework. Status of the created migrations can be obtained using the [Jobs APIs](https://docs.togai.com/api-reference/jobs/get-the-status-of-a-job) 
+         * @summary Create a price plan migration
+         * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to create price plan migration request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pricePlanMigration: async (createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'createPricePlanMigrationRequest' is not null or undefined
+            assertParamExists('pricePlanMigration', 'createPricePlanMigrationRequest', createPricePlanMigrationRequest)
+            const localVarPath = `/price_plans/migration`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(createPricePlanMigrationRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Remove a draft currency from a price plan
          * @summary Remove a draft currency from a price plan
          * @param {string} pricePlanId 
@@ -19163,6 +19243,17 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Migrates accounts across price plans. This is an asynchronous process functioning on top of Togai\'s Jobs  framework. Status of the created migrations can be obtained using the [Jobs APIs](https://docs.togai.com/api-reference/jobs/get-the-status-of-a-job) 
+         * @summary Create a price plan migration
+         * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to create price plan migration request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async pricePlanMigration(createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.pricePlanMigration(createPricePlanMigrationRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Remove a draft currency from a price plan
          * @summary Remove a draft currency from a price plan
          * @param {string} pricePlanId 
@@ -19250,6 +19341,16 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
          */
         getPricePlans(nextToken?: string, pageSize?: number, options?: any): AxiosPromise<PricePlanPaginatedResponse> {
             return localVarFp.getPricePlans(nextToken, pageSize, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * Migrates accounts across price plans. This is an asynchronous process functioning on top of Togai\'s Jobs  framework. Status of the created migrations can be obtained using the [Jobs APIs](https://docs.togai.com/api-reference/jobs/get-the-status-of-a-job) 
+         * @summary Create a price plan migration
+         * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to create price plan migration request
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        pricePlanMigration(createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.pricePlanMigration(createPricePlanMigrationRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * Remove a draft currency from a price plan
@@ -19346,6 +19447,18 @@ export class PricePlansApi extends BaseAPI {
      */
     public getPricePlans(nextToken?: string, pageSize?: number, options?: AxiosRequestConfig) {
         return PricePlansApiFp(this.configuration).getPricePlans(nextToken, pageSize, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Migrates accounts across price plans. This is an asynchronous process functioning on top of Togai\'s Jobs  framework. Status of the created migrations can be obtained using the [Jobs APIs](https://docs.togai.com/api-reference/jobs/get-the-status-of-a-job) 
+     * @summary Create a price plan migration
+     * @param {CreatePricePlanMigrationRequest} createPricePlanMigrationRequest Payload to create price plan migration request
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PricePlansApi
+     */
+    public pricePlanMigration(createPricePlanMigrationRequest: CreatePricePlanMigrationRequest, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).pricePlanMigration(createPricePlanMigrationRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
