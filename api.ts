@@ -6545,7 +6545,7 @@ export interface LicenseRateCard {
      * @type {AddOnType}
      * @memberof LicenseRateCard
      */
-    'type': AddOnType;
+    'type'?: AddOnType;
     /**
      * Name of the attached AddOn
      * @type {string}
@@ -13239,7 +13239,7 @@ export const CreditsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async voidCredit(creditId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CreateCreditResponse>> {
+        async voidCredit(creditId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Credit>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.voidCredit(creditId, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
@@ -13304,7 +13304,7 @@ export const CreditsApiFactory = function (configuration?: Configuration, basePa
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        voidCredit(creditId: string, options?: any): AxiosPromise<CreateCreditResponse> {
+        voidCredit(creditId: string, options?: any): AxiosPromise<Credit> {
             return localVarFp.voidCredit(creditId, options).then((request) => request(axios, basePath));
         },
     };
