@@ -1117,6 +1117,12 @@ export interface CreateCustomInvoiceRequest {
      * @type {string}
      * @memberof CreateCustomInvoiceRequest
      */
+    'ownerType'?: CreateCustomInvoiceRequestOwnerTypeEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof CreateCustomInvoiceRequest
+     */
     'startDate': string;
     /**
      * 
@@ -1162,6 +1168,12 @@ export interface CreateCustomInvoiceRequest {
     'applyWalletBalance'?: boolean;
 }
 
+export const CreateCustomInvoiceRequestOwnerTypeEnum = {
+    Account: 'ACCOUNT',
+    InvoiceGroup: 'INVOICE_GROUP'
+} as const;
+
+export type CreateCustomInvoiceRequestOwnerTypeEnum = typeof CreateCustomInvoiceRequestOwnerTypeEnum[keyof typeof CreateCustomInvoiceRequestOwnerTypeEnum];
 export const CreateCustomInvoiceRequestStatusEnum = {
     Draft: 'DRAFT',
     Due: 'DUE',
@@ -5383,6 +5395,12 @@ export interface Invoice {
      * @memberof Invoice
      */
     'invoiceType': InvoiceInvoiceTypeEnum;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof Invoice
+     */
+    'autoAdvance'?: boolean;
     /**
      * Start date of the invoice
      * @type {string}
@@ -10479,7 +10497,7 @@ export interface WalletBalanceResponse {
      */
     'customerId': string;
     /**
-     * 
+     * This amount is the difference of total credited amount and sum of consumed, hold amount. ie. credit amount - (consumed amount + hold amount) 
      * @type {number}
      * @memberof WalletBalanceResponse
      */
