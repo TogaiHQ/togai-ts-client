@@ -5384,6 +5384,12 @@ export interface Invoice {
      */
     'status': InvoiceStatusEnum;
     /**
+     * 
+     * @type {string}
+     * @memberof Invoice
+     */
+    'finalizingStatus'?: InvoiceFinalizingStatusEnum;
+    /**
      * Represents the class of entity( INVOICE/ORDER/BILLABLE)
      * @type {string}
      * @memberof Invoice
@@ -5494,6 +5500,12 @@ export const InvoiceStatusEnum = {
 } as const;
 
 export type InvoiceStatusEnum = typeof InvoiceStatusEnum[keyof typeof InvoiceStatusEnum];
+export const InvoiceFinalizingStatusEnum = {
+    Finalizing: 'FINALIZING',
+    Finalized: 'FINALIZED'
+} as const;
+
+export type InvoiceFinalizingStatusEnum = typeof InvoiceFinalizingStatusEnum[keyof typeof InvoiceFinalizingStatusEnum];
 export const InvoiceInvoiceClassEnum = {
     Invoice: 'INVOICE',
     Order: 'ORDER',
@@ -6063,7 +6075,9 @@ export const InvoiceLineItemTypeEnum = {
     PricingRuleAdditionAmount: 'PRICING_RULE_ADDITION_AMOUNT',
     PricingRuleRevenueUpdateAmount: 'PRICING_RULE_REVENUE_UPDATE_AMOUNT',
     PricingRuleUsageUpdateAmount: 'PRICING_RULE_USAGE_UPDATE_AMOUNT',
-    RateConfigAdjustmentAmount: 'RATE_CONFIG_ADJUSTMENT_AMOUNT'
+    RateConfigAdjustmentAmount: 'RATE_CONFIG_ADJUSTMENT_AMOUNT',
+    TotalTaxAmount: 'TOTAL_TAX_AMOUNT',
+    TaxAmount: 'TAX_AMOUNT'
 } as const;
 
 export type InvoiceLineItemTypeEnum = typeof InvoiceLineItemTypeEnum[keyof typeof InvoiceLineItemTypeEnum];
@@ -6128,6 +6142,12 @@ export interface InvoiceSummary {
      * @memberof InvoiceSummary
      */
     'status': InvoiceSummaryStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof InvoiceSummary
+     */
+    'finalizingStatus'?: InvoiceSummaryFinalizingStatusEnum;
     /**
      * Represents the class of entity( INVOICE/ORDER/BILLABLE)
      * @type {string}
@@ -6227,6 +6247,12 @@ export const InvoiceSummaryStatusEnum = {
 } as const;
 
 export type InvoiceSummaryStatusEnum = typeof InvoiceSummaryStatusEnum[keyof typeof InvoiceSummaryStatusEnum];
+export const InvoiceSummaryFinalizingStatusEnum = {
+    Finalizing: 'FINALIZING',
+    Finalized: 'FINALIZED'
+} as const;
+
+export type InvoiceSummaryFinalizingStatusEnum = typeof InvoiceSummaryFinalizingStatusEnum[keyof typeof InvoiceSummaryFinalizingStatusEnum];
 export const InvoiceSummaryInvoiceClassEnum = {
     Invoice: 'INVOICE',
     Order: 'ORDER',
