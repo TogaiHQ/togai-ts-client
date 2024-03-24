@@ -4087,7 +4087,7 @@ export interface EventWithStatusAndEventPipelineInfo {
      * @type {EventPipelineInfo}
      * @memberof EventWithStatusAndEventPipelineInfo
      */
-    'EventPipelineInfo'?: EventPipelineInfo;
+    'eventPipelineInfo': EventPipelineInfo;
 }
 /**
  * 
@@ -4100,7 +4100,7 @@ export interface EventWithStatusAndEventPipelineInfoAllOf {
      * @type {EventPipelineInfo}
      * @memberof EventWithStatusAndEventPipelineInfoAllOf
      */
-    'EventPipelineInfo'?: EventPipelineInfo;
+    'eventPipelineInfo': EventPipelineInfo;
 }
 /**
  * Events Correction response
@@ -5162,18 +5162,6 @@ export interface GetPurchaseResponse {
  * @interface GetPurchaseResponseAllOf
  */
 export interface GetPurchaseResponseAllOf {
-    /**
-     * 
-     * @type {number}
-     * @memberof GetPurchaseResponseAllOf
-     */
-    'price'?: number;
-    /**
-     * 
-     * @type {string}
-     * @memberof GetPurchaseResponseAllOf
-     */
-    'invoiceCurrency'?: string;
     /**
      * 
      * @type {PricePlanDetails}
