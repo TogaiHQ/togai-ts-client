@@ -7363,7 +7363,7 @@ export interface Payment {
      * @type {ExternalPaymentReference}
      * @memberof Payment
      */
-    'externalPaymentReferences'?: ExternalPaymentReference;
+    'externalPaymentReferences': ExternalPaymentReference;
     /**
      * 
      * @type {Array<PaymentLineItemRecord>}
