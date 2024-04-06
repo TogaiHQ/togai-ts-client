@@ -5232,7 +5232,7 @@ export interface IngestEventRequest {
      * @type {Event}
      * @memberof IngestEventRequest
      */
-    'event'?: Event;
+    'event': Event;
 }
 /**
  * 
@@ -8339,6 +8339,12 @@ export interface PricingSchedule {
      * @memberof PricingSchedule
      */
     'pricingRules'?: Array<PricingRule>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PricingSchedule
+     */
+    'isOverriden': boolean;
 }
 /**
  * 
@@ -8407,6 +8413,12 @@ export interface PricingScheduleWithPricePlanId {
      * @memberof PricingScheduleWithPricePlanId
      */
     'pricingRules'?: Array<PricingRule>;
+    /**
+     * 
+     * @type {boolean}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'isOverriden': boolean;
     /**
      * 
      * @type {string}
@@ -10988,10 +11000,11 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
          * @param {string} [startDate] 
          * @param {string} [endDate] 
          * @param {boolean} [includePricePlanInfo] 
+         * @param {boolean} [compact] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPricingSchedules: async (accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getPricingSchedules: async (accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, compact?: boolean, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'accountId' is not null or undefined
             assertParamExists('getPricingSchedules', 'accountId', accountId)
             const localVarPath = `/accounts/{account_id}/pricing_schedules`
@@ -11029,6 +11042,10 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
 
             if (includePricePlanInfo !== undefined) {
                 localVarQueryParameter['include_price_plan_info'] = includePricePlanInfo;
+            }
+
+            if (compact !== undefined) {
+                localVarQueryParameter['compact'] = compact;
             }
 
 
@@ -11591,11 +11608,12 @@ export const AccountsApiFp = function(configuration?: Configuration) {
          * @param {string} [startDate] 
          * @param {string} [endDate] 
          * @param {boolean} [includePricePlanInfo] 
+         * @param {boolean} [compact] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricingSchedulePaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, includePricePlanInfo, options);
+        async getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, compact?: boolean, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricingSchedulePaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, includePricePlanInfo, compact, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
@@ -11810,11 +11828,12 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
          * @param {string} [startDate] 
          * @param {string} [endDate] 
          * @param {boolean} [includePricePlanInfo] 
+         * @param {boolean} [compact] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, options?: any): AxiosPromise<PricingSchedulePaginatedResponse> {
-            return localVarFp.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, includePricePlanInfo, options).then((request) => request(axios, basePath));
+        getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, compact?: boolean, options?: any): AxiosPromise<PricingSchedulePaginatedResponse> {
+            return localVarFp.getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, includePricePlanInfo, compact, options).then((request) => request(axios, basePath));
         },
         /**
          * Get proposal information
@@ -12029,12 +12048,13 @@ export class AccountsApi extends BaseAPI {
      * @param {string} [startDate] 
      * @param {string} [endDate] 
      * @param {boolean} [includePricePlanInfo] 
+     * @param {boolean} [compact] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
      */
-    public getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, options?: AxiosRequestConfig) {
-        return AccountsApiFp(this.configuration).getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, includePricePlanInfo, options).then((request) => request(this.axios, this.basePath));
+    public getPricingSchedules(accountId: string, nextToken?: string, pageSize?: number, startDate?: string, endDate?: string, includePricePlanInfo?: boolean, compact?: boolean, options?: AxiosRequestConfig) {
+        return AccountsApiFp(this.configuration).getPricingSchedules(accountId, nextToken, pageSize, startDate, endDate, includePricePlanInfo, compact, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
