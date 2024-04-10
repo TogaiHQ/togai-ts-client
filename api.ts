@@ -8427,6 +8427,12 @@ export interface PricingScheduleWithPricePlanId {
     'pricePlanId': string;
     /**
      * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'pricePlanName'?: string;
+    /**
+     * 
      * @type {PricePlanInfo}
      * @memberof PricingScheduleWithPricePlanId
      */
@@ -8444,6 +8450,12 @@ export interface PricingScheduleWithPricePlanIdAllOf {
      * @memberof PricingScheduleWithPricePlanIdAllOf
      */
     'pricePlanId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanIdAllOf
+     */
+    'pricePlanName'?: string;
     /**
      * 
      * @type {PricePlanInfo}
