@@ -5473,6 +5473,12 @@ export interface Invoice {
      * @memberof Invoice
      */
     'paidAmount': number;
+    /**
+     * Number of days from the invoice date after which an invoice is considered overdue.
+     * @type {number}
+     * @memberof Invoice
+     */
+    'netTermDays': number;
 }
 
 export const InvoiceStatusEnum = {
@@ -6220,6 +6226,12 @@ export interface InvoiceSummary {
      * @memberof InvoiceSummary
      */
     'invoiceDetails'?: InvoiceDetails;
+    /**
+     * Number of days from the invoice date after which an invoice is considered overdue.
+     * @type {number}
+     * @memberof InvoiceSummary
+     */
+    'netTermDays': number;
 }
 
 export const InvoiceSummaryStatusEnum = {
