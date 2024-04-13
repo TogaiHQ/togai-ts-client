@@ -10265,6 +10265,27 @@ export const UpdateUsageMeterRequestAggregationEnum = {
 export type UpdateUsageMeterRequestAggregationEnum = typeof UpdateUsageMeterRequestAggregationEnum[keyof typeof UpdateUsageMeterRequestAggregationEnum];
 
 /**
+ * Payload to update wallet of an account
+ * @export
+ * @interface UpdateWalletRequest
+ */
+export interface UpdateWalletRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateWalletRequest
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {WalletStatus}
+     * @memberof UpdateWalletRequest
+     */
+    'status'?: WalletStatus;
+}
+
+
+/**
  * Configuration for getting the usage
  * @export
  * @interface UsageConfig
@@ -10611,16 +10632,22 @@ export interface WalletBalanceResponse {
     'externalId'?: string;
     /**
      * 
-     * @type {string}
+     * @type {WalletStatus}
      * @memberof WalletBalanceResponse
      */
-    'status'?: WalletBalanceResponseStatusEnum;
+    'status': WalletStatus;
     /**
      * 
      * @type {number}
      * @memberof WalletBalanceResponse
      */
     'holdAmount'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof WalletBalanceResponse
+     */
+    'effectiveFrom': string;
     /**
      * 
      * @type {string}
@@ -10641,11 +10668,6 @@ export interface WalletBalanceResponse {
     'metadata'?: { [key: string]: any; };
 }
 
-export const WalletBalanceResponseStatusEnum = {
-    Active: 'ACTIVE'
-} as const;
-
-export type WalletBalanceResponseStatusEnum = typeof WalletBalanceResponseStatusEnum[keyof typeof WalletBalanceResponseStatusEnum];
 
 /**
  * List wallet entries response
@@ -10728,6 +10750,20 @@ export const WalletEntryTransactionTypeEnum = {
 } as const;
 
 export type WalletEntryTransactionTypeEnum = typeof WalletEntryTransactionTypeEnum[keyof typeof WalletEntryTransactionTypeEnum];
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const WalletStatus = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type WalletStatus = typeof WalletStatus[keyof typeof WalletStatus];
+
 
 /**
  * Information related to wallet topup purchase
@@ -20720,6 +20756,48 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Update wallet details for an account
+         * @summary Update wallet details for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateWalletForAccount: async (accountId: string, updateWalletRequest?: UpdateWalletRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('updateWalletForAccount', 'accountId', accountId)
+            const localVarPath = `/accounts/{account_id}/wallet`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateWalletRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Wallet balance for Account
          * @summary Wallet balance for Account
          * @param {string} accountId account_id corresponding to an account
@@ -20828,6 +20906,18 @@ export const WalletApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Update wallet details for an account
+         * @summary Update wallet details for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateWalletForAccount(accountId: string, updateWalletRequest?: UpdateWalletRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WalletBalanceResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateWalletForAccount(accountId, updateWalletRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Wallet balance for Account
          * @summary Wallet balance for Account
          * @param {string} accountId account_id corresponding to an account
@@ -20873,6 +20963,17 @@ export const WalletApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.topUpWalletForAccount(accountId, topupWalletRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Update wallet details for an account
+         * @summary Update wallet details for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateWalletForAccount(accountId: string, updateWalletRequest?: UpdateWalletRequest, options?: any): AxiosPromise<WalletBalanceResponse> {
+            return localVarFp.updateWalletForAccount(accountId, updateWalletRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Wallet balance for Account
          * @summary Wallet balance for Account
          * @param {string} accountId account_id corresponding to an account
@@ -20915,6 +21016,19 @@ export class WalletApi extends BaseAPI {
      */
     public topUpWalletForAccount(accountId: string, topupWalletRequest?: TopupWalletRequest, options?: AxiosRequestConfig) {
         return WalletApiFp(this.configuration).topUpWalletForAccount(accountId, topupWalletRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update wallet details for an account
+     * @summary Update wallet details for an account
+     * @param {string} accountId account_id corresponding to an account
+     * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WalletApi
+     */
+    public updateWalletForAccount(accountId: string, updateWalletRequest?: UpdateWalletRequest, options?: AxiosRequestConfig) {
+        return WalletApiFp(this.configuration).updateWalletForAccount(accountId, updateWalletRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
