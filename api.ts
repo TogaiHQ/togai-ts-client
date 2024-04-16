@@ -7790,51 +7790,6 @@ export interface PricePlanDetailsOverrideAllOf {
 /**
  * 
  * @export
- * @interface PricePlanDetailsWithoutRateCards
- */
-export interface PricePlanDetailsWithoutRateCards {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'supportedCurrencies': Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'activeCurrencies': Array<string>;
-    /**
-     * 
-     * @type {PricingCycleConfig}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'pricingCycleConfig'?: PricingCycleConfig;
-    /**
-     * 
-     * @type {MinimumCommitment}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'minimumCommitment'?: MinimumCommitment;
-    /**
-     * 
-     * @type {PricePlanType}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'type'?: PricePlanType;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'deferredRevenue'?: boolean;
-}
-
-
-/**
- * 
- * @export
  * @interface PricePlanInfo
  */
 export interface PricePlanInfo {
@@ -7895,10 +7850,10 @@ export interface PricePlanListData {
     'usageMeters': Array<string>;
     /**
      * 
-     * @type {PricePlanDetailsWithoutRateCards}
+     * @type {PricePlanDetails}
      * @memberof PricePlanListData
      */
-    'pricePlanDetails': PricePlanDetailsWithoutRateCards;
+    'pricePlanDetails': PricePlanDetails;
     /**
      * 
      * @type {Array<PricingRule>}
@@ -8270,6 +8225,12 @@ export interface PricingRulesLog {
      * @memberof PricingRulesLog
      */
     'ruleId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingRulesLog
+     */
+    'ruleName'?: string;
     /**
      * 
      * @type {number}
