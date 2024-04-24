@@ -1740,13 +1740,13 @@ export interface CreatePricePlanMigrationRequest {
      * @type {string}
      * @memberof CreatePricePlanMigrationRequest
      */
-    'targetId': string;
+    'targetId'?: string;
     /**
      * Version of the target price plan
      * @type {number}
      * @memberof CreatePricePlanMigrationRequest
      */
-    'targetVersion': number;
+    'targetVersion'?: number;
     /**
      * 
      * @type {string}
@@ -5311,6 +5311,7 @@ export const IngestionStatusStatusEnum = {
     IngestionFailedDuplicateEvent: 'INGESTION_FAILED_DUPLICATE_EVENT',
     IngestionFailedNoEventId: 'INGESTION_FAILED_NO_EVENT_ID',
     IngestionFailedInvalidNamedLicenseEvent: 'INGESTION_FAILED_INVALID_NAMED_LICENSE_EVENT',
+    IngestionFailedInsufficientCredits: 'INGESTION_FAILED_INSUFFICIENT_CREDITS',
     Reverted: 'REVERTED',
     Unknown: 'UNKNOWN'
 } as const;
@@ -7911,13 +7912,13 @@ export interface PricePlanMigrationConfig {
      * @type {string}
      * @memberof PricePlanMigrationConfig
      */
-    'targetId': string;
+    'targetId'?: string;
     /**
      * Version of the target price plan
      * @type {number}
      * @memberof PricePlanMigrationConfig
      */
-    'targetVersion': number;
+    'targetVersion'?: number;
     /**
      * 
      * @type {string}
@@ -19033,6 +19034,44 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
+         * Archive a price plan
+         * @summary Archive a price plan
+         * @param {string} pricePlanId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        archivePricePlan: async (pricePlanId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pricePlanId' is not null or undefined
+            assertParamExists('archivePricePlan', 'pricePlanId', pricePlanId)
+            const localVarPath = `/price_plans/{price_plan_id}`
+                .replace(`{${"price_plan_id"}}`, encodeURIComponent(String(pricePlanId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This API let\'s you create and price plan Learn more about [Price Plans](https://docs.togai.com/docs/priceplan) 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
@@ -19325,6 +19364,17 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Archive a price plan
+         * @summary Archive a price plan
+         * @param {string} pricePlanId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async archivePricePlan(pricePlanId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.archivePricePlan(pricePlanId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * This API let\'s you create and price plan Learn more about [Price Plans](https://docs.togai.com/docs/priceplan) 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
@@ -19428,6 +19478,16 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
             return localVarFp.addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Archive a price plan
+         * @summary Archive a price plan
+         * @param {string} pricePlanId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        archivePricePlan(pricePlanId: string, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.archivePricePlan(pricePlanId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This API let\'s you create and price plan Learn more about [Price Plans](https://docs.togai.com/docs/priceplan) 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
@@ -19526,6 +19586,18 @@ export class PricePlansApi extends BaseAPI {
      */
     public addCurrencyToPricePlan(pricePlanId: string, addCurrencyToPricePlanRequest: AddCurrencyToPricePlanRequest, options?: AxiosRequestConfig) {
         return PricePlansApiFp(this.configuration).addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Archive a price plan
+     * @summary Archive a price plan
+     * @param {string} pricePlanId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PricePlansApi
+     */
+    public archivePricePlan(pricePlanId: string, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).archivePricePlan(pricePlanId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
