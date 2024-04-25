@@ -14734,7 +14734,7 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+         * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -14795,7 +14795,7 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+         * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -14826,7 +14826,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
             return localVarFp.ingest(ingestEventRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+         * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -14858,7 +14858,7 @@ export class EventIngestionApi extends BaseAPI {
     }
 
     /**
-     * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+     * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
      * @summary Ingest events to Togai in batch
      * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
      * @param {*} [options] Override http request option.
