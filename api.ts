@@ -10685,6 +10685,12 @@ export interface WalletEntry {
      * @type {string}
      * @memberof WalletEntry
      */
+    'status': WalletEntryStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof WalletEntry
+     */
     'entityId'?: string;
     /**
      * 
@@ -10712,6 +10718,12 @@ export const WalletEntryTransactionTypeEnum = {
 } as const;
 
 export type WalletEntryTransactionTypeEnum = typeof WalletEntryTransactionTypeEnum[keyof typeof WalletEntryTransactionTypeEnum];
+export const WalletEntryStatusEnum = {
+    Completed: 'COMPLETED',
+    OnHold: 'ON_HOLD'
+} as const;
+
+export type WalletEntryStatusEnum = typeof WalletEntryStatusEnum[keyof typeof WalletEntryStatusEnum];
 
 /**
  * 
