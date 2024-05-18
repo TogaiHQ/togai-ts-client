@@ -9386,6 +9386,37 @@ export interface RevenueInfo {
     'slabRevenueSummaries'?: Array<SlabRevenueSummary>;
 }
 /**
+ * 
+ * @export
+ * @interface RevenueSummaryWithMetadata
+ */
+export interface RevenueSummaryWithMetadata {
+    /**
+     * 
+     * @type {number}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'revenue': number;
+    /**
+     * Field: revenue is computed for all rate cards Field: slabRevenues is supported for only usage/license Field: metadata is populated based on application of rateConfig(\'minimumRate\', \'maximumRate\') 
+     * @type {Array<RevenueSummaryWithMetadata>}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'revenueSummary'?: Array<RevenueSummaryWithMetadata>;
+    /**
+     * 
+     * @type {Array<SlabRevenueWithMetadata>}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'slabRevenues'?: Array<SlabRevenueWithMetadata>;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'metadata'?: { [key: string]: string; };
+}
+/**
  * Represents a setting
  * @export
  * @interface Setting
@@ -9577,6 +9608,31 @@ export interface SlabRate {
 /**
  * 
  * @export
+ * @interface SlabRevenue
+ */
+export interface SlabRevenue {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenue
+     */
+    'order': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenue
+     */
+    'usage': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenue
+     */
+    'revenue': number;
+}
+/**
+ * 
+ * @export
  * @interface SlabRevenueMetadata
  */
 export interface SlabRevenueMetadata {
@@ -9629,6 +9685,50 @@ export interface SlabRevenueSummary {
      * @memberof SlabRevenueSummary
      */
     'metadata'?: SlabRevenueMetadata;
+}
+/**
+ * 
+ * @export
+ * @interface SlabRevenueWithMetadata
+ */
+export interface SlabRevenueWithMetadata {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'order': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'usage': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'revenue': number;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'metadata'?: { [key: string]: string; };
+}
+/**
+ * 
+ * @export
+ * @interface SlabRevenueWithMetadataAllOf
+ */
+export interface SlabRevenueWithMetadataAllOf {
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRevenueWithMetadataAllOf
+     */
+    'metadata'?: { [key: string]: string; };
 }
 /**
  * 
