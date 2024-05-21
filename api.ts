@@ -6050,6 +6050,7 @@ export const InvoiceLineItemTypeEnum = {
     EntitlementOverageRateCardAmount: 'ENTITLEMENT_OVERAGE_RATE_CARD_AMOUNT',
     EntitlementOverageRateCardSlabAmount: 'ENTITLEMENT_OVERAGE_RATE_CARD_SLAB_AMOUNT',
     LicenseRateCardAmount: 'LICENSE_RATE_CARD_AMOUNT',
+    UsageCycleAmount: 'USAGE_CYCLE_AMOUNT',
     LicenseRateCardSlabAmount: 'LICENSE_RATE_CARD_SLAB_AMOUNT',
     UsageRateCardAmount: 'USAGE_RATE_CARD_AMOUNT',
     UsageRateCardSlabAmount: 'USAGE_RATE_CARD_SLAB_AMOUNT',
@@ -6609,6 +6610,12 @@ export interface LicenseRateCard {
      * @memberof LicenseRateCard
      */
     'invoiceTiming'?: InvoiceTiming;
+    /**
+     * 
+     * @type {UsageCycleInterval}
+     * @memberof LicenseRateCard
+     */
+    'usageCycle'?: UsageCycleInterval;
     /**
      * 
      * @type {boolean}
@@ -8003,11 +8010,11 @@ export type PriceType = typeof PriceType[keyof typeof PriceType];
  */
 export interface PricingCycleConfig {
     /**
-     * Interval field allow you to define the billing interval you would like to set
-     * @type {string}
+     * 
+     * @type {PricingCycleInterval}
      * @memberof PricingCycleConfig
      */
-    'interval': PricingCycleConfigIntervalEnum;
+    'interval': PricingCycleInterval;
     /**
      * 
      * @type {PricingCycleConfigStartOffset}
@@ -8028,15 +8035,6 @@ export interface PricingCycleConfig {
     'anniversaryCycle'?: boolean;
 }
 
-export const PricingCycleConfigIntervalEnum = {
-    Weekly: 'WEEKLY',
-    Monthly: 'MONTHLY',
-    Quarterly: 'QUARTERLY',
-    HalfYearly: 'HALF_YEARLY',
-    Annually: 'ANNUALLY'
-} as const;
-
-export type PricingCycleConfigIntervalEnum = typeof PricingCycleConfigIntervalEnum[keyof typeof PricingCycleConfigIntervalEnum];
 
 /**
  * Represents the start of pricing cycle in terms of  - dayOffset - number of days from beginning of week / month and  - monthOffset - number of months from beginning of interval (quarter, half-year or year) Note: If a day with offset doesn\'t exist for a month, closest previous day is considered Examples: WEEKLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every week (Monday)   - {dayOffset: 3, monthOffset: NIL} - 3rd day of every week (Wednesday)   - {dayOffset: LAST, monthOffset: NIL} - Last day of every week (Sunday) MONTHLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every month   - {dayOffset: 12, monthOffset: NIL} - 12th of every month   - {dayOffset: 28, monthOffset: NIL} - 28th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: 30, monthOffset: NIL} - 30th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: LAST, monthOffset: NIL} - Last day of every month. i.e, 31st of Jan, 28th of Feb, ... QUARTERLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan, 15th Apr, 15th Jul and 15th Oct   - {dayOffset: 15, monthOffset: 2} - 15th Feb, 15th May, 15th Aug and 15th Nov   - {dayOffset: 15, monthOffset: LAST} - 15th Mar, 15th Jun, 15th Sep and 15th Dec   - {dayOffset: LAST, monthOffset: FIRST} - 31st Jan, 30th Apr, 30th Jul and 31th Oct HALF_YEARLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan and 15th Jul   - {dayOffset: 15, monthOffset: 4} - 15th Apr and 15th Oct   - {dayOffset: 15, monthOffset: LAST} - 15th Jun and 15th Dec ANNUALLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan   - {dayOffset: 15, monthOffset: 1} - 15th Jan   - {dayOffset: LAST, monthOffset: 2} - 29th Feb on Leap year, 28th otherwise    - {dayOffset: 15, monthOffset: 8} - 15th Aug   - {dayOffset: 15, monthOffset: LAST} - 15th Dec 
@@ -8057,6 +8055,23 @@ export interface PricingCycleConfigStartOffset {
      */
     'monthOffset': string;
 }
+/**
+ * Interval field allow you to define the billing interval you would like to set
+ * @export
+ * @enum {string}
+ */
+
+export const PricingCycleInterval = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Quarterly: 'QUARTERLY',
+    HalfYearly: 'HALF_YEARLY',
+    Annually: 'ANNUALLY'
+} as const;
+
+export type PricingCycleInterval = typeof PricingCycleInterval[keyof typeof PricingCycleInterval];
+
+
 /**
  * Togai supports two type of pricing model Tiered and Volume. Tiered pricing model applies respective slab and its rate to the usage value while volume pricing model applies the latest matching slab of the usage value and applies respective rate.  For more understanding read [Rate Cards](https://docs.togai.com/docs/priceplan#setting-up-multiple-rate-cards) 
  * @export
@@ -10431,6 +10446,23 @@ export interface UsageConfigLookupRange {
      */
     'accountId': string;
 }
+/**
+ * Interval field allow you to define the billing interval you would like to set
+ * @export
+ * @enum {string}
+ */
+
+export const UsageCycleInterval = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Quarterly: 'QUARTERLY',
+    HalfYearly: 'HALF_YEARLY',
+    Annually: 'ANNUALLY'
+} as const;
+
+export type UsageCycleInterval = typeof UsageCycleInterval[keyof typeof UsageCycleInterval];
+
+
 /**
  * Start and end dates of usage lookup if usage mode is LOOKUP
  * @export
