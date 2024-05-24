@@ -1466,6 +1466,12 @@ export interface CreateEventSchemaRequest {
      */
     'enrichments'?: Enrichments;
     /**
+     * List of fields that can be used for filtering in usage meter
+     * @type {Array<string>}
+     * @memberof CreateEventSchemaRequest
+     */
+    'filterFields'?: Array<string>;
+    /**
      * Template used to generate event id based on event payload
      * @type {string}
      * @memberof CreateEventSchemaRequest
@@ -2073,17 +2079,23 @@ export interface CreateUsageMeterRequest {
      */
     'description'?: string;
     /**
+     * The usage meter\'s applicability will be determined by comparing the filter condition agianst the events.
+     * @type {Array<UsageMeterFilterEntry>}
+     * @memberof CreateUsageMeterRequest
+     */
+    'filters'?: Array<UsageMeterFilterEntry>;
+    /**
      * Type of usage meter
      * @type {string}
      * @memberof CreateUsageMeterRequest
      */
     'type': CreateUsageMeterRequestTypeEnum;
     /**
-     * Aggregation to be applied on usage meter result
-     * @type {string}
+     * 
+     * @type {UsageMeterAggregation}
      * @memberof CreateUsageMeterRequest
      */
-    'aggregation': CreateUsageMeterRequestAggregationEnum;
+    'aggregation': UsageMeterAggregation;
     /**
      * 
      * @type {Array<Computation>}
@@ -2103,12 +2115,6 @@ export const CreateUsageMeterRequestTypeEnum = {
 } as const;
 
 export type CreateUsageMeterRequestTypeEnum = typeof CreateUsageMeterRequestTypeEnum[keyof typeof CreateUsageMeterRequestTypeEnum];
-export const CreateUsageMeterRequestAggregationEnum = {
-    Count: 'COUNT',
-    Sum: 'SUM'
-} as const;
-
-export type CreateUsageMeterRequestAggregationEnum = typeof CreateUsageMeterRequestAggregationEnum[keyof typeof CreateUsageMeterRequestAggregationEnum];
 
 /**
  * 
@@ -3768,6 +3774,12 @@ export interface EventSchema {
     'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof EventSchema
+     */
+    'filterFields'?: Array<string>;
+    /**
+     * 
      * @type {FeatureDetails}
      * @memberof EventSchema
      */
@@ -3855,6 +3867,12 @@ export interface EventSchemaListData {
      * @memberof EventSchemaListData
      */
     'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof EventSchemaListData
+     */
+    'filterFields'?: Array<string>;
     /**
      * 
      * @type {FeatureDetails}
@@ -6073,7 +6091,8 @@ export const InvoiceLineItemTypeEnum = {
     PricingRuleUsageUpdateAmount: 'PRICING_RULE_USAGE_UPDATE_AMOUNT',
     RateConfigAdjustmentAmount: 'RATE_CONFIG_ADJUSTMENT_AMOUNT',
     TotalTaxAmount: 'TOTAL_TAX_AMOUNT',
-    TaxAmount: 'TAX_AMOUNT'
+    TaxAmount: 'TAX_AMOUNT',
+    ProxyAmount: 'PROXY_AMOUNT'
 } as const;
 
 export type InvoiceLineItemTypeEnum = typeof InvoiceLineItemTypeEnum[keyof typeof InvoiceLineItemTypeEnum];
@@ -9909,6 +9928,12 @@ export interface UpdateEventSchemaRequest {
      */
     'enrichments'?: Enrichments;
     /**
+     * List of fields that can be used for filtering in usage meter
+     * @type {Array<string>}
+     * @memberof UpdateEventSchemaRequest
+     */
+    'filterFields'?: Array<string>;
+    /**
      * Template used to generate event id based on event payload
      * @type {string}
      * @memberof UpdateEventSchemaRequest
@@ -10316,17 +10341,23 @@ export interface UpdateUsageMeterRequest {
      */
     'type'?: UpdateUsageMeterRequestTypeEnum;
     /**
-     * Aggregation to be applied on usage meter result * COUNT - Counts number of events matching the usage meter * SUM - Sums up results of computation of all events matching usage meter 
-     * @type {string}
+     * 
+     * @type {UsageMeterAggregation}
      * @memberof UpdateUsageMeterRequest
      */
-    'aggregation'?: UpdateUsageMeterRequestAggregationEnum;
+    'aggregation'?: UsageMeterAggregation;
     /**
      * 
      * @type {Array<Computation>}
      * @memberof UpdateUsageMeterRequest
      */
     'computations'?: Array<Computation>;
+    /**
+     * 
+     * @type {Array<UsageMeterFilterEntry>}
+     * @memberof UpdateUsageMeterRequest
+     */
+    'filters'?: Array<UsageMeterFilterEntry>;
 }
 
 export const UpdateUsageMeterRequestTypeEnum = {
@@ -10334,12 +10365,6 @@ export const UpdateUsageMeterRequestTypeEnum = {
 } as const;
 
 export type UpdateUsageMeterRequestTypeEnum = typeof UpdateUsageMeterRequestTypeEnum[keyof typeof UpdateUsageMeterRequestTypeEnum];
-export const UpdateUsageMeterRequestAggregationEnum = {
-    Count: 'COUNT',
-    Sum: 'SUM'
-} as const;
-
-export type UpdateUsageMeterRequestAggregationEnum = typeof UpdateUsageMeterRequestAggregationEnum[keyof typeof UpdateUsageMeterRequestAggregationEnum];
 
 /**
  * Payload to update wallet of an account
@@ -10519,6 +10544,12 @@ export interface UsageMeter {
      */
     'description'?: string;
     /**
+     * 
+     * @type {Array<UsageMeterFilterEntry>}
+     * @memberof UsageMeter
+     */
+    'filters'?: Array<UsageMeterFilterEntry>;
+    /**
      * Type of usage meter
      * @type {string}
      * @memberof UsageMeter
@@ -10531,11 +10562,11 @@ export interface UsageMeter {
      */
     'status'?: UsageMeterStatusEnum;
     /**
-     * Aggregation to be applied on usage meter result
-     * @type {string}
+     * 
+     * @type {UsageMeterAggregation}
      * @memberof UsageMeter
      */
-    'aggregation': UsageMeterAggregationEnum;
+    'aggregation': UsageMeterAggregation;
     /**
      * 
      * @type {Array<Computation>}
@@ -10575,13 +10606,40 @@ export const UsageMeterStatusEnum = {
 } as const;
 
 export type UsageMeterStatusEnum = typeof UsageMeterStatusEnum[keyof typeof UsageMeterStatusEnum];
-export const UsageMeterAggregationEnum = {
+
+/**
+ * Aggregation to be applied on usage meter result * COUNT - Counts number of events matching the usage meter * SUM - Sums up results of computation of all events matching usage meter 
+ * @export
+ * @enum {string}
+ */
+
+export const UsageMeterAggregation = {
     Count: 'COUNT',
     Sum: 'SUM'
 } as const;
 
-export type UsageMeterAggregationEnum = typeof UsageMeterAggregationEnum[keyof typeof UsageMeterAggregationEnum];
+export type UsageMeterAggregation = typeof UsageMeterAggregation[keyof typeof UsageMeterAggregation];
 
+
+/**
+ * Filter entry with field and value
+ * @export
+ * @interface UsageMeterFilterEntry
+ */
+export interface UsageMeterFilterEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof UsageMeterFilterEntry
+     */
+    'field': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsageMeterFilterEntry
+     */
+    'value': string;
+}
 /**
  * 
  * @export
