@@ -1466,6 +1466,12 @@ export interface CreateEventSchemaRequest {
      */
     'enrichments'?: Enrichments;
     /**
+     * List of fields that can be used for filtering in usage meter
+     * @type {Array<string>}
+     * @memberof CreateEventSchemaRequest
+     */
+    'filterFields'?: Array<string>;
+    /**
      * Template used to generate event id based on event payload
      * @type {string}
      * @memberof CreateEventSchemaRequest
@@ -1740,13 +1746,13 @@ export interface CreatePricePlanMigrationRequest {
      * @type {string}
      * @memberof CreatePricePlanMigrationRequest
      */
-    'targetId': string;
+    'targetId'?: string;
     /**
      * Version of the target price plan
      * @type {number}
      * @memberof CreatePricePlanMigrationRequest
      */
-    'targetVersion': number;
+    'targetVersion'?: number;
     /**
      * 
      * @type {string}
@@ -2073,17 +2079,23 @@ export interface CreateUsageMeterRequest {
      */
     'description'?: string;
     /**
+     * The usage meter\'s applicability will be determined by comparing the filter condition agianst the events.
+     * @type {Array<UsageMeterFilterEntry>}
+     * @memberof CreateUsageMeterRequest
+     */
+    'filters'?: Array<UsageMeterFilterEntry>;
+    /**
      * Type of usage meter
      * @type {string}
      * @memberof CreateUsageMeterRequest
      */
     'type': CreateUsageMeterRequestTypeEnum;
     /**
-     * Aggregation to be applied on usage meter result
-     * @type {string}
+     * 
+     * @type {UsageMeterAggregation}
      * @memberof CreateUsageMeterRequest
      */
-    'aggregation': CreateUsageMeterRequestAggregationEnum;
+    'aggregation': UsageMeterAggregation;
     /**
      * 
      * @type {Array<Computation>}
@@ -2103,12 +2115,6 @@ export const CreateUsageMeterRequestTypeEnum = {
 } as const;
 
 export type CreateUsageMeterRequestTypeEnum = typeof CreateUsageMeterRequestTypeEnum[keyof typeof CreateUsageMeterRequestTypeEnum];
-export const CreateUsageMeterRequestAggregationEnum = {
-    Count: 'COUNT',
-    Sum: 'SUM'
-} as const;
-
-export type CreateUsageMeterRequestAggregationEnum = typeof CreateUsageMeterRequestAggregationEnum[keyof typeof CreateUsageMeterRequestAggregationEnum];
 
 /**
  * 
@@ -3768,6 +3774,12 @@ export interface EventSchema {
     'dimensions'?: Array<DimensionsSchema>;
     /**
      * 
+     * @type {Array<string>}
+     * @memberof EventSchema
+     */
+    'filterFields'?: Array<string>;
+    /**
+     * 
      * @type {FeatureDetails}
      * @memberof EventSchema
      */
@@ -3855,6 +3867,12 @@ export interface EventSchemaListData {
      * @memberof EventSchemaListData
      */
     'dimensions'?: Array<DimensionsSchema>;
+    /**
+     * 
+     * @type {Array<string>}
+     * @memberof EventSchemaListData
+     */
+    'filterFields'?: Array<string>;
     /**
      * 
      * @type {FeatureDetails}
@@ -5311,6 +5329,7 @@ export const IngestionStatusStatusEnum = {
     IngestionFailedDuplicateEvent: 'INGESTION_FAILED_DUPLICATE_EVENT',
     IngestionFailedNoEventId: 'INGESTION_FAILED_NO_EVENT_ID',
     IngestionFailedInvalidNamedLicenseEvent: 'INGESTION_FAILED_INVALID_NAMED_LICENSE_EVENT',
+    IngestionFailedInsufficientCredits: 'INGESTION_FAILED_INSUFFICIENT_CREDITS',
     Reverted: 'REVERTED',
     Unknown: 'UNKNOWN'
 } as const;
@@ -5473,6 +5492,12 @@ export interface Invoice {
      * @memberof Invoice
      */
     'paidAmount': number;
+    /**
+     * Number of days from the invoice date after which an invoice is considered overdue.
+     * @type {number}
+     * @memberof Invoice
+     */
+    'netTermDays': number;
 }
 
 export const InvoiceStatusEnum = {
@@ -6043,6 +6068,7 @@ export const InvoiceLineItemTypeEnum = {
     EntitlementOverageRateCardAmount: 'ENTITLEMENT_OVERAGE_RATE_CARD_AMOUNT',
     EntitlementOverageRateCardSlabAmount: 'ENTITLEMENT_OVERAGE_RATE_CARD_SLAB_AMOUNT',
     LicenseRateCardAmount: 'LICENSE_RATE_CARD_AMOUNT',
+    UsageCycleAmount: 'USAGE_CYCLE_AMOUNT',
     LicenseRateCardSlabAmount: 'LICENSE_RATE_CARD_SLAB_AMOUNT',
     UsageRateCardAmount: 'USAGE_RATE_CARD_AMOUNT',
     UsageRateCardSlabAmount: 'USAGE_RATE_CARD_SLAB_AMOUNT',
@@ -6065,7 +6091,8 @@ export const InvoiceLineItemTypeEnum = {
     PricingRuleUsageUpdateAmount: 'PRICING_RULE_USAGE_UPDATE_AMOUNT',
     RateConfigAdjustmentAmount: 'RATE_CONFIG_ADJUSTMENT_AMOUNT',
     TotalTaxAmount: 'TOTAL_TAX_AMOUNT',
-    TaxAmount: 'TAX_AMOUNT'
+    TaxAmount: 'TAX_AMOUNT',
+    ProxyAmount: 'PROXY_AMOUNT'
 } as const;
 
 export type InvoiceLineItemTypeEnum = typeof InvoiceLineItemTypeEnum[keyof typeof InvoiceLineItemTypeEnum];
@@ -6220,6 +6247,12 @@ export interface InvoiceSummary {
      * @memberof InvoiceSummary
      */
     'invoiceDetails'?: InvoiceDetails;
+    /**
+     * Number of days from the invoice date after which an invoice is considered overdue.
+     * @type {number}
+     * @memberof InvoiceSummary
+     */
+    'netTermDays': number;
 }
 
 export const InvoiceSummaryStatusEnum = {
@@ -6598,6 +6631,12 @@ export interface LicenseRateCard {
     'invoiceTiming'?: InvoiceTiming;
     /**
      * 
+     * @type {UsageCycleInterval}
+     * @memberof LicenseRateCard
+     */
+    'usageCycle'?: UsageCycleInterval;
+    /**
+     * 
      * @type {boolean}
      * @memberof LicenseRateCard
      */
@@ -6928,7 +6967,7 @@ export interface MetricDataPointsGroupedBy {
     'fieldValue': string;
 }
 /**
- * Define the metric you would like to get - allowed options are EVENTS - Aggregation of raw events, USAGE - Aggregated usage value from Usage meters, REVENUE - Aggregated revenue value from Pricing Plans USAGE_FOR_CYCLE - Usage in pricing cycle REVENUE_FOR_CYCLE - Revenue in pricing cycle 
+ * Define the metric you would like to get - allowed options are EVENTS - Aggregation of raw events, USAGE - Default to METER_USAGE. To be deprecated soon, METER_USAGE - Aggregated usage value from Usage meters, NAMED_LICENSE_USAGE - Aggregated usage value from Named Licenses, REVENUE - Aggregated revenue value from Pricing Plans USAGE_FOR_CYCLE - Usage in pricing cycle REVENUE_FOR_CYCLE - Revenue in pricing cycle 
  * @export
  * @enum {string}
  */
@@ -6936,6 +6975,8 @@ export interface MetricDataPointsGroupedBy {
 export const MetricName = {
     Events: 'EVENTS',
     Usage: 'USAGE',
+    MeterUsage: 'METER_USAGE',
+    NamedLicenseUsage: 'NAMED_LICENSE_USAGE',
     Revenue: 'REVENUE',
     UsageForCycle: 'USAGE_FOR_CYCLE',
     RevenueForCycle: 'REVENUE_FOR_CYCLE'
@@ -6969,7 +7010,7 @@ export interface MetricQuery {
      */
     'aggregationPeriod': MetricQueryAggregationPeriodEnum;
     /**
-     * Group your metric with a groupBy field.  Allowed fields are  ACCOUNT_ID EVENT_STATUS  SCHEMA_NAME  USAGE_METER_ID  Please refer the table above for the list of combinations allowed in the groupBy 
+     * Group your metric with a groupBy field.  Allowed fields are  ACCOUNT_ID EVENT_STATUS  SCHEMA_NAME  USAGE_METER_ID [Use BILLABLE_ID as this will be deprecated soon...] BILLABLE_ID RAW_EVENT_STATUS Please refer the table above for the list of combinations allowed in the groupBy 
      * @type {string}
      * @memberof MetricQuery
      */
@@ -6998,7 +7039,7 @@ export const MetricQueryAggregationPeriodEnum = {
 export type MetricQueryAggregationPeriodEnum = typeof MetricQueryAggregationPeriodEnum[keyof typeof MetricQueryAggregationPeriodEnum];
 
 /**
- *  | Metric Name       | FilterEntry Name |    Allowed groupBy fields                 |      Default Values      |                 Allowed Values                  | |-------------------|------------------|-------------------------------------------|--------------------------|-------------------------------------------------| | EVENTS            | ACCOUNT_ID       | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME,    | None                     | *\\<one or more valid account IDs>               | | EVENTS            | CUSTOMER_ID      | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME,    | None                     | *\\<one or more valid customer IDs>              | | EVENTS            | SCHEMA_NAME      | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME,    | None                     | *\\<at most one valid schema names>              | | EVENTS            | EVENT_STATUS     | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME,    | [PROCESSED, UNPROCESSED] | oneOrMoreOf PROCESSED, UNPROCESSED, IN_PROGRESS | | USAGE             | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid account IDs>               | | USAGE             | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid customer IDs>              | | USAGE             | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid usage meter name>          | | REVENUE           | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid account IDs>               | | REVENUE           | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid customer IDs>              | | REVENUE           | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid usage meter name>          | | EVENTS            | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | <From auth token>        |                                                 | | USAGE             | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | <From auth token>        |                                                 | | REVENUE           | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | <From auth token>        |                                                 | | USAGE_FOR_CYCLE   | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid account IDs>               | | USAGE_FOR_CYCLE   | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid customer IDs>              | | USAGE_FOR_CYCLE   | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid usage meter name>          | | REVENUE_FOR_CYCLE | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid account IDs>               | | REVENUE_FOR_CYCLE | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid customer IDs>              | | REVENUE_FOR_CYCLE | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, CUSTOMER_ID   | None                     | *\\<one or more valid usage meter name>          | 
+ *  | Metric Name       | FilterEntry Name |    Allowed groupBy fields                                           |      Default Values      |                 Allowed Values                                  | |-------------------|------------------|---------------------------------------------------------------------|--------------------------|-----------------------------------------------------------------| | EVENTS            | ACCOUNT_ID       | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME, RAW_EVENT_STATUS             | None                     | *\\<one or more valid account IDs>                               | | EVENTS            | CUSTOMER_ID      | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME, RAW_EVENT_STATUS             | None                     | *\\<one or more valid customer IDs>                              | | EVENTS            | SCHEMA_NAME      | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME, RAW_EVENT_STATUS             | None                     | *\\<at most one valid schema names>                              | | EVENTS            | EVENT_STATUS     | ACCOUNT_ID, EVENT_STATUS, SCHEMA_NAME, RAW_EVENT_STATUS             | [PROCESSED, UNPROCESSED] | oneOrMoreOf PROCESSED, UNPROCESSED, IN_PROGRESS, IngestionStatus|       | USAGE             | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid account IDs>                               | | USAGE             | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid customer IDs>                              | | USAGE             | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | USAGE             | BILLABLE_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | REVENUE           | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid account IDs>                               | | REVENUE           | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid customer IDs>                              | | REVENUE           | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | REVENUE           | BILLABLE_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | EVENTS            | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | <From auth token>        |                                                                 | | USAGE             | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | <From auth token>        |                                                                 | | REVENUE           | ORGANIZATION_ID  | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | <From auth token>        |                                                                 | | USAGE_FOR_CYCLE   | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid account IDs>                               | | USAGE_FOR_CYCLE   | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid customer IDs>                              | | USAGE_FOR_CYCLE   | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | USAGE_FOR_CYCLE   | BILLABLE_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | REVENUE_FOR_CYCLE | ACCOUNT_ID       | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid account IDs>                               | | REVENUE_FOR_CYCLE | CUSTOMER_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid customer IDs>                              | | REVENUE_FOR_CYCLE | USAGE_METER_ID   | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | | REVENUE_FOR_CYCLE | BILLABLE_ID      | ACCOUNT_ID, USAGE_METER_ID, BILLABLE_ID CUSTOMER_ID                 | None                     | *\\<one or more valid usage meter name>                          | 
  * @export
  * @interface MetricQueryFilterEntry
  */
@@ -7778,51 +7819,6 @@ export interface PricePlanDetailsOverrideAllOf {
 /**
  * 
  * @export
- * @interface PricePlanDetailsWithoutRateCards
- */
-export interface PricePlanDetailsWithoutRateCards {
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'supportedCurrencies': Array<string>;
-    /**
-     * 
-     * @type {Array<string>}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'activeCurrencies': Array<string>;
-    /**
-     * 
-     * @type {PricingCycleConfig}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'pricingCycleConfig'?: PricingCycleConfig;
-    /**
-     * 
-     * @type {MinimumCommitment}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'minimumCommitment'?: MinimumCommitment;
-    /**
-     * 
-     * @type {PricePlanType}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'type'?: PricePlanType;
-    /**
-     * 
-     * @type {boolean}
-     * @memberof PricePlanDetailsWithoutRateCards
-     */
-    'deferredRevenue'?: boolean;
-}
-
-
-/**
- * 
- * @export
  * @interface PricePlanInfo
  */
 export interface PricePlanInfo {
@@ -7883,10 +7879,10 @@ export interface PricePlanListData {
     'usageMeters': Array<string>;
     /**
      * 
-     * @type {PricePlanDetailsWithoutRateCards}
+     * @type {PricePlanDetails}
      * @memberof PricePlanListData
      */
-    'pricePlanDetails': PricePlanDetailsWithoutRateCards;
+    'pricePlanDetails': PricePlanDetails;
     /**
      * 
      * @type {Array<PricingRule>}
@@ -7944,13 +7940,13 @@ export interface PricePlanMigrationConfig {
      * @type {string}
      * @memberof PricePlanMigrationConfig
      */
-    'targetId': string;
+    'targetId'?: string;
     /**
      * Version of the target price plan
      * @type {number}
      * @memberof PricePlanMigrationConfig
      */
-    'targetVersion': number;
+    'targetVersion'?: number;
     /**
      * 
      * @type {string}
@@ -8035,11 +8031,11 @@ export type PriceType = typeof PriceType[keyof typeof PriceType];
  */
 export interface PricingCycleConfig {
     /**
-     * Interval field allow you to define the billing interval you would like to set
-     * @type {string}
+     * 
+     * @type {PricingCycleInterval}
      * @memberof PricingCycleConfig
      */
-    'interval': PricingCycleConfigIntervalEnum;
+    'interval': PricingCycleInterval;
     /**
      * 
      * @type {PricingCycleConfigStartOffset}
@@ -8060,15 +8056,6 @@ export interface PricingCycleConfig {
     'anniversaryCycle'?: boolean;
 }
 
-export const PricingCycleConfigIntervalEnum = {
-    Weekly: 'WEEKLY',
-    Monthly: 'MONTHLY',
-    Quarterly: 'QUARTERLY',
-    HalfYearly: 'HALF_YEARLY',
-    Annually: 'ANNUALLY'
-} as const;
-
-export type PricingCycleConfigIntervalEnum = typeof PricingCycleConfigIntervalEnum[keyof typeof PricingCycleConfigIntervalEnum];
 
 /**
  * Represents the start of pricing cycle in terms of  - dayOffset - number of days from beginning of week / month and  - monthOffset - number of months from beginning of interval (quarter, half-year or year) Note: If a day with offset doesn\'t exist for a month, closest previous day is considered Examples: WEEKLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every week (Monday)   - {dayOffset: 3, monthOffset: NIL} - 3rd day of every week (Wednesday)   - {dayOffset: LAST, monthOffset: NIL} - Last day of every week (Sunday) MONTHLY -   - {dayOffset: 1, monthOffset: NIL} - First day of every month   - {dayOffset: 12, monthOffset: NIL} - 12th of every month   - {dayOffset: 28, monthOffset: NIL} - 28th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: 30, monthOffset: NIL} - 30th of every month. i.e, 28th of Jan, 28th of Feb, ...   - {dayOffset: LAST, monthOffset: NIL} - Last day of every month. i.e, 31st of Jan, 28th of Feb, ... QUARTERLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan, 15th Apr, 15th Jul and 15th Oct   - {dayOffset: 15, monthOffset: 2} - 15th Feb, 15th May, 15th Aug and 15th Nov   - {dayOffset: 15, monthOffset: LAST} - 15th Mar, 15th Jun, 15th Sep and 15th Dec   - {dayOffset: LAST, monthOffset: FIRST} - 31st Jan, 30th Apr, 30th Jul and 31th Oct HALF_YEARLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan and 15th Jul   - {dayOffset: 15, monthOffset: 4} - 15th Apr and 15th Oct   - {dayOffset: 15, monthOffset: LAST} - 15th Jun and 15th Dec ANNUALLY   - {dayOffset: 15, monthOffset: FIRST} - 15th Jan   - {dayOffset: 15, monthOffset: 1} - 15th Jan   - {dayOffset: LAST, monthOffset: 2} - 29th Feb on Leap year, 28th otherwise    - {dayOffset: 15, monthOffset: 8} - 15th Aug   - {dayOffset: 15, monthOffset: LAST} - 15th Dec 
@@ -8089,6 +8076,23 @@ export interface PricingCycleConfigStartOffset {
      */
     'monthOffset': string;
 }
+/**
+ * Interval field allow you to define the billing interval you would like to set
+ * @export
+ * @enum {string}
+ */
+
+export const PricingCycleInterval = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Quarterly: 'QUARTERLY',
+    HalfYearly: 'HALF_YEARLY',
+    Annually: 'ANNUALLY'
+} as const;
+
+export type PricingCycleInterval = typeof PricingCycleInterval[keyof typeof PricingCycleInterval];
+
+
 /**
  * Togai supports two type of pricing model Tiered and Volume. Tiered pricing model applies respective slab and its rate to the usage value while volume pricing model applies the latest matching slab of the usage value and applies respective rate.  For more understanding read [Rate Cards](https://docs.togai.com/docs/priceplan#setting-up-multiple-rate-cards) 
  * @export
@@ -8260,6 +8264,12 @@ export interface PricingRulesLog {
     'ruleId': string;
     /**
      * 
+     * @type {string}
+     * @memberof PricingRulesLog
+     */
+    'ruleName'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof PricingRulesLog
      */
@@ -8427,6 +8437,12 @@ export interface PricingScheduleWithPricePlanId {
     'pricePlanId': string;
     /**
      * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanId
+     */
+    'pricePlanName'?: string;
+    /**
+     * 
      * @type {PricePlanInfo}
      * @memberof PricingScheduleWithPricePlanId
      */
@@ -8444,6 +8460,12 @@ export interface PricingScheduleWithPricePlanIdAllOf {
      * @memberof PricingScheduleWithPricePlanIdAllOf
      */
     'pricePlanId': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingScheduleWithPricePlanIdAllOf
+     */
+    'pricePlanName'?: string;
     /**
      * 
      * @type {PricePlanInfo}
@@ -9400,6 +9422,37 @@ export interface RevenueInfo {
     'slabRevenueSummaries'?: Array<SlabRevenueSummary>;
 }
 /**
+ * 
+ * @export
+ * @interface RevenueSummaryWithMetadata
+ */
+export interface RevenueSummaryWithMetadata {
+    /**
+     * 
+     * @type {number}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'revenue': number;
+    /**
+     * Field: revenue is computed for all rate cards Field: slabRevenues is supported for only usage/license Field: metadata is populated based on application of rateConfig(\'minimumRate\', \'maximumRate\') 
+     * @type {Array<RevenueSummaryWithMetadata>}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'revenueSummary'?: Array<RevenueSummaryWithMetadata>;
+    /**
+     * 
+     * @type {Array<SlabRevenueWithMetadata>}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'slabRevenues'?: Array<SlabRevenueWithMetadata>;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof RevenueSummaryWithMetadata
+     */
+    'metadata'?: { [key: string]: string; };
+}
+/**
  * Represents a setting
  * @export
  * @interface Setting
@@ -9591,6 +9644,31 @@ export interface SlabRate {
 /**
  * 
  * @export
+ * @interface SlabRevenue
+ */
+export interface SlabRevenue {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenue
+     */
+    'order': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenue
+     */
+    'usage': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenue
+     */
+    'revenue': number;
+}
+/**
+ * 
+ * @export
  * @interface SlabRevenueMetadata
  */
 export interface SlabRevenueMetadata {
@@ -9643,6 +9721,50 @@ export interface SlabRevenueSummary {
      * @memberof SlabRevenueSummary
      */
     'metadata'?: SlabRevenueMetadata;
+}
+/**
+ * 
+ * @export
+ * @interface SlabRevenueWithMetadata
+ */
+export interface SlabRevenueWithMetadata {
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'order': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'usage': number;
+    /**
+     * 
+     * @type {number}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'revenue': number;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRevenueWithMetadata
+     */
+    'metadata'?: { [key: string]: string; };
+}
+/**
+ * 
+ * @export
+ * @interface SlabRevenueWithMetadataAllOf
+ */
+export interface SlabRevenueWithMetadataAllOf {
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof SlabRevenueWithMetadataAllOf
+     */
+    'metadata'?: { [key: string]: string; };
 }
 /**
  * 
@@ -9807,6 +9929,12 @@ export interface UpdateEventSchemaRequest {
      * @memberof UpdateEventSchemaRequest
      */
     'enrichments'?: Enrichments;
+    /**
+     * List of fields that can be used for filtering in usage meter
+     * @type {Array<string>}
+     * @memberof UpdateEventSchemaRequest
+     */
+    'filterFields'?: Array<string>;
     /**
      * Template used to generate event id based on event payload
      * @type {string}
@@ -10215,17 +10343,23 @@ export interface UpdateUsageMeterRequest {
      */
     'type'?: UpdateUsageMeterRequestTypeEnum;
     /**
-     * Aggregation to be applied on usage meter result * COUNT - Counts number of events matching the usage meter * SUM - Sums up results of computation of all events matching usage meter 
-     * @type {string}
+     * 
+     * @type {UsageMeterAggregation}
      * @memberof UpdateUsageMeterRequest
      */
-    'aggregation'?: UpdateUsageMeterRequestAggregationEnum;
+    'aggregation'?: UsageMeterAggregation;
     /**
      * 
      * @type {Array<Computation>}
      * @memberof UpdateUsageMeterRequest
      */
     'computations'?: Array<Computation>;
+    /**
+     * 
+     * @type {Array<UsageMeterFilterEntry>}
+     * @memberof UpdateUsageMeterRequest
+     */
+    'filters'?: Array<UsageMeterFilterEntry>;
 }
 
 export const UpdateUsageMeterRequestTypeEnum = {
@@ -10233,12 +10367,27 @@ export const UpdateUsageMeterRequestTypeEnum = {
 } as const;
 
 export type UpdateUsageMeterRequestTypeEnum = typeof UpdateUsageMeterRequestTypeEnum[keyof typeof UpdateUsageMeterRequestTypeEnum];
-export const UpdateUsageMeterRequestAggregationEnum = {
-    Count: 'COUNT',
-    Sum: 'SUM'
-} as const;
 
-export type UpdateUsageMeterRequestAggregationEnum = typeof UpdateUsageMeterRequestAggregationEnum[keyof typeof UpdateUsageMeterRequestAggregationEnum];
+/**
+ * Payload to update wallet of an account
+ * @export
+ * @interface UpdateWalletRequest
+ */
+export interface UpdateWalletRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateWalletRequest
+     */
+    'effectiveFrom'?: string;
+    /**
+     * 
+     * @type {WalletStatus}
+     * @memberof UpdateWalletRequest
+     */
+    'status'?: WalletStatus;
+}
+
 
 /**
  * Configuration for getting the usage
@@ -10325,6 +10474,23 @@ export interface UsageConfigLookupRange {
     'accountId': string;
 }
 /**
+ * UsageCycleInterval field allows you to treat the billing interval as many smaller windows. Revenue is calculated for each of the windows (usage cycles) and their sum is considered as the billing interval revenue. Example: 1 Named License being used across entire billing interval. Rate Value: $1/license CASE 1: Without usage cycle. $1 is charged for the entire billing cycle. CASE 2: Usage cycle is configure to be WEEKLY and the billing interval has 4 weeks. In this case $1 is charged  for each week totalling to $4 across for the billing interval 
+ * @export
+ * @enum {string}
+ */
+
+export const UsageCycleInterval = {
+    Weekly: 'WEEKLY',
+    Monthly: 'MONTHLY',
+    Quarterly: 'QUARTERLY',
+    HalfYearly: 'HALF_YEARLY',
+    Annually: 'ANNUALLY'
+} as const;
+
+export type UsageCycleInterval = typeof UsageCycleInterval[keyof typeof UsageCycleInterval];
+
+
+/**
  * Start and end dates of usage lookup if usage mode is LOOKUP
  * @export
  * @interface UsageLookupRange
@@ -10380,6 +10546,12 @@ export interface UsageMeter {
      */
     'description'?: string;
     /**
+     * 
+     * @type {Array<UsageMeterFilterEntry>}
+     * @memberof UsageMeter
+     */
+    'filters'?: Array<UsageMeterFilterEntry>;
+    /**
      * Type of usage meter
      * @type {string}
      * @memberof UsageMeter
@@ -10392,11 +10564,11 @@ export interface UsageMeter {
      */
     'status'?: UsageMeterStatusEnum;
     /**
-     * Aggregation to be applied on usage meter result
-     * @type {string}
+     * 
+     * @type {UsageMeterAggregation}
      * @memberof UsageMeter
      */
-    'aggregation': UsageMeterAggregationEnum;
+    'aggregation': UsageMeterAggregation;
     /**
      * 
      * @type {Array<Computation>}
@@ -10436,13 +10608,40 @@ export const UsageMeterStatusEnum = {
 } as const;
 
 export type UsageMeterStatusEnum = typeof UsageMeterStatusEnum[keyof typeof UsageMeterStatusEnum];
-export const UsageMeterAggregationEnum = {
+
+/**
+ * Aggregation to be applied on usage meter result * COUNT - Counts number of events matching the usage meter * SUM - Sums up results of computation of all events matching usage meter 
+ * @export
+ * @enum {string}
+ */
+
+export const UsageMeterAggregation = {
     Count: 'COUNT',
     Sum: 'SUM'
 } as const;
 
-export type UsageMeterAggregationEnum = typeof UsageMeterAggregationEnum[keyof typeof UsageMeterAggregationEnum];
+export type UsageMeterAggregation = typeof UsageMeterAggregation[keyof typeof UsageMeterAggregation];
 
+
+/**
+ * Filter entry with field and value
+ * @export
+ * @interface UsageMeterFilterEntry
+ */
+export interface UsageMeterFilterEntry {
+    /**
+     * 
+     * @type {string}
+     * @memberof UsageMeterFilterEntry
+     */
+    'field': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UsageMeterFilterEntry
+     */
+    'value': string;
+}
 /**
  * 
  * @export
@@ -10587,16 +10786,22 @@ export interface WalletBalanceResponse {
     'externalId'?: string;
     /**
      * 
-     * @type {string}
+     * @type {WalletStatus}
      * @memberof WalletBalanceResponse
      */
-    'status'?: WalletBalanceResponseStatusEnum;
+    'status': WalletStatus;
     /**
      * 
      * @type {number}
      * @memberof WalletBalanceResponse
      */
     'holdAmount'?: number;
+    /**
+     * 
+     * @type {string}
+     * @memberof WalletBalanceResponse
+     */
+    'effectiveFrom': string;
     /**
      * 
      * @type {string}
@@ -10617,11 +10822,6 @@ export interface WalletBalanceResponse {
     'metadata'?: { [key: string]: any; };
 }
 
-export const WalletBalanceResponseStatusEnum = {
-    Active: 'ACTIVE'
-} as const;
-
-export type WalletBalanceResponseStatusEnum = typeof WalletBalanceResponseStatusEnum[keyof typeof WalletBalanceResponseStatusEnum];
 
 /**
  * List wallet entries response
@@ -10677,6 +10877,12 @@ export interface WalletEntry {
      * @type {string}
      * @memberof WalletEntry
      */
+    'status': WalletEntryStatusEnum;
+    /**
+     * 
+     * @type {string}
+     * @memberof WalletEntry
+     */
     'entityId'?: string;
     /**
      * 
@@ -10704,6 +10910,26 @@ export const WalletEntryTransactionTypeEnum = {
 } as const;
 
 export type WalletEntryTransactionTypeEnum = typeof WalletEntryTransactionTypeEnum[keyof typeof WalletEntryTransactionTypeEnum];
+export const WalletEntryStatusEnum = {
+    Completed: 'COMPLETED',
+    OnHold: 'ON_HOLD'
+} as const;
+
+export type WalletEntryStatusEnum = typeof WalletEntryStatusEnum[keyof typeof WalletEntryStatusEnum];
+
+/**
+ * 
+ * @export
+ * @enum {string}
+ */
+
+export const WalletStatus = {
+    Active: 'ACTIVE',
+    Inactive: 'INACTIVE'
+} as const;
+
+export type WalletStatus = typeof WalletStatus[keyof typeof WalletStatus];
+
 
 /**
  * Information related to wallet topup purchase
@@ -14712,7 +14938,7 @@ export const EventIngestionApiAxiosParamCreator = function (configuration?: Conf
             };
         },
         /**
-         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+         * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -14773,7 +14999,7 @@ export const EventIngestionApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
-         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+         * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -14804,7 +15030,7 @@ export const EventIngestionApiFactory = function (configuration?: Configuration,
             return localVarFp.ingest(ingestEventRequest, options).then((request) => request(axios, basePath));
         },
         /**
-         * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+         * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
          * @summary Ingest events to Togai in batch
          * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
          * @param {*} [options] Override http request option.
@@ -14836,7 +15062,7 @@ export class EventIngestionApi extends BaseAPI {
     }
 
     /**
-     * This API let’s you to ingest events in batch upto 1000 events. Ingest large amounts of events up to 1000 in batches in an array using this API.
+     * This API let’s you to ingest events in batch upto 500 events. Ingest large amounts of events up to 500 in batches in an array using this API.
      * @summary Ingest events to Togai in batch
      * @param {IngestBatchEventRequest} ingestBatchEventRequest Request body to ingest events in batch to Togai usage and billing management service.
      * @param {*} [options] Override http request option.
@@ -19012,6 +19238,44 @@ export const PricePlansApiAxiosParamCreator = function (configuration?: Configur
             };
         },
         /**
+         * Archive a price plan
+         * @summary Archive a price plan
+         * @param {string} pricePlanId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        archivePricePlan: async (pricePlanId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'pricePlanId' is not null or undefined
+            assertParamExists('archivePricePlan', 'pricePlanId', pricePlanId)
+            const localVarPath = `/price_plans/{price_plan_id}`
+                .replace(`{${"price_plan_id"}}`, encodeURIComponent(String(pricePlanId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * This API let\'s you create and price plan Learn more about [Price Plans](https://docs.togai.com/docs/priceplan) 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
@@ -19304,6 +19568,17 @@ export const PricePlansApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Archive a price plan
+         * @summary Archive a price plan
+         * @param {string} pricePlanId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async archivePricePlan(pricePlanId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<BaseSuccessResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.archivePricePlan(pricePlanId, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * This API let\'s you create and price plan Learn more about [Price Plans](https://docs.togai.com/docs/priceplan) 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
@@ -19407,6 +19682,16 @@ export const PricePlansApiFactory = function (configuration?: Configuration, bas
             return localVarFp.addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Archive a price plan
+         * @summary Archive a price plan
+         * @param {string} pricePlanId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        archivePricePlan(pricePlanId: string, options?: any): AxiosPromise<BaseSuccessResponse> {
+            return localVarFp.archivePricePlan(pricePlanId, options).then((request) => request(axios, basePath));
+        },
+        /**
          * This API let\'s you create and price plan Learn more about [Price Plans](https://docs.togai.com/docs/priceplan) 
          * @summary Create a price plan
          * @param {CreatePricePlanRequest} createPricePlanRequest Payload to create price plan
@@ -19505,6 +19790,18 @@ export class PricePlansApi extends BaseAPI {
      */
     public addCurrencyToPricePlan(pricePlanId: string, addCurrencyToPricePlanRequest: AddCurrencyToPricePlanRequest, options?: AxiosRequestConfig) {
         return PricePlansApiFp(this.configuration).addCurrencyToPricePlan(pricePlanId, addCurrencyToPricePlanRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Archive a price plan
+     * @summary Archive a price plan
+     * @param {string} pricePlanId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof PricePlansApi
+     */
+    public archivePricePlan(pricePlanId: string, options?: AxiosRequestConfig) {
+        return PricePlansApiFp(this.configuration).archivePricePlan(pricePlanId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -20696,6 +20993,48 @@ export const WalletApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Update wallet details for an account
+         * @summary Update wallet details for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateWalletForAccount: async (accountId: string, updateWalletRequest?: UpdateWalletRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'accountId' is not null or undefined
+            assertParamExists('updateWalletForAccount', 'accountId', accountId)
+            const localVarPath = `/accounts/{account_id}/wallet`
+                .replace(`{${"account_id"}}`, encodeURIComponent(String(accountId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PATCH', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateWalletRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Wallet balance for Account
          * @summary Wallet balance for Account
          * @param {string} accountId account_id corresponding to an account
@@ -20804,6 +21143,18 @@ export const WalletApiFp = function(configuration?: Configuration) {
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
         /**
+         * Update wallet details for an account
+         * @summary Update wallet details for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateWalletForAccount(accountId: string, updateWalletRequest?: UpdateWalletRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<WalletBalanceResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateWalletForAccount(accountId, updateWalletRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+        /**
          * Wallet balance for Account
          * @summary Wallet balance for Account
          * @param {string} accountId account_id corresponding to an account
@@ -20849,6 +21200,17 @@ export const WalletApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.topUpWalletForAccount(accountId, topupWalletRequest, options).then((request) => request(axios, basePath));
         },
         /**
+         * Update wallet details for an account
+         * @summary Update wallet details for an account
+         * @param {string} accountId account_id corresponding to an account
+         * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateWalletForAccount(accountId: string, updateWalletRequest?: UpdateWalletRequest, options?: any): AxiosPromise<WalletBalanceResponse> {
+            return localVarFp.updateWalletForAccount(accountId, updateWalletRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Wallet balance for Account
          * @summary Wallet balance for Account
          * @param {string} accountId account_id corresponding to an account
@@ -20891,6 +21253,19 @@ export class WalletApi extends BaseAPI {
      */
     public topUpWalletForAccount(accountId: string, topupWalletRequest?: TopupWalletRequest, options?: AxiosRequestConfig) {
         return WalletApiFp(this.configuration).topUpWalletForAccount(accountId, topupWalletRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Update wallet details for an account
+     * @summary Update wallet details for an account
+     * @param {string} accountId account_id corresponding to an account
+     * @param {UpdateWalletRequest} [updateWalletRequest] Payload to update wallet of an account
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof WalletApi
+     */
+    public updateWalletForAccount(accountId: string, updateWalletRequest?: UpdateWalletRequest, options?: AxiosRequestConfig) {
+        return WalletApiFp(this.configuration).updateWalletForAccount(accountId, updateWalletRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
