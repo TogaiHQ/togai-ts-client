@@ -5,7 +5,6 @@ import {
     UsageMetersApi,
     CreateUsageMeterRequest,
     CreateUsageMeterRequestTypeEnum,
-    CreateUsageMeterRequestAggregationEnum,
     PricePlansApi,
     CreatePricePlanRequest,
     CreateCustomerRequest,
@@ -18,10 +17,11 @@ import {
     GetMetricsRequest,
     MetricQueryAggregationPeriodEnum,
     MetricName,
-    PricingCycleConfigIntervalEnum,
     PricingModel,
     PriceType,
     UpdatePricingScheduleRequestModeEnum,
+    UsageMeterAggregation,
+    PricingCycleInterval,
 } from "togai-client";
 
 const API_TOKEN = process.env.API_TOKEN;
@@ -66,7 +66,7 @@ async function sample() {
     const createUsageMeterRequest: CreateUsageMeterRequest = {
         name: "message_count" + "-" + randomSeed,
         type: CreateUsageMeterRequestTypeEnum.Counter,
-        aggregation: CreateUsageMeterRequestAggregationEnum.Count,
+        aggregation: UsageMeterAggregation.Count,
         eventSchemaName: eventSchema.name,
         computations: [
             {
@@ -101,7 +101,7 @@ async function sample() {
         pricePlanDetails: {
             supportedCurrencies: ["USD"],
             pricingCycleConfig: {
-                interval: PricingCycleConfigIntervalEnum.Monthly,
+                interval: PricingCycleInterval.Monthly,
                 startOffset: {
                     dayOffset: "1",
                     monthOffset: "NIL"
