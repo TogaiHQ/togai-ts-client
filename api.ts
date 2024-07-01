@@ -4604,6 +4604,37 @@ export type FixedFeeType = typeof FixedFeeType[keyof typeof FixedFeeType];
 
 
 /**
+ * Request to get delegate token for customer portal
+ * @export
+ * @interface GetCustomerPortalDelegateTokenRequest
+ */
+export interface GetCustomerPortalDelegateTokenRequest {
+    /**
+     * Identifier of the customer
+     * @type {string}
+     * @memberof GetCustomerPortalDelegateTokenRequest
+     */
+    'customerId': string;
+    /**
+     * Identifier of the accounts under the customer for which access is requested. Maximum of 5 account ids can be provided 
+     * @type {Array<string>}
+     * @memberof GetCustomerPortalDelegateTokenRequest
+     */
+    'accountIds'?: Array<string>;
+    /**
+     * Flag to specify if access for every account under the customer is required
+     * @type {boolean}
+     * @memberof GetCustomerPortalDelegateTokenRequest
+     */
+    'allAccountsAccess'?: boolean;
+    /**
+     * Expiry in seconds from the time of generation.  If not provided, generated token will have the expiry of the token used for requesting. 
+     * @type {number}
+     * @memberof GetCustomerPortalDelegateTokenRequest
+     */
+    'expiry'?: number;
+}
+/**
  * 
  * @export
  * @interface GetEntitlementValuesResponse
@@ -13678,6 +13709,117 @@ export class CreditsApi extends BaseAPI {
      */
     public voidCredit(creditId: string, options?: AxiosRequestConfig) {
         return CreditsApiFp(this.configuration).voidCredit(creditId, options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+/**
+ * CustomerPortalApi - axios parameter creator
+ * @export
+ */
+export const CustomerPortalApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * Get delegate token for customer portal
+         * @summary Get delegate token for customer portal
+         * @param {GetCustomerPortalDelegateTokenRequest} getCustomerPortalDelegateTokenRequest Payload to get delegate token for customer portal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCustomerPortalDelegateToken: async (getCustomerPortalDelegateTokenRequest: GetCustomerPortalDelegateTokenRequest, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'getCustomerPortalDelegateTokenRequest' is not null or undefined
+            assertParamExists('getCustomerPortalDelegateToken', 'getCustomerPortalDelegateTokenRequest', getCustomerPortalDelegateTokenRequest)
+            const localVarPath = `/portal/token`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(getCustomerPortalDelegateTokenRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * CustomerPortalApi - functional programming interface
+ * @export
+ */
+export const CustomerPortalApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = CustomerPortalApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * Get delegate token for customer portal
+         * @summary Get delegate token for customer portal
+         * @param {GetCustomerPortalDelegateTokenRequest} getCustomerPortalDelegateTokenRequest Payload to get delegate token for customer portal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getCustomerPortalDelegateToken(getCustomerPortalDelegateTokenRequest: GetCustomerPortalDelegateTokenRequest, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<TokenResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getCustomerPortalDelegateToken(getCustomerPortalDelegateTokenRequest, options);
+            return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
+        },
+    }
+};
+
+/**
+ * CustomerPortalApi - factory interface
+ * @export
+ */
+export const CustomerPortalApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = CustomerPortalApiFp(configuration)
+    return {
+        /**
+         * Get delegate token for customer portal
+         * @summary Get delegate token for customer portal
+         * @param {GetCustomerPortalDelegateTokenRequest} getCustomerPortalDelegateTokenRequest Payload to get delegate token for customer portal
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getCustomerPortalDelegateToken(getCustomerPortalDelegateTokenRequest: GetCustomerPortalDelegateTokenRequest, options?: any): AxiosPromise<TokenResponse> {
+            return localVarFp.getCustomerPortalDelegateToken(getCustomerPortalDelegateTokenRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * CustomerPortalApi - object-oriented interface
+ * @export
+ * @class CustomerPortalApi
+ * @extends {BaseAPI}
+ */
+export class CustomerPortalApi extends BaseAPI {
+    /**
+     * Get delegate token for customer portal
+     * @summary Get delegate token for customer portal
+     * @param {GetCustomerPortalDelegateTokenRequest} getCustomerPortalDelegateTokenRequest Payload to get delegate token for customer portal
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof CustomerPortalApi
+     */
+    public getCustomerPortalDelegateToken(getCustomerPortalDelegateTokenRequest: GetCustomerPortalDelegateTokenRequest, options?: AxiosRequestConfig) {
+        return CustomerPortalApiFp(this.configuration).getCustomerPortalDelegateToken(getCustomerPortalDelegateTokenRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
