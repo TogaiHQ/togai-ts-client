@@ -1853,6 +1853,12 @@ export interface CreatePricingRule {
      */
     'order': number;
     /**
+     * 
+     * @type {PricingRuleTiming}
+     * @memberof CreatePricingRule
+     */
+    'invoiceTiming'?: PricingRuleTiming;
+    /**
      * JSON logic condition deciding whether to compute this pricing rule or not
      * @type {string}
      * @memberof CreatePricingRule
@@ -1871,6 +1877,8 @@ export interface CreatePricingRule {
      */
     'action': PricingRuleAction;
 }
+
+
 /**
  * 
  * @export
@@ -5416,11 +5424,11 @@ export interface Invoice {
      */
     'invoiceDetails'?: InvoiceDetails;
     /**
-     * Status of the invoice
-     * @type {string}
+     * 
+     * @type {InvoicesStatus}
      * @memberof Invoice
      */
-    'status': InvoiceStatusEnum;
+    'status': InvoicesStatus;
     /**
      * 
      * @type {string}
@@ -5428,17 +5436,17 @@ export interface Invoice {
      */
     'finalizingStatus'?: InvoiceFinalizingStatusEnum;
     /**
-     * Represents the class of entity( INVOICE/ORDER/BILLABLE)
-     * @type {string}
+     * 
+     * @type {InvoicesClass}
      * @memberof Invoice
      */
-    'invoiceClass': InvoiceInvoiceClassEnum;
+    'invoiceClass': InvoicesClass;
     /**
-     * Represents the type of entity(STANDARD/AD_HOC/COMPOSITE)
-     * @type {string}
+     * 
+     * @type {InvoicesType}
      * @memberof Invoice
      */
-    'invoiceType': InvoiceInvoiceTypeEnum;
+    'invoiceType': InvoicesType;
     /**
      * 
      * @type {boolean}
@@ -5531,40 +5539,12 @@ export interface Invoice {
     'netTermDays': number;
 }
 
-export const InvoiceStatusEnum = {
-    Draft: 'DRAFT',
-    Due: 'DUE',
-    Paid: 'PAID',
-    Void: 'VOID',
-    UnCollectible: 'UN_COLLECTIBLE',
-    RefundInitiated: 'REFUND_INITIATED',
-    RefundCompleted: 'REFUND_COMPLETED',
-    Merged: 'MERGED',
-    PartiallyPaid: 'PARTIALLY_PAID'
-} as const;
-
-export type InvoiceStatusEnum = typeof InvoiceStatusEnum[keyof typeof InvoiceStatusEnum];
 export const InvoiceFinalizingStatusEnum = {
     Finalizing: 'FINALIZING',
     Finalized: 'FINALIZED'
 } as const;
 
 export type InvoiceFinalizingStatusEnum = typeof InvoiceFinalizingStatusEnum[keyof typeof InvoiceFinalizingStatusEnum];
-export const InvoiceInvoiceClassEnum = {
-    Invoice: 'INVOICE',
-    Order: 'ORDER',
-    Billable: 'BILLABLE'
-} as const;
-
-export type InvoiceInvoiceClassEnum = typeof InvoiceInvoiceClassEnum[keyof typeof InvoiceInvoiceClassEnum];
-export const InvoiceInvoiceTypeEnum = {
-    Standard: 'STANDARD',
-    AdHoc: 'AD_HOC',
-    Custom: 'CUSTOM',
-    Composite: 'COMPOSITE'
-} as const;
-
-export type InvoiceInvoiceTypeEnum = typeof InvoiceInvoiceTypeEnum[keyof typeof InvoiceInvoiceTypeEnum];
 
 /**
  * 
@@ -6159,11 +6139,11 @@ export interface InvoiceSummary {
      */
     'pricePlanId'?: string;
     /**
-     * Status of the invoice
-     * @type {string}
+     * 
+     * @type {InvoicesStatus}
      * @memberof InvoiceSummary
      */
-    'status': InvoiceSummaryStatusEnum;
+    'status': InvoicesStatus;
     /**
      * 
      * @type {string}
@@ -6171,17 +6151,17 @@ export interface InvoiceSummary {
      */
     'finalizingStatus'?: InvoiceSummaryFinalizingStatusEnum;
     /**
-     * Represents the class of entity( INVOICE/ORDER/BILLABLE)
-     * @type {string}
+     * 
+     * @type {InvoicesClass}
      * @memberof InvoiceSummary
      */
-    'invoiceClass': InvoiceSummaryInvoiceClassEnum;
+    'invoiceClass': InvoicesClass;
     /**
-     * Represents the type of entity(STANDARD/AD_HOC/COMPOSITE)
-     * @type {string}
+     * 
+     * @type {InvoicesType}
      * @memberof InvoiceSummary
      */
-    'invoiceType': InvoiceSummaryInvoiceTypeEnum;
+    'invoiceType': InvoicesType;
     /**
      * Start date of the invoice
      * @type {string}
@@ -6262,40 +6242,12 @@ export interface InvoiceSummary {
     'netTermDays': number;
 }
 
-export const InvoiceSummaryStatusEnum = {
-    Draft: 'DRAFT',
-    Due: 'DUE',
-    Paid: 'PAID',
-    Void: 'VOID',
-    UnCollectible: 'UN_COLLECTIBLE',
-    RefundInitiated: 'REFUND_INITIATED',
-    RefundCompleted: 'REFUND_COMPLETED',
-    Merged: 'MERGED',
-    PartiallyPaid: 'PARTIALLY_PAID'
-} as const;
-
-export type InvoiceSummaryStatusEnum = typeof InvoiceSummaryStatusEnum[keyof typeof InvoiceSummaryStatusEnum];
 export const InvoiceSummaryFinalizingStatusEnum = {
     Finalizing: 'FINALIZING',
     Finalized: 'FINALIZED'
 } as const;
 
 export type InvoiceSummaryFinalizingStatusEnum = typeof InvoiceSummaryFinalizingStatusEnum[keyof typeof InvoiceSummaryFinalizingStatusEnum];
-export const InvoiceSummaryInvoiceClassEnum = {
-    Invoice: 'INVOICE',
-    Order: 'ORDER',
-    Billable: 'BILLABLE'
-} as const;
-
-export type InvoiceSummaryInvoiceClassEnum = typeof InvoiceSummaryInvoiceClassEnum[keyof typeof InvoiceSummaryInvoiceClassEnum];
-export const InvoiceSummaryInvoiceTypeEnum = {
-    Standard: 'STANDARD',
-    AdHoc: 'AD_HOC',
-    Custom: 'CUSTOM',
-    Composite: 'COMPOSITE'
-} as const;
-
-export type InvoiceSummaryInvoiceTypeEnum = typeof InvoiceSummaryInvoiceTypeEnum[keyof typeof InvoiceSummaryInvoiceTypeEnum];
 
 /**
  * If IN_ADVANCE, the rate card will be invoiced in the previous billing cycle. If IN_ARREARS, the rate card will be invoiced in the current billing cycle. If PREPAID, credits/entitlements will be granted only after invoice is paid 
@@ -6310,6 +6262,60 @@ export const InvoiceTiming = {
 } as const;
 
 export type InvoiceTiming = typeof InvoiceTiming[keyof typeof InvoiceTiming];
+
+
+/**
+ * Represents the class of entity( INVOICE/ORDER/BILLABLE)
+ * @export
+ * @enum {string}
+ */
+
+export const InvoicesClass = {
+    Invoice: 'INVOICE',
+    Order: 'ORDER',
+    Billable: 'BILLABLE'
+} as const;
+
+export type InvoicesClass = typeof InvoicesClass[keyof typeof InvoicesClass];
+
+
+/**
+ * Status of the invoice
+ * @export
+ * @enum {string}
+ */
+
+export const InvoicesStatus = {
+    Draft: 'DRAFT',
+    Due: 'DUE',
+    Paid: 'PAID',
+    Void: 'VOID',
+    UnCollectible: 'UN_COLLECTIBLE',
+    RefundInitiated: 'REFUND_INITIATED',
+    RefundCompleted: 'REFUND_COMPLETED',
+    Merged: 'MERGED',
+    PartiallyPaid: 'PARTIALLY_PAID'
+} as const;
+
+export type InvoicesStatus = typeof InvoicesStatus[keyof typeof InvoicesStatus];
+
+
+/**
+ * Represents the type of entity(STANDARD/AD_HOC/COMPOSITE)
+ * @export
+ * @enum {string}
+ */
+
+export const InvoicesType = {
+    Standard: 'STANDARD',
+    AdHoc: 'AD_HOC',
+    Custom: 'CUSTOM',
+    Composite: 'COMPOSITE',
+    StandardAdvanced: 'STANDARD_ADVANCED',
+    AdhocAdvanced: 'ADHOC_ADVANCED'
+} as const;
+
+export type InvoicesType = typeof InvoicesType[keyof typeof InvoicesType];
 
 
 /**
@@ -8140,6 +8146,12 @@ export interface PricingRule {
     'version': number;
     /**
      * 
+     * @type {PricingRuleTiming}
+     * @memberof PricingRule
+     */
+    'invoiceTiming'?: PricingRuleTiming;
+    /**
+     * 
      * @type {number}
      * @memberof PricingRule
      */
@@ -8163,6 +8175,8 @@ export interface PricingRule {
      */
     'action': PricingRuleAction;
 }
+
+
 /**
  * 
  * @export
@@ -8251,6 +8265,20 @@ export interface PricingRuleChangesLog {
      */
     'errorMessage'?: string;
 }
+/**
+ * If IN_ADVANCE, the rule will be applied on rate cards with invoice timing IN_ADVANCE . If IN_ARREARS, the rule will be applied on rate cards with invoice timing IN_ARREARS . 
+ * @export
+ * @enum {string}
+ */
+
+export const PricingRuleTiming = {
+    IN_ADVANCE: 'IN_ADVANCE',
+    IN_ARREARS: 'IN_ARREARS'
+} as const;
+
+export type PricingRuleTiming = typeof PricingRuleTiming[keyof typeof PricingRuleTiming];
+
+
 /**
  * Pricing Rules Logs
  * @export
@@ -10048,7 +10076,8 @@ export const UpdateInvoiceRequestStatusEnum = {
     Due: 'DUE',
     Paid: 'PAID',
     Void: 'VOID',
-    UnCollectible: 'UN_COLLECTIBLE'
+    UnCollectible: 'UN_COLLECTIBLE',
+    RefundInitiated: 'REFUND_INITIATED'
 } as const;
 
 export type UpdateInvoiceRequestStatusEnum = typeof UpdateInvoiceRequestStatusEnum[keyof typeof UpdateInvoiceRequestStatusEnum];
@@ -19932,10 +19961,11 @@ export const PricingRulesApiAxiosParamCreator = function (configuration?: Config
          * @summary List pricing rules by price plan id and pricing schedule id
          * @param {string} pricePlanId 
          * @param {string} pricingScheduleId 
+         * @param {'IN_ADVANCE' | 'IN_ARREARS'} [invoiceTiming] Optional field to filter pricing rules based on invoice timing
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPricingRulesByScheduleId: async (pricePlanId: string, pricingScheduleId: string, options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listPricingRulesByScheduleId: async (pricePlanId: string, pricingScheduleId: string, invoiceTiming?: 'IN_ADVANCE' | 'IN_ARREARS', options: AxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'pricePlanId' is not null or undefined
             assertParamExists('listPricingRulesByScheduleId', 'pricePlanId', pricePlanId)
             // verify required parameter 'pricingScheduleId' is not null or undefined
@@ -19957,6 +19987,10 @@ export const PricingRulesApiAxiosParamCreator = function (configuration?: Config
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (invoiceTiming !== undefined) {
+                localVarQueryParameter['invoice_timing'] = invoiceTiming;
+            }
 
 
     
@@ -19984,11 +20018,12 @@ export const PricingRulesApiFp = function(configuration?: Configuration) {
          * @summary List pricing rules by price plan id and pricing schedule id
          * @param {string} pricePlanId 
          * @param {string} pricingScheduleId 
+         * @param {'IN_ADVANCE' | 'IN_ARREARS'} [invoiceTiming] Optional field to filter pricing rules based on invoice timing
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listPricingRulesByScheduleId(pricePlanId: string, pricingScheduleId: string, options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricingRulesPaginatedResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listPricingRulesByScheduleId(pricePlanId, pricingScheduleId, options);
+        async listPricingRulesByScheduleId(pricePlanId: string, pricingScheduleId: string, invoiceTiming?: 'IN_ADVANCE' | 'IN_ARREARS', options?: AxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PricingRulesPaginatedResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listPricingRulesByScheduleId(pricePlanId, pricingScheduleId, invoiceTiming, options);
             return createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration);
         },
     }
@@ -20006,11 +20041,12 @@ export const PricingRulesApiFactory = function (configuration?: Configuration, b
          * @summary List pricing rules by price plan id and pricing schedule id
          * @param {string} pricePlanId 
          * @param {string} pricingScheduleId 
+         * @param {'IN_ADVANCE' | 'IN_ARREARS'} [invoiceTiming] Optional field to filter pricing rules based on invoice timing
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listPricingRulesByScheduleId(pricePlanId: string, pricingScheduleId: string, options?: any): AxiosPromise<PricingRulesPaginatedResponse> {
-            return localVarFp.listPricingRulesByScheduleId(pricePlanId, pricingScheduleId, options).then((request) => request(axios, basePath));
+        listPricingRulesByScheduleId(pricePlanId: string, pricingScheduleId: string, invoiceTiming?: 'IN_ADVANCE' | 'IN_ARREARS', options?: any): AxiosPromise<PricingRulesPaginatedResponse> {
+            return localVarFp.listPricingRulesByScheduleId(pricePlanId, pricingScheduleId, invoiceTiming, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -20027,12 +20063,13 @@ export class PricingRulesApi extends BaseAPI {
      * @summary List pricing rules by price plan id and pricing schedule id
      * @param {string} pricePlanId 
      * @param {string} pricingScheduleId 
+     * @param {'IN_ADVANCE' | 'IN_ARREARS'} [invoiceTiming] Optional field to filter pricing rules based on invoice timing
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof PricingRulesApi
      */
-    public listPricingRulesByScheduleId(pricePlanId: string, pricingScheduleId: string, options?: AxiosRequestConfig) {
-        return PricingRulesApiFp(this.configuration).listPricingRulesByScheduleId(pricePlanId, pricingScheduleId, options).then((request) => request(this.axios, this.basePath));
+    public listPricingRulesByScheduleId(pricePlanId: string, pricingScheduleId: string, invoiceTiming?: 'IN_ADVANCE' | 'IN_ARREARS', options?: AxiosRequestConfig) {
+        return PricingRulesApiFp(this.configuration).listPricingRulesByScheduleId(pricePlanId, pricingScheduleId, invoiceTiming, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
