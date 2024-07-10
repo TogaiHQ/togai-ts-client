@@ -8236,6 +8236,12 @@ export interface PricingRuleChangesLog {
     'key': string;
     /**
      * 
+     * @type {string}
+     * @memberof PricingRuleChangesLog
+     */
+    'keyName'?: string;
+    /**
+     * 
      * @type {number}
      * @memberof PricingRuleChangesLog
      */
@@ -8264,6 +8270,37 @@ export interface PricingRuleChangesLog {
      * @memberof PricingRuleChangesLog
      */
     'errorMessage'?: string;
+}
+/**
+ * Pricing Rule Info
+ * @export
+ * @interface PricingRuleInfo
+ */
+export interface PricingRuleInfo {
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingRuleInfo
+     */
+    'id': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingRuleInfo
+     */
+    'name'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingRuleInfo
+     */
+    'condition'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof PricingRuleInfo
+     */
+    'computation'?: string;
 }
 /**
  * If IN_ADVANCE, the rule will be applied on rate cards with invoice timing IN_ADVANCE . If IN_ARREARS, the rule will be applied on rate cards with invoice timing IN_ARREARS . 
@@ -8296,13 +8333,7 @@ export interface PricingRulesLog {
      * @type {string}
      * @memberof PricingRulesLog
      */
-    'ruleId': string;
-    /**
-     * 
-     * @type {string}
-     * @memberof PricingRulesLog
-     */
-    'ruleName'?: string;
+    'type'?: PricingRulesLogTypeEnum;
     /**
      * 
      * @type {number}
@@ -8315,7 +8346,28 @@ export interface PricingRulesLog {
      * @memberof PricingRulesLog
      */
     'changes': PricingRuleChangesLog;
+    /**
+     * 
+     * @type {PricingRuleInfo}
+     * @memberof PricingRulesLog
+     */
+    'rule'?: PricingRuleInfo;
+    /**
+     * 
+     * @type {{ [key: string]: string; }}
+     * @memberof PricingRulesLog
+     */
+    'variablesValue'?: { [key: string]: string; };
 }
+
+export const PricingRulesLogTypeEnum = {
+    ConditionTrue: 'CONDITION_TRUE',
+    ConditionFalse: 'CONDITION_FALSE',
+    Error: 'ERROR'
+} as const;
+
+export type PricingRulesLogTypeEnum = typeof PricingRulesLogTypeEnum[keyof typeof PricingRulesLogTypeEnum];
+
 /**
  * Pricing Rules Logs response
  * @export
